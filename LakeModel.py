@@ -51,7 +51,7 @@ class Lake(object):
     morpho_vars = ["lake_name", "latitude", "longitude", "bsn_len", "bsn_wid",
                    "bsn_vals"]
     # &output: Specification of output file details
-    out_vars = ["out_dir", "out_fn", "nsave", "csv_lake_fname", 
+    output_vars = ["out_dir", "out_fn", "nsave", "csv_lake_fname", 
                 "csv_point_nlevs", "csv_point_fname", "csv_point_at", 
                 "csv_point_nvars", "csv_point_vars", "csv_outlet_allinone", 
                 "csv_outlet_fname", "csv_outlet_nvars", "csv_outlet_vars", 
@@ -66,9 +66,12 @@ class Lake(object):
                 "lw_factor", "at_factor", "rh_factor", "rain_factor", "ce",
                 "ch", "cd", "rain_threshold", "runoff_coef"]
     # &inflows: Information about inflows
-
+    inflow_vars = ["num_inflows", "names_of_strms", "subm_flag", 
+                   "strm_hf_angle", "strmbd_slope", "strmbd_drag", 
+                   "inflow_factor", "inflow_fl", "inflow_varnum", 
+                   "inflow_vars", "coef_inf_entrain"]
     # &outflows: Information about outflows
-    out_vars = ["num_outlet", "flt_off_sw", "outl_elvs", "bsn_len_outl", 
+    outflow_vars = ["num_outlet", "flt_off_sw", "outl_elvs", "bsn_len_outl", 
                 "bsn_wid_outl", "outflow_fl", "outflow_factor"]
     # &bird: Optional block to input parameters for the Bird solar radiation model
     bird_vars = ["AP", "Oz", "WatVap", "AOD500", "AOD380", "Albedo"]
@@ -141,7 +144,7 @@ class Lake(object):
             glm_handle.write("\t{0} = {1}\n".format(var, value_dict[var]))
         glm_handle.write("/\n&output\n")
         
-        for var in self.out_vars:
+        for var in self.output_vars:
             val = value_dict[var]            
             if type(val) == list:
                 glm_handle.write("\t{0} = {1}\n".format(var, val[0]))
@@ -181,14 +184,27 @@ class Lake(object):
         for var in self.met_vars:
             val = value_dict[var]
             glm_handle.write("\t{0} = {1}\n".format(var, val))
+
         glm_handle.write("/\n&bird_model\n")
         for var in self.bird_vars:
             val = value_dict[var]
             glm_handle.write("\t{0} = {1}\n".format(var, val))
+        
         glm_handle.write("/\n&outflows\n")
-        for var in self.out_vars:
+        for var in self.outflow_vars:
             val = value_dict[var]
             glm_handle.write("\t{0} = {1}\n".format(var, val))
+        glm_handle.write("/\n&inflows\n")        
+        for var in self.inflow_vars:
+            val = value_dict[var]
+            if type(val) != list:
+                glm_handle.write("\t{0} = {1}\n".format(var, val))
+            else:
+                glm_handle.write("\t{0} = '{1}',\n".format(var, val[0]))
+                for idx in np.array(range(len(val)-1))+1:
+                    glm_handle.write("                  ")
+                    glm_handle.write("'{0}',\n".format(val[idx]))    
+        glm_handle.write("/")
         glm_handle.close()
 
         

@@ -57,7 +57,7 @@ wq_vars = ['wq_lib', 'ode_method', 'split_factor', 'bioshade_feedback',
 morpho_vars = ["lake_name", "latitude", "longitude",
                "bsn_len", "bsn_wid", "bsn_vals"]
 time_vars = ["timefmt", "start", "stop", "dt", "timezone"]
-out_vars = ["out_dir", "out_fn", "nsave", "csv_lake_fname", "csv_point_nlevs",
+output_vars = ["out_dir", "out_fn", "nsave", "csv_lake_fname", "csv_point_nlevs",
             "csv_point_fname", "csv_point_at", "csv_point_nvars",
             "csv_point_vars", "csv_outlet_allinone", "csv_outlet_fname",
             "csv_outlet_nvars", "csv_outlet_vars", "csv_ovrflw_fname"]
@@ -68,9 +68,18 @@ met_vars = ["met_sw", "lw_type", "rain_sw", "snow_sw", "atm_stab", "catchrain",
             "wind_factor", "sw_factor", "lw_factor", "at_factor", "rh_factor",
             "rain_factor", "ce", "ch", "cd", "rain_threshold", "runoff_coef"]
 bird_vars = ["AP", "Oz", "WatVap", "AOD500", "AOD380", "Albedo"]
-out_vars = ["num_outlet", "flt_off_sw", "outl_elvs", "bsn_len_outl", 
+outflow_vars = ["num_outlet", "flt_off_sw", "outl_elvs", "bsn_len_outl", 
             "bsn_wid_outl", "outflow_fl", "outflow_factor"]
-out_vals = [1, ".false.", -215.5, 799, 399, "'outflow.csv'", 0.8]
+inflow_vars = ["num_inflows", "names_of_strms", "subm_flag", "strm_hf_angle", 
+               "strmbd_slope", "strmbd_drag", "inflow_factor", "inflow_fl", 
+               "inflow_varnum", "inflow_vars", "coef_inf_entrain"]
+
+inflow_vals = [1, "'Aberjona'", ".false.", 65.0, 2.0, 0.0160, 1.0, 
+               "'inflow.csv'", 4, ['FLOW', 'TEMP', 'SALT', 'OXY_oxy', 
+               'SIL_rsi', 'NIT_amm', 'NIT_nit', 'PHS_frp', 'OGM_don', 
+               'OGM_pon', 'OGM_dop', 'OGM_pop', 'OGM_doc', 'OGM_poc', 
+               'PHY_green', 'PHY_crypto', 'PHY_diatom'], 0.]
+outflow_vals = [1, ".false.", -215.5, 799, 399, "'outflow.csv'", 0.8]
 bird_vals = [973, 0.279, 1.1, 0.033, 0.038, 0.2]
 init_vals = [ 22.0, 5, [1, 5, 9, 13, 17, 21],
               [4.0, 4.0, 4.0, 4.0, 4.0, 4.0],
@@ -91,7 +100,7 @@ wq_vals = ["'aed2'", 1, 1, '.true.', '.true.', "'fabm.nml'", '.true.']
 morpho_vals = ["'UpperMysticLake'", 42.4317, -71.1483, 
                "1073.637,", "632.60,", 24]
 time_vals = [2, "'2012-01-01 00:00:00'", "'2014-01-01 00:00:00'", 3600.0, 5.0]
-out_vals = ["", "out", 12, "'lake'", 1, "'WQ_'", "17.", 2, 
+output_vals = ["", "out", 12, "'lake'", 1, "'WQ_'", "17.", 2, 
             ["'temp',", "'salt',", "'OXY_oxy',"], ".false.", 'outlet_', 3,
             ["'flow',", "'temp',", "'salt',", "'OXY_oxy',"], "\"overflow\""]
 met_vals = [".true.", "'LW_IN'", ".false.", ".false.", ".false.", ".false.", 
@@ -102,11 +111,12 @@ value_dict = {var:val for var, val in zip(setup_vars, setup_vals)}
 addtodict(wq_vals, wq_vars, value_dict)
 addtodict(morpho_vals, morpho_vars, value_dict)
 addtodict(time_vals, time_vars, value_dict)
-addtodict(out_vals, out_vars, value_dict)
+addtodict(output_vals, output_vars, value_dict)
 addtodict(init_vals, init_vars, value_dict)
 addtodict(met_vals, met_vars, value_dict)
 addtodict(bird_vals, bird_vars, value_dict)
-addtodict(out_vals, out_vars, value_dict)
+addtodict(outflow_vals, outflow_vars, value_dict)
+addtodict(inflow_vals, inflow_vars, value_dict)
 sunnyLake = LakeModel.Lake(cases[0], newDirs[0], value_dict)
 
 
