@@ -1,11 +1,83 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Apr 13 16:03:39 2016
+ncdump() was created by this dude:
+http://schubert.atmos.colostate.edu/~cslocum/netcdf_example.html#code
+JD_converter was created by this dude: (and modified by me)
+https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 
 @author: login
 """
 import os
 import numpy as np
+import pandas as pd
+from netCDF4 import Dataset
+import JD_converter as jd
+
+def ncdump(nc_fid, verb=True):
+    '''
+    ncdump outputs dimensions, variables and their attribute information.
+    The information is similar to that of NCAR's ncdump utility.
+    ncdump requires a valid instance of Dataset.
+
+    Parameters
+    ----------
+    nc_fid : netCDF4.Dataset
+        A netCDF4 dateset object
+    verb : Boolean
+        whether or not nc_attrs, nc_dims, and nc_vars are printed
+
+    Returns
+    -------
+    nc_attrs : list
+        A Python list of the NetCDF file global attributes
+    nc_dims : list
+        A Python list of the NetCDF file dimensions
+    nc_vars : list
+        A Python list of the NetCDF file variables
+    '''
+    def print_ncattr(key):
+        """
+        Prints the NetCDF file attributes for a given key
+
+        Parameters
+        ----------
+        key : unicode
+            a valid netCDF4.Dataset.variables key
+        """
+        try:
+            print "\t\ttype:", repr(nc_fid.variables[key].dtype)
+            for ncattr in nc_fid.variables[key].ncattrs():
+                print '\t\t%s:' % ncattr,\
+                      repr(nc_fid.variables[key].getncattr(ncattr))
+        except KeyError:
+            print "\t\tWARNING: %s does not contain variable attributes" % key
+
+    # NetCDF global attributes
+    nc_attrs = nc_fid.ncattrs()
+    if verb:
+        print "NetCDF Global Attributes:"
+        for nc_attr in nc_attrs:
+            print '\t%s:' % nc_attr, repr(nc_fid.getncattr(nc_attr))
+    nc_dims = [dim for dim in nc_fid.dimensions]  # list of nc dimensions
+    # Dimension shape information.
+    if verb:
+        print "NetCDF dimension information:"
+        for dim in nc_dims:
+            print "\tName:", dim 
+            print "\t\tsize:", len(nc_fid.dimensions[dim])
+            print_ncattr(dim)
+    # Variable information.
+    nc_vars = [var for var in nc_fid.variables]  # list of nc variables
+    if verb:
+        print "NetCDF variable information:"
+        for var in nc_vars:
+            if var not in nc_dims:
+                print '\tName:', var
+                print "\t\tdimensions:", nc_fid.variables[var].dimensions
+                print "\t\tsize:", nc_fid.variables[var].size
+                print_ncattr(var)
+    return nc_attrs, nc_dims, nc_vars
 
 def make_dir(s):
         if os.path.exists(s):
@@ -206,6 +278,69 @@ class Lake(object):
                     glm_handle.write("'{0}',\n".format(val[idx]))    
         glm_handle.write("/")
         glm_handle.close()
+        self.met_path = None
+        self.raw_met = None
+    
+    def read_GCHN(self, met_path):
+        self.met_path = met_path
+        self.raw_met = pd.read_csv(met_path, parse_dates=[2], 
+                                   infer_datetime_format=True, 
+                                   na_values=[-9999])
+        
+        # TODO: play with dates in the way that we did in 
+        # WaterBalance.py to get different resamples & groupbys        
+        dates = self.raw_met.DATE
+        
+        #PRCP - Precipitation (tenths of mm)        
+        self.precip = self.raw_met.PRCP/10000
+        #AWND - Average daily wind speed (tenths of meters per second)        
+        self.wind_speed = self.raw_met.AWND/10
+        #TMAX - Maximum temperature (tenths of degrees C)
+        self.t_max = self.raw_met.TMAX/10
+        self.t_min = self.raw_met.TMIN/10
+        #SNOW - Snowfall (mm) -> meters
+        self.snow_fall = self.raw_met.SNOW/1000
+        #SNWD - Snow depth (mm) -> meters
+        self.snow_depth = self.raw_met.SNWD/1000
+        self.clean_cols = [self.precip, self.wind_speed, self.t_max, self.t_min, 
+                      self.snow_fall, self.snow_depth]
+        col_labels = ["precip", "wind_speed", "t_max", "t_min", "snow_fall",
+                      "snow_depth"]
+        self.net_GCHN = pd.DataFrame(index=self.raw_met.DATE, columns=col_labels)
+        for idx in range(len(self.clean_cols)):
+            self.net_GCHN.iloc[:, idx] = self.clean_cols[idx].values
+        print "\nNaN Values read into net_GCHN dataframe"
+        print self.net_GCHN.isnull().sum()
+        print "\tSetting them equal to zero"
+        self.net_GCHN.fillna(value=0, inplace=True)
+        
+    def read_CERES_nc(self, ceres_path):
+        rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
+        nc_attrs, nc_dims, nc_vars = ncdump(rootgrp)
+        # Temps in Kelvin        
+        # Fluxes in u'Watts per square meter'
+        # wind vectors in meters per second
+        # humididity & cloud cover in ?
+        toExtract = ["lon", "lat", "Time_of_observation", 
+                     "Surface_skin_temperature", "Surface_wind___U_vector",
+                     "Surface_wind___V_vector", 
+                     "Column_averaged_relative_humidity", 
+                     "Altitude_of_surface_above_sea_level",
+                     "PSF_wtd_MOD04_cloud_fraction_land",
+                     "CERES_net_LW_surface_flux___Model_B",
+                     "CERES_net_SW_surface_flux___Model_B"]
+        betterNames = ["lat", "lon", "time_J", "temp", "windU", "windV",
+                       "humidity", "altitude", "cloud_frac", "LW_rad", "SW_rad"]
+        self.ceres_ = {}
+        for var, nam in zip(toExtract, betterNames):
+            self.ceres_[nam] = rootgrp.variables[var][:]
+        gDays = [jd.caldate(j) for j in self.ceres_["time_J"]]
+        self.ceres_['time_G'] = np.array(gDays)
+        #ceres_ needs to be converted into a dataframe        
+        rootgrp.close()
+                                   
+
+                                   
 
         
         

@@ -117,6 +117,16 @@ addtodict(met_vals, met_vars, value_dict)
 addtodict(bird_vals, bird_vars, value_dict)
 addtodict(outflow_vals, outflow_vars, value_dict)
 addtodict(inflow_vals, inflow_vars, value_dict)
-sunnyLake = LakeModel.Lake(cases[0], newDirs[0], value_dict)
+test = LakeModel.Lake(cases[0], newDirs[0], value_dict)
+met_path = mainFolder + "/" + "BostonLoganAirportWeather.csv"
+ceres_path =mainFolder+"/CERES/"+"CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
+
+test.read_GCHN(met_path)
+test.read_CERES_nc(ceres_path)
+# each input file will be manually input as a file argument for vetting
+# each will be accessible as a data frame object 
+
+#input inflow.csv
+
 
 
