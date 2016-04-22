@@ -8,6 +8,7 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 
 @author: login
 """
+import peakutils
 import os
 import numpy as np
 import pandas as pd
@@ -32,17 +33,29 @@ def pandasfillwrap(seriesORdf, fill_method):
         print "\tLeaving them alone"
     return None
 
-def printAutocorr(pdSeries, threshold):
-    lags = np.array([i for i in range(len(pdSeries))])
-    maxima = []
-    import peakutils
-    signal = pdSeries.values
-    peaks = peakutils.indexes(signal, thres=0.02/max(signal), min_dist=100)
-    
-    for col in test.ceres_df.columns:
-        if test.ceres_df[col].dtype != '<M8[ns]':
-            print "{0}: {1}".format(col, test.ceres_df[col].autocorr(1))
-        
+def printAutocorr(df, threshold=None):
+    print "Autocorrelation peaks"    
+    data_cols = {}
+    ac_df = pd.DataFrame(index=df.index, columns=df.columns)
+    for col in df.columns:
+        if df[col].dtype != '<M8[ns]':
+            print "\t{}:".format(col)
+            autocorrs = np.array([df[col].autocorr(i) for i in range(len(df[col]))])
+            data_cols[col] = autocorrs
+            peaks = peakutils.indexes(autocorrs, thres=0.5*max(autocorrs), 
+                                  min_dist=10)
+            #peakvals = {autocorrs[j]:j for j in peaks}
+            print "\t\t{} peaks detected".format(len(peaks))
+            print "\t\tTallest peak ({0}) @ lag {1}".format(autocorrs.max(),
+                                                            autocorrs.argmax())
+        else:
+            ac_df = ac_df.drop(col, 1)
+            
+    for key in data_cols.keys():
+            ac_df[key] = data_cols[key]
+            
+    return ac_df
+
 # TODO: def standardscaling():
 # TODO: def plotfrequencydomain():
 
@@ -375,7 +388,7 @@ class Lake(object):
             self.net_GCHN.iloc[:, idx] = self.clean_cols[idx].values
         
         printNaNWarning(self.net_GCHN, "GCHN data", None)
-        
+        self.GCHN_ac = printAutocorr(self.net_GCHN)        
         
     def read_CERES_nc(self, ceres_path):
         rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
@@ -409,16 +422,17 @@ class Lake(object):
                 self.ceres_df[key] = self.ceres_[key].values
 
         printNaNWarning(self.ceres_df, "CERES data", None)
+        self.ceres_ac = printAutocorr(self.ceres_df)
         
         ceres_daily = self.ceres_df.resample("D", how='mean')
         #pass dataframe to insert new index columns
         self.ceres_daily = insertTimeColumns(ceres_daily, ceres_daily.index)
         
-        annualsum = data.groupby(data['year']).agg(np.sum)
-        monthlysum = data.groupby(data['month']).agg(np.sum)
-        dailysum = data.groupby(data['day']).agg(np.sum)
-        seasonalsum = data.groupby(data['season']).agg(np.sum)
-        #ceres_ needs to be converted into a dataframe        
+#        annualsum = data.groupby(data['year']).agg(np.sum)
+#        monthlysum = data.groupby(data['month']).agg(np.sum)
+#        dailysum = data.groupby(data['day']).agg(np.sum)
+#        seasonalsum = data.groupby(data['season']).agg(np.sum)
+#        #ceres_ needs to be converted into a dataframe        
         rootgrp.close()
         
 
