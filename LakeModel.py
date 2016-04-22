@@ -20,7 +20,22 @@ def printNaNWarning(df, label, fill_method=None):
     print "\nNaN Values read into {0} ({1})".format(label, str(type(df)))
     print df.isnull().sum()
     return None
+def plotTemporalDist(df, fignum, clear=True, bins=None):
+    days = df.index.dayofyear
+    if bins == None:
+        buckets = len(np.unique(days))
+    else:
+        buckets = bins
+        
+    plt.figure(fignum)
     
+    if clear == True:
+        plt.clf()
+        
+    n, bins, patches = plt.hist(days, buckets, facecolor='green', alpha=0.75)
+    
+    return n, bins, patches
+
 def pandasfillwrap(seriesORdf, fill_method):
     if fill_method=="ZERO":
         print "\tSetting them equal to zero"
@@ -33,8 +48,43 @@ def pandasfillwrap(seriesORdf, fill_method):
         print "\tLeaving them alone"
     return None
 
-# TODO: def standardscaling():
-# TODO: def makeAggregations():
+def z_score(df):
+    z_df = pd.DataFrame(index=df.index, columns=df.columns)    
+    for col in df.columns:
+        z_df[col] = (df[col] - np.mean(df[col])) / np.std(df[col], ddof=1)
+    return z_df
+    
+def makeAggregations(df, indices, fxn):
+    aggs = {}    
+    for idx in indices:
+        aggs[idx] = df.groupby(df[idx]).agg(fxn)
+    return aggs
+    
+def show_agg_resolution(aggs, col_name):
+    day_frame = pd.DataFrame(index=aggs['day_i'].index, columns=aggs.keys())
+    for col in day_frame.columns:
+        ser = aggs[col][col_name]
+        if col == 'day_i':
+            new_idx = ser.index
+        elif col == 'week_i':
+            new_idx = ser.index*7+2
+        elif col == 'month_i':
+            new_idx = ser.index*30+6
+        elif col == 'season_i':
+            new_idx = ser.index*(366/4)+2
+        elif col == 'year_i':
+            new_idx = pd.Index([366], dtype='Int64')
+            
+        if col == 'year_i':
+            mod_ser = pd.Series(data=ser.values.mean(), index=new_idx)
+            day_frame[col] = mod_ser.reindex(day_frame.index)
+        else:
+            mod_ser = pd.Series(data=ser.values, index=new_idx)
+            day_frame[col] = mod_ser.reindex(day_frame.index)
+        
+    return day_frame
+
+
 # TODO: def plotAggregations():
 # TODO: redo this to apply to aggregations 
 
@@ -42,9 +92,9 @@ def printAutocorr(df, threshold=None):
     print "Autocorrelation peaks"    
     data_cols = {}
     ac_df = pd.DataFrame(index=df.index, columns=df.columns)
-    ignorable = ['lat', 'lon', 'time_J', 'altitude']
+    
     for col in df.columns:
-        if df[col].dtype != '<M8[ns]' or col not in ignorable:
+        if df[col].dtype != '<M8[ns]':
             print "\t{}:".format(col)
             autocorrs = np.array([df[col].autocorr(i) for i in range(1, len(df[col]))])
             data_cols[col] = autocorrs
@@ -53,8 +103,6 @@ def printAutocorr(df, threshold=None):
             print "\t\t{} peaks detected".format(len(peaks))
             print "\t\tTallest peak ({0}) @ lag {1}".format(autocorrs.max(),
                                                             autocorrs.argmax())
-        else:
-            ac_df = ac_df.drop(col, 1)
             
     for key in data_cols.keys():
             ac_df[key] = data_cols[key]
@@ -66,11 +114,18 @@ def printAutocorr(df, threshold=None):
 
 
 
-def insertTimeColumns(df, dates=None, insertAt=0):
+def TimeIdx(df, dates=None, insertAt=0):
     """this inserts day of the year, month of the year, and season of the year
     columns into a dataframe for use by the groupby function"""
+
+    if dates == None:
+        dates = df.index
+    else:
+        pass
+    
     dates = pd.date_range(dates[0], periods=len(dates))
     month_i = dates.month
+    week_i = dates.week
     day_i = dates.dayofyear
     year_i = dates.year
     fall, winter, spring, summer = [10,11,12], [1,2,3], [4,5,6], [7,8,9]
@@ -87,11 +142,11 @@ def insertTimeColumns(df, dates=None, insertAt=0):
         else:
             print "unexpected error"
 
-    name = ["year_i", "month_i", "season_i", "day_i"]
-    new_cols = [year_i, month_i, season_i, day_i]
-    for ind, name, col in zip(range(insertAt,4), name, new_cols):
+    i_names = ["year_i", "month_i", "season_i", 'week_i', "day_i"]
+    new_cols = [year_i, month_i, season_i, week_i, day_i]
+    for ind, name, col in zip(range(insertAt,len(new_cols)), i_names, new_cols):
         df.insert(ind, name, col)
-    return df
+    return df, i_names
 
 def ncdump(nc_fid, verb=True):
     '''
@@ -389,8 +444,9 @@ class Lake(object):
         for idx in range(len(self.clean_cols)):
             self.net_GCHN.iloc[:, idx] = self.clean_cols[idx].values
         
+        self.gchn_zs = z_score(self.net_GCHN)
         printNaNWarning(self.net_GCHN, "GCHN data", None)
-        self.GCHN_ac = printAutocorr(self.net_GCHN)        
+        #self.GCHN_ac = printAutocorr(self.net_GCHN)        
         
     def read_CERES_nc(self, ceres_path):
         rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
@@ -417,24 +473,36 @@ class Lake(object):
         
         self.ceres_df = pd.DataFrame(index=self.ceres_['date'], 
                                      columns=betterNames)
+        ignorable = ['lat', 'lon', 'time_J', 'altitude']
         for key in self.ceres_.keys():
             if key == 'temp':
                 self.ceres_df[key] = self.ceres_[key].values-273.15
+            elif key in ignorable:
+                self.ceres_df = self.ceres_df.drop(key, 1)
+            elif key not in self.ceres_df.columns.values:
+                pass
             else:
                 self.ceres_df[key] = self.ceres_[key].values
-
+        
+        self.histo = plotTemporalDist(self.ceres_df, 1, clear=False, bins=4)
+        
+        self.ceres_zs = z_score(self.ceres_df)
+        self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
+        self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
         printNaNWarning(self.ceres_df, "CERES data", None)
-        self.ceres_ac = printAutocorr(self.ceres_df)
-        
-        ceres_daily = self.ceres_df.resample("D", how='mean')
+        self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)
+        self.ceres_mean_aggs = makeAggregations(self.ceres_reindex_zs, 
+                                                self.i_names, np.mean)
+                                                
+        self.humidity_scales = show_agg_resolution(self.ceres_mean_aggs, 
+                                                   "humidity")
+        self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
+                                                   "cloud_frac")
+        #self.ceres_ac = printAutocorr(self.ceres_df)
         #pass dataframe to insert new index columns
-        self.ceres_daily = insertTimeColumns(ceres_daily, ceres_daily.index)
         
-#        annualsum = data.groupby(data['year']).agg(np.sum)
-#        monthlysum = data.groupby(data['month']).agg(np.sum)
-#        dailysum = data.groupby(data['day']).agg(np.sum)
-#        seasonalsum = data.groupby(data['season']).agg(np.sum)
-#        #ceres_ needs to be converted into a dataframe        
+        
+        
         rootgrp.close()
         
 

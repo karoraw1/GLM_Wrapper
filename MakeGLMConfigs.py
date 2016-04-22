@@ -13,6 +13,7 @@ and later use the command when terminal starts:
 
 @author: Keith Arora-Williams
 """
+import time
 import os
 import LakeModel
 import numpy as np
@@ -28,6 +29,9 @@ def make_dir(s):
     else:
         os.mkdir( s, 0760)
 
+print "\nGLM_WRAPPER"
+print time.ctime(time.time())
+print ""
 
 # these are code names for each trial
 cases = ["sunnyDay"]
