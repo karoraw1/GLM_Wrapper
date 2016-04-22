@@ -11,8 +11,72 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import JD_converter as jd
+
+def printNaNWarning(df, label, fill_method=None):
+    print "\nNaN Values read into {0} ({1})".format(label, str(type(df)))
+    print df.isnull().sum()
+    return None
+    
+def pandasfillwrap(seriesORdf, fill_method):
+    if fill_method=="ZERO":
+        print "\tSetting them equal to zero"
+        seriesORdf.fillna(value=0, inplace=True)
+    elif fill_method in ['backfill', 'bfill', 'pad', 'ffill']:
+        seriesORdf.fillna(method=fill_method, inplace=True)
+        print "\t using Pandas {} method".format(fill_method)
+    else:
+        print "\t FILL METHOD NOT RECOGNIZED"
+        print "\tLeaving them alone"
+    return None
+
+def printAutocorr(pdSeries, threshold):
+    lags = np.array([i for i in range(len(pdSeries))])
+    maxima = []
+    import peakutils
+    signal = pdSeries.values
+    peaks = peakutils.indexes(signal, thres=0.02/max(signal), min_dist=100)
+    
+    for col in test.ceres_df.columns:
+        if test.ceres_df[col].dtype != '<M8[ns]':
+            print "{0}: {1}".format(col, test.ceres_df[col].autocorr(1))
+        
+# TODO: def standardscaling():
+# TODO: def plotfrequencydomain():
+
+# TODO: def makeAggregations():
+
+# TODO: def plotAggregations():
+
+
+def insertTimeColumns(df, dates=None, insertAt=0):
+    """this inserts day of the year, month of the year, and season of the year
+    columns into a dataframe for use by the groupby function"""
+    dates = pd.date_range(dates[0], periods=len(dates))
+    month_i = dates.month
+    day_i = dates.dayofyear
+    year_i = dates.year
+    fall, winter, spring, summer = [10,11,12], [1,2,3], [4,5,6], [7,8,9]
+    season_i = np.zeros(len(month_i))
+    for idx in range(len(month_i)):
+        if month_i[idx] in fall:
+            season_i[idx] = 1
+        elif month_i[idx] in winter:
+            season_i[idx] = 2
+        elif month_i[idx] in spring:
+            season_i[idx] = 3
+        elif month_i[idx] in summer:
+            season_i[idx] = 4
+        else:
+            print "unexpected error"
+
+    name = ["year_i", "month_i", "season_i", "day_i"]
+    new_cols = [year_i, month_i, season_i, day_i]
+    for ind, name, col in zip(range(insertAt,4), name, new_cols):
+        df.insert(ind, name, col)
+    return df
 
 def ncdump(nc_fid, verb=True):
     '''
@@ -72,7 +136,7 @@ def ncdump(nc_fid, verb=True):
     if verb:
         print "NetCDF variable information:"
         for var in nc_vars:
-            if var not in nc_dims:
+           if var not in nc_dims:
                 print '\tName:', var
                 print "\t\tdimensions:", nc_fid.variables[var].dimensions
                 print "\t\tsize:", nc_fid.variables[var].size
@@ -309,14 +373,13 @@ class Lake(object):
         self.net_GCHN = pd.DataFrame(index=self.raw_met.DATE, columns=col_labels)
         for idx in range(len(self.clean_cols)):
             self.net_GCHN.iloc[:, idx] = self.clean_cols[idx].values
-        print "\nNaN Values read into net_GCHN dataframe"
-        print self.net_GCHN.isnull().sum()
-        print "\tSetting them equal to zero"
-        self.net_GCHN.fillna(value=0, inplace=True)
+        
+        printNaNWarning(self.net_GCHN, "GCHN data", None)
+        
         
     def read_CERES_nc(self, ceres_path):
         rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
-        nc_attrs, nc_dims, nc_vars = ncdump(rootgrp)
+        nc_attrs, nc_dims, nc_vars = ncdump(rootgrp, False)
         # Temps in Kelvin        
         # Fluxes in u'Watts per square meter'
         # wind vectors in meters per second
@@ -333,12 +396,31 @@ class Lake(object):
                        "humidity", "altitude", "cloud_frac", "LW_rad", "SW_rad"]
         self.ceres_ = {}
         for var, nam in zip(toExtract, betterNames):
-            self.ceres_[nam] = rootgrp.variables[var][:]
+            self.ceres_[nam] = pd.Series(rootgrp.variables[var][:])
         gDays = [jd.caldate(j) for j in self.ceres_["time_J"]]
-        self.ceres_['time_G'] = np.array(gDays)
+        self.ceres_['date'] = pd.to_datetime(np.array(gDays))
+        
+        self.ceres_df = pd.DataFrame(index=self.ceres_['date'], 
+                                     columns=betterNames)
+        for key in self.ceres_.keys():
+            if key == 'temp':
+                self.ceres_df[key] = self.ceres_[key].values-273.15
+            else:
+                self.ceres_df[key] = self.ceres_[key].values
+
+        printNaNWarning(self.ceres_df, "CERES data", None)
+        
+        ceres_daily = self.ceres_df.resample("D", how='mean')
+        #pass dataframe to insert new index columns
+        self.ceres_daily = insertTimeColumns(ceres_daily, ceres_daily.index)
+        
+        annualsum = data.groupby(data['year']).agg(np.sum)
+        monthlysum = data.groupby(data['month']).agg(np.sum)
+        dailysum = data.groupby(data['day']).agg(np.sum)
+        seasonalsum = data.groupby(data['season']).agg(np.sum)
         #ceres_ needs to be converted into a dataframe        
         rootgrp.close()
-                                   
+        
 
                                    
 

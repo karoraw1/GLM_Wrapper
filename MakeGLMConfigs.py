@@ -123,10 +123,22 @@ ceres_path =mainFolder+"/CERES/"+"CERES_SSF_XTRK-MODIS_Edition3A_Subset_20100101
 
 test.read_GCHN(met_path)
 test.read_CERES_nc(ceres_path)
+
+# TODO: plot aggregations and original data on each plot 
+# TODO: use fft / mixed gaussian model to determine variables within time series
+# TODO: impute interpolated data based on autocorrelation (spline?)
+# TODO: read in inflow data
+# TODO: read in outflow data
+# TODO: maximize cross-correlation of identical data from different sources
+# TODO: write out properly formatted input files based on input data
+# TODO: write class method that runs glm by spawning independent processes
+# TODO: test and debug execution
+# TODO: run once and time it and measure memory footprint 
+# TODO: write a function that generates & submits a batch file
+# TODO: 
+# 
+# 
 # each input file will be manually input as a file argument for vetting
 # each will be accessible as a data frame object 
-
-#input inflow.csv
-
 
 

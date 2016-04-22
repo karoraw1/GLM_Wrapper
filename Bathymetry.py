@@ -42,3 +42,4 @@ for r, z in zip(radii_int, elevation_int):
     ax.plot(r*np.cos(t), r*np.sin(t), z)
 plt.show()
 
+plt.xlabel("meters")
