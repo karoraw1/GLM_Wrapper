@@ -33,17 +33,22 @@ def pandasfillwrap(seriesORdf, fill_method):
         print "\tLeaving them alone"
     return None
 
+# TODO: def standardscaling():
+# TODO: def makeAggregations():
+# TODO: def plotAggregations():
+# TODO: redo this to apply to aggregations 
+
 def printAutocorr(df, threshold=None):
     print "Autocorrelation peaks"    
     data_cols = {}
     ac_df = pd.DataFrame(index=df.index, columns=df.columns)
+    ignorable = ['lat', 'lon', 'time_J', 'altitude']
     for col in df.columns:
-        if df[col].dtype != '<M8[ns]':
+        if df[col].dtype != '<M8[ns]' or col not in ignorable:
             print "\t{}:".format(col)
-            autocorrs = np.array([df[col].autocorr(i) for i in range(len(df[col]))])
+            autocorrs = np.array([df[col].autocorr(i) for i in range(1, len(df[col]))])
             data_cols[col] = autocorrs
-            peaks = peakutils.indexes(autocorrs, thres=0.5*max(autocorrs), 
-                                  min_dist=10)
+            peaks = peakutils.indexes(autocorrs, thres=0.5, min_dist=100)
             #peakvals = {autocorrs[j]:j for j in peaks}
             print "\t\t{} peaks detected".format(len(peaks))
             print "\t\tTallest peak ({0}) @ lag {1}".format(autocorrs.max(),
@@ -56,12 +61,9 @@ def printAutocorr(df, threshold=None):
             
     return ac_df
 
-# TODO: def standardscaling():
+
 # TODO: def plotfrequencydomain():
 
-# TODO: def makeAggregations():
-
-# TODO: def plotAggregations():
 
 
 def insertTimeColumns(df, dates=None, insertAt=0):
