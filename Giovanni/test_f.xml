@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="ftp://aurapar2u.ecs.nasa.gov/data/s4pa//S4paGran2HTML.xsl"?>
+<S4PAGranuleMetaDataFile>
+  <CollectionMetaData>
+    <LongName>OMI/Aura and MODIS/Aqua Merged Cloud Product 1-Orbit L2 Swath 13x24</LongName>
+    <ShortName>OMMYDCLD</ShortName>
+    <VersionID>003</VersionID>
+    <URL xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="ftp://aurapar2u.ecs.nasa.gov/data/s4pa//Aura_OMI_Level2/OMMYDCLD.003/GES_DISC_OMMYDCLD_V003_dif.xml" xlink:show="new" xlink:actuate="onRequest" xlink:title="Click to view OMMYDCLD collection">ftp://aurapar2u.ecs.nasa.gov/data/s4pa//Aura_OMI_Level2/OMMYDCLD.003/GES_DISC_OMMYDCLD_V003_dif.xml</URL>
+  </CollectionMetaData>
+  <DataGranule>
+    <CheckSum>
+      <CheckSumType>CRC32</CheckSumType>
+      <CheckSumValue>2730425987</CheckSumValue>
+    </CheckSum>
+    <DayNightFlag>Day</DayNightFlag>
+    <Format>HDF5</Format>
+    <GranuleID>OMI-Aura_L2-OMMYDCLD_2014m0101t1651-o50349_v003-2015m0228t154805.he5</GranuleID>
+    <LocalGranuleID>OMI-Aura_L2-OMMYDCLD_2014m0101t1651-o50349_v003-2015m0228t154805.he5</LocalGranuleID>
+    <ProductionDateTime>2015-02-28 15:48:51.228893</ProductionDateTime>
+    <SizeBytesDataGranule>16847471</SizeBytesDataGranule>
+    <InsertDateTime>2015-04-12 19:18:49</InsertDateTime>
+  </DataGranule>
+  <OrbitCalculatedSpatialDomain>
+    <OrbitCalculatedSpatialDomainContainer>
+      <EquatorCrossingDate>2014-01-01</EquatorCrossingDate>
+      <EquatorCrossingLongitude>-60.61</EquatorCrossingLongitude>
+      <EquatorCrossingTime>17:46:47</EquatorCrossingTime>
+      <OrbitNumber>50349</OrbitNumber>
+      <Orbit>
+        <AscendingCrossing>-60.61</AscendingCrossing>
+        <StartLat>-58.385640</StartLat>
+        <StartDirection>D</StartDirection>
+        <EndLat>75.959368</EndLat>
+        <EndDirection>A</EndDirection>
+        <NumberOfOrbit>1</NumberOfOrbit>
+      </Orbit>
+    </OrbitCalculatedSpatialDomainContainer>
+  </OrbitCalculatedSpatialDomain>
+  <Platform>
+    <Instrument>
+      <InstrumentShortName>OMI</InstrumentShortName>
+      <Sensor>
+        <SensorShortName>CCD Ultra Violet</SensorShortName>
+      </Sensor>
+    </Instrument>
+    <PlatformShortName>AURA</PlatformShortName>
+  </Platform>
+  <RangeDateTime>
+    <RangeBeginningDate>2014-01-01</RangeBeginningDate>
+    <RangeBeginningTime>16:51:19</RangeBeginningTime>
+    <RangeEndingDate>2014-01-01</RangeEndingDate>
+    <RangeEndingTime>18:30:12</RangeEndingTime>
+  </RangeDateTime>
+</S4PAGranuleMetaDataFile>

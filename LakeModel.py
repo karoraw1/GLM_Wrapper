@@ -19,7 +19,9 @@ import JD_converter as jd
 def printNaNWarning(df, label, fill_method=None):
     print "\nNaN Values read into {0} ({1})".format(label, str(type(df)))
     print df.isnull().sum()
+    print "Total measurements per variable: {}".format(df.shape[0])
     return None
+
 def plotTemporalDist(df, fignum, clear=True, bins=None):
     days = df.index.dayofyear
     if bins == None:
@@ -88,26 +90,33 @@ def show_agg_resolution(aggs, col_name):
 # TODO: def plotAggregations():
 # TODO: redo this to apply to aggregations 
 
-def printAutocorr(df, threshold=None):
+def printAutocorr(aggs, threshold=None):
     print "Autocorrelation peaks"    
-    data_cols = {}
-    ac_df = pd.DataFrame(index=df.index, columns=df.columns)
-    
-    for col in df.columns:
-        if df[col].dtype != '<M8[ns]':
-            print "\t{}:".format(col)
-            autocorrs = np.array([df[col].autocorr(i) for i in range(1, len(df[col]))])
-            data_cols[col] = autocorrs
-            peaks = peakutils.indexes(autocorrs, thres=0.5, min_dist=100)
-            #peakvals = {autocorrs[j]:j for j in peaks}
-            print "\t\t{} peaks detected".format(len(peaks))
-            print "\t\tTallest peak ({0}) @ lag {1}".format(autocorrs.max(),
-                                                            autocorrs.argmax())
+#    data_cols = {}
+#    ac_df = pd.DataFrame(index=df.index, columns=df.columns)
+#    
+#    for col in df.columns:
+#        if df[col].dtype != '<M8[ns]':
+#            print "\t{}:".format(col)
+#            autocorrs = np.array([df[col].autocorr(i) for i in range(1, len(df[col]))])
+#            data_cols[col] = autocorrs
+#            peaks = peakutils.indexes(autocorrs, thres=0.5, min_dist=100)
+#            #peakvals = {autocorrs[j]:j for j in peaks}
+#            print "\t\t{} peaks detected".format(len(peaks))
+#            print "\t\tTallest peak ({0}) @ lag {1}".format(autocorrs.max(),
+#                                                            autocorrs.argmax())
+#            
+#    for key in data_cols.keys():
+#            ac_df[key] = data_cols[key]
+    for key in aggs.keys():
+        df = aggs[key].dropna()
+        print key
+        for col in df.columns:
+            if col[-1] != "i":
+                autocorrs = np.array([df[col].autocorr(i) for i in range(1, len(df[col])/2)])
+                print "\t{0} max autocorr @ {1} = {2:.2f}".format(col, np.argmax(autocorrs)+1, autocorrs.mean())
             
-    for key in data_cols.keys():
-            ac_df[key] = data_cols[key]
-            
-    return ac_df
+    return None
 
 
 # TODO: def plotfrequencydomain():
@@ -498,7 +507,7 @@ class Lake(object):
                                                    "humidity")
         self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
                                                    "cloud_frac")
-        #self.ceres_ac = printAutocorr(self.ceres_df)
+        printAutocorr(self.ceres_mean_aggs)
         #pass dataframe to insert new index columns
         
         

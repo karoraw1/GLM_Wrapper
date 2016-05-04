@@ -127,10 +127,34 @@ ceres_path =mainFolder+"/CERES/"+"CERES_SSF_XTRK-MODIS_Edition3A_Subset_20100101
 
 test.read_GCHN(met_path)
 test.read_CERES_nc(ceres_path)
+lat = test.ceres_['lat']
+lon = test.ceres_['lon']
+c1 = lat.min()
+c3 = lon.min()
+lat_c = lat-c1
+lon_c = lon-c1
+#
+#import matplotlib.pyplot as plt
+#plt.figure(1)
+#plt.clf()
+#im_path = "/home/login/GDrive/Documents/Landscape_Hydrology/Final Project/Presentation"
+#im_name = os.path.join(im_path, "CERESBB.png")
+#im = plt.imread(im_name)
+#
+#implot = plt.imshow(im)
+## put a red dot, size 40, at 2 locations:
+#
+##
+##plt.scatter(x=[10], y=[10], marker="x", s=10)
+#xlim = 380/lat_c.mean()
+#ylim = 480/lon_c.mean()
+#plt.scatter(x=lat_c*xlim, y=lon_c*ylim, marker="x", s=10)
+#plt.tight_layout()
+#plt.show()
 
 # TODO: plot aggregations and original data on each plot 
-# TODO: use fft / mixed gaussian model to determine variables within time series
-# TODO: impute interpolated data based on autocorrelation (spline?)
+# TODO: use fft to determine variables within time series
+# TODO: impute interpolated data based on autocorrelation
 # TODO: read in inflow data
 # TODO: read in outflow data
 # TODO: maximize cross-correlation of identical data from different sources
