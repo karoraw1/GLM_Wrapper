@@ -1,0 +1,680 @@
+Is this a test run?  True
+40 metadata files located
+No previous metadata detected. Downloading metadata
+Downloading began at  Wed May  4 21:55:15 2016
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/278/OMI-Aura_L2-OMMYDCLD_2013m1005t1746-o49068_v003-2015m0226t153935.he5.xml
+Deleting temp file. This file took 1.5343999862670898
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/293/OMI-Aura_L2-OMMYDCLD_2012m1019t0019-o43946_v003-2015m0218t040745.he5.xml
+Deleting temp file. This file took 3.2291440963745117
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/121/OMI-Aura_L2-OMMYDCLD_2011m0501t1702-o36136_v003-2015m0207t025929.he5.xml
+Deleting temp file. This file took 1.5511338710784912
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/249/OMI-Aura_L2-OMMYDCLD_2009m0906t1625-o27369_v003-2015m0123t202406.he5.xml
+Deleting temp file. This file took 1.5558738708496094
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/298/OMI-Aura_L2-OMMYDCLD_2007m1025t1547-o17437_v003-2015m0108t175159.he5.xml
+Deleting temp file. This file took 1.5327250957489014
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/252/OMI-Aura_L2-OMMYDCLD_2013m0909t1850-o48690_v003-2015m0224t103705.he5.xml
+Deleting temp file. This file took 1.7381260395050049
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/217/OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml
+Deleting temp file. This file took 1.507822036743164
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/365/OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml
+Deleting temp file. This file took 1.5015759468078613
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/330/OMI-Aura_L2-OMMYDCLD_2007m1126t1544-o17903_v003-2015m0109t165636.he5.xml
+Deleting temp file. This file took 6.482090950012207
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/179/OMI-Aura_L2-OMMYDCLD_2007m0628t1730-o15705_v003-2015m0105t133007.he5.xml
+Deleting temp file. This file took 1.5563750267028809
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/245/OMI-Aura_L2-OMMYDCLD_2011m0902t1724-o37942_v003-2015m0209t180525.he5.xml
+Deleting temp file. This file took 1.599565029144287
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/084/OMI-Aura_L2-OMMYDCLD_2013m0325t0946-o46238_v003-2015m0221t050254.he5.xml
+Deleting temp file. This file took 1.5047259330749512
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/365/OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml
+Deleting temp file. This file took 1.4996490478515625
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/217/OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml
+Deleting temp file. This file took 1.5092229843139648
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/101/OMI-Aura_L2-OMMYDCLD_2012m0410t1654-o41160_v003-2015m0214t112657.he5.xml
+Deleting temp file. This file took 11.443140029907227
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/276/OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml
+Deleting temp file. This file took 1.5066947937011719
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/069/OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml
+Deleting temp file. This file took 1.4263808727264404
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2004/299/OMI-Aura_L2-OMMYDCLD_2004m1025t1539-o01491_v003-2014m1211t011250.he5.xml
+Deleting temp file. This file took 6.498027086257935
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/001/OMI-Aura_L2-OMMYDCLD_2007m0101t1550-o13112_v003-2014m1231t140025.he5.xml
+Deleting temp file. This file took 1.733290195465088
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/086/OMI-Aura_L2-OMMYDCLD_2011m0327t1627-o35626_v003-2015m0206t102007.he5.xml
+Deleting temp file. This file took 1.6644279956817627
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/139/OMI-Aura_L2-OMMYDCLD_2005m0519t1738-o04492_v003-2014m1216t045710.he5.xml
+Deleting temp file. This file took 1.4484930038452148
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/069/OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml
+Deleting temp file. This file took 1.600620985031128
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/276/OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml
+Deleting temp file. This file took 1.4355192184448242
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/306/OMI-Aura_L2-OMMYDCLD_2006m1102t1707-o12239_v003-2014m1230t114637.he5.xml
+Deleting temp file. This file took 6.715847969055176
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/212/OMI-Aura_L2-OMMYDCLD_2013m0731t1805-o48107_v003-2015m0223t203945.he5.xml
+Deleting temp file. This file took 1.6123290061950684
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/336/OMI-Aura_L2-OMMYDCLD_2010m1202t1728-o33952_v003-2015m0203t064640.he5.xml
+Deleting temp file. This file took 1.6237869262695312
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/171/OMI-Aura_L2-OMMYDCLD_2006m0620t1711-o10273_v003-2014m1224t015541.he5.xml
+Deleting temp file. This file took 1.4362812042236328
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/089/OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml
+Deleting temp file. This file took 1.566159963607788
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/137/OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml
+Deleting temp file. This file took 1.4292800426483154
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/028/OMI-Aura_L2-OMMYDCLD_2006m0128t1601-o08190_v003-2014m1220t110708.he5.xml
+Deleting temp file. This file took 6.518279075622559
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/361/OMI-Aura_L2-OMMYDCLD_2012m1226t1619-o44946_v003-2015m0219t085352.he5.xml
+Deleting temp file. This file took 1.599869966506958
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/176/OMI-Aura_L2-OMMYDCLD_2006m0625t1550-o10345_v003-2014m1224t035936.he5.xml
+Deleting temp file. This file took 3.0897109508514404
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/205/OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml
+Deleting temp file. This file took 1.67964506149292
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/205/OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml
+Deleting temp file. This file took 1.5082628726959229
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/137/OMI-Aura_L2-OMMYDCLD_2009m0517t1631-o25738_v003-2015m0120t134222.he5.xml
+Deleting temp file. This file took 11.536674976348877
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/197/OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml
+Deleting temp file. This file took 1.461435079574585
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/197/OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml
+Deleting temp file. This file took 1.4377140998840332
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/209/OMI-Aura_L2-OMMYDCLD_2010m0728t1645-o32102_v003-2015m0131t111858.he5.xml
+Deleting temp file. This file took 11.471276044845581
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/137/OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml
+Deleting temp file. This file took 1.479449987411499
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/089/OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml
+Deleting temp file. This file took 1.6311249732971191
+Downloading ended after 14.683192014694214 s.
+Total of 1 iterations
+Length of Accumulator: 40
+Is this a test run?  True
+40 metadata files located
+Skipping metadata download. Database parse detected
+Data download began at  Wed May  4 21:56:11 2016
+Data download ended after 223.08648300170898 s.
+Total of 1 iterations
+Length of Accumulator: 40
+testing complete
+
+
+Is this a test run?  True
+40 metadata files located
+No previous metadata detected. Downloading metadata
+Downloading began at  Thu May  5 18:49:34 2016
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/278/OMI-Aura_L2-OMMYDCLD_2013m1005t1746-o49068_v003-2015m0226t153935.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/028/OMI-Aura_L2-OMMYDCLD_2006m0128t1601-o08190_v003-2014m1220t110708.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/330/OMI-Aura_L2-OMMYDCLD_2007m1126t1544-o17903_v003-2015m0109t165636.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/209/OMI-Aura_L2-OMMYDCLD_2010m0728t1645-o32102_v003-2015m0131t111858.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/101/OMI-Aura_L2-OMMYDCLD_2012m0410t1654-o41160_v003-2015m0214t112657.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/306/OMI-Aura_L2-OMMYDCLD_2006m1102t1707-o12239_v003-2014m1230t114637.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/137/OMI-Aura_L2-OMMYDCLD_2009m0517t1631-o25738_v003-2015m0120t134222.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2004/299/OMI-Aura_L2-OMMYDCLD_2004m1025t1539-o01491_v003-2014m1211t011250.he5.xml
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/278/OMI-Aura_L2-OMMYDCLD_2013m1005t1746-o49068_v003-2015m0226t153935.he5.xml [2526] -> "OMI-Aura_L2-OMMYDCLD_2013m1005t1746-o49068_v003-2015m0226t153935.he5.xml" [1]
+Deleting temp file. This file took 1.4974138736724854
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/293/OMI-Aura_L2-OMMYDCLD_2012m1019t0019-o43946_v003-2015m0218t040745.he5.xml
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/101/OMI-Aura_L2-OMMYDCLD_2012m0410t1654-o41160_v003-2015m0214t112657.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2012m0410t1654-o41160_v003-2015m0214t112657.he5.xml" [1]
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/330/OMI-Aura_L2-OMMYDCLD_2007m1126t1544-o17903_v003-2015m0109t165636.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m1126t1544-o17903_v003-2015m0109t165636.he5.xml" [1]
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/306/OMI-Aura_L2-OMMYDCLD_2006m1102t1707-o12239_v003-2014m1230t114637.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2006m1102t1707-o12239_v003-2014m1230t114637.he5.xml" [1]
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/137/OMI-Aura_L2-OMMYDCLD_2009m0517t1631-o25738_v003-2015m0120t134222.he5.xml [2526] -> "OMI-Aura_L2-OMMYDCLD_2009m0517t1631-o25738_v003-2015m0120t134222.he5.xml" [1]
+Deleting temp file. This file took 1.5016989707946777
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/121/OMI-Aura_L2-OMMYDCLD_2011m0501t1702-o36136_v003-2015m0207t025929.he5.xml
+Deleting temp file. This file took 1.5068349838256836
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/249/OMI-Aura_L2-OMMYDCLD_2009m0906t1625-o27369_v003-2015m0123t202406.he5.xml
+Deleting temp file. This file took 1.5041601657867432
+Deleting temp file. This file took 1.5053751468658447
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/179/OMI-Aura_L2-OMMYDCLD_2007m0628t1730-o15705_v003-2015m0105t133007.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/001/OMI-Aura_L2-OMMYDCLD_2007m0101t1550-o13112_v003-2014m1231t140025.he5.xml
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/028/OMI-Aura_L2-OMMYDCLD_2006m0128t1601-o08190_v003-2014m1220t110708.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2006m0128t1601-o08190_v003-2014m1220t110708.he5.xml" [1]
+Deleting temp file. This file took 1.6956710815429688
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/361/OMI-Aura_L2-OMMYDCLD_2012m1226t1619-o44946_v003-2015m0219t085352.he5.xml
+2016-05-05 18:49:35 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/209/OMI-Aura_L2-OMMYDCLD_2010m0728t1645-o32102_v003-2015m0131t111858.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2010m0728t1645-o32102_v003-2015m0131t111858.he5.xml" [1]
+Deleting temp file. This file took 1.904703140258789
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/212/OMI-Aura_L2-OMMYDCLD_2013m0731t1805-o48107_v003-2015m0223t203945.he5.xml
+2016-05-05 18:49:36 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2004/299/OMI-Aura_L2-OMMYDCLD_2004m1025t1539-o01491_v003-2014m1211t011250.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2004m1025t1539-o01491_v003-2014m1211t011250.he5.xml" [1]
+Deleting temp file. This file took 2.1078290939331055
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/298/OMI-Aura_L2-OMMYDCLD_2007m1025t1547-o17437_v003-2015m0108t175159.he5.xml
+2016-05-05 18:49:37 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/293/OMI-Aura_L2-OMMYDCLD_2012m1019t0019-o43946_v003-2015m0218t040745.he5.xml [2530] -> "OMI-Aura_L2-OMMYDCLD_2012m1019t0019-o43946_v003-2015m0218t040745.he5.xml" [1]
+Deleting temp file. This file took 1.7345237731933594
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/245/OMI-Aura_L2-OMMYDCLD_2011m0902t1724-o37942_v003-2015m0209t180525.he5.xml
+2016-05-05 18:49:37 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/361/OMI-Aura_L2-OMMYDCLD_2012m1226t1619-o44946_v003-2015m0219t085352.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2012m1226t1619-o44946_v003-2015m0219t085352.he5.xml" [1]
+Deleting temp file. This file took 1.551835060119629
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/176/OMI-Aura_L2-OMMYDCLD_2006m0625t1550-o10345_v003-2014m1224t035936.he5.xml
+2016-05-05 18:49:37 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/212/OMI-Aura_L2-OMMYDCLD_2013m0731t1805-o48107_v003-2015m0223t203945.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2013m0731t1805-o48107_v003-2015m0223t203945.he5.xml" [1]
+Deleting temp file. This file took 1.4404411315917969
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/086/OMI-Aura_L2-OMMYDCLD_2011m0327t1627-o35626_v003-2015m0206t102007.he5.xml
+2016-05-05 18:49:37 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/298/OMI-Aura_L2-OMMYDCLD_2007m1025t1547-o17437_v003-2015m0108t175159.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m1025t1547-o17437_v003-2015m0108t175159.he5.xml" [1]
+Deleting temp file. This file took 1.5057380199432373
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/336/OMI-Aura_L2-OMMYDCLD_2010m1202t1728-o33952_v003-2015m0203t064640.he5.xml
+2016-05-05 18:49:38 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/245/OMI-Aura_L2-OMMYDCLD_2011m0902t1724-o37942_v003-2015m0209t180525.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2011m0902t1724-o37942_v003-2015m0209t180525.he5.xml" [1]
+2016-05-05 18:49:38 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/176/OMI-Aura_L2-OMMYDCLD_2006m0625t1550-o10345_v003-2014m1224t035936.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2006m0625t1550-o10345_v003-2014m1224t035936.he5.xml" [1]
+Deleting temp file. This file took 1.5226750373840332
+Deleting temp file. This file took 1.5061290264129639
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/252/OMI-Aura_L2-OMMYDCLD_2013m0909t1850-o48690_v003-2015m0224t103705.he5.xml
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/084/OMI-Aura_L2-OMMYDCLD_2013m0325t0946-o46238_v003-2015m0221t050254.he5.xml
+2016-05-05 18:49:38 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/086/OMI-Aura_L2-OMMYDCLD_2011m0327t1627-o35626_v003-2015m0206t102007.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2011m0327t1627-o35626_v003-2015m0206t102007.he5.xml" [1]
+Deleting temp file. This file took 1.4195590019226074
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/139/OMI-Aura_L2-OMMYDCLD_2005m0519t1738-o04492_v003-2014m1216t045710.he5.xml
+2016-05-05 18:49:39 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/336/OMI-Aura_L2-OMMYDCLD_2010m1202t1728-o33952_v003-2015m0203t064640.he5.xml [2526] -> "OMI-Aura_L2-OMMYDCLD_2010m1202t1728-o33952_v003-2015m0203t064640.he5.xml" [1]
+Deleting temp file. This file took 1.5970408916473389
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/171/OMI-Aura_L2-OMMYDCLD_2006m0620t1711-o10273_v003-2014m1224t015541.he5.xml
+2016-05-05 18:49:40 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/084/OMI-Aura_L2-OMMYDCLD_2013m0325t0946-o46238_v003-2015m0221t050254.he5.xml [2524] -> "OMI-Aura_L2-OMMYDCLD_2013m0325t0946-o46238_v003-2015m0221t050254.he5.xml" [1]
+2016-05-05 18:49:40 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/139/OMI-Aura_L2-OMMYDCLD_2005m0519t1738-o04492_v003-2014m1216t045710.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2005m0519t1738-o04492_v003-2014m1216t045710.he5.xml" [1]
+Deleting temp file. This file took 1.5112240314483643
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/217/OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml
+Deleting temp file. This file took 1.5083389282226562
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/365/OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml
+2016-05-05 18:49:40 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/252/OMI-Aura_L2-OMMYDCLD_2013m0909t1850-o48690_v003-2015m0224t103705.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2013m0909t1850-o48690_v003-2015m0224t103705.he5.xml" [1]
+Deleting temp file. This file took 1.7815887928009033
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/205/OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml
+2016-05-05 18:49:40 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/171/OMI-Aura_L2-OMMYDCLD_2006m0620t1711-o10273_v003-2014m1224t015541.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2006m0620t1711-o10273_v003-2014m1224t015541.he5.xml" [1]
+Deleting temp file. This file took 1.5400199890136719
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/069/OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml
+2016-05-05 18:49:41 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/365/OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml" [1]
+Deleting temp file. This file took 1.5049738883972168
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/089/OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml
+2016-05-05 18:49:42 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/217/OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml" [1]
+Deleting temp file. This file took 1.7093660831451416
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/276/OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml
+2016-05-05 18:49:42 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/249/OMI-Aura_L2-OMMYDCLD_2009m0906t1625-o27369_v003-2015m0123t202406.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2009m0906t1625-o27369_v003-2015m0123t202406.he5.xml" [1]
+2016-05-05 18:49:42 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/121/OMI-Aura_L2-OMMYDCLD_2011m0501t1702-o36136_v003-2015m0207t025929.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2011m0501t1702-o36136_v003-2015m0207t025929.he5.xml" [1]
+Deleting temp file. This file took 6.650614023208618
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/137/OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml
+Deleting temp file. This file took 6.66089391708374
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/197/OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml
+2016-05-05 18:49:42 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/001/OMI-Aura_L2-OMMYDCLD_2007m0101t1550-o13112_v003-2014m1231t140025.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m0101t1550-o13112_v003-2014m1231t140025.he5.xml" [1]
+Deleting temp file. This file took 6.661107063293457
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/217/OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml
+2016-05-05 18:49:42 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/179/OMI-Aura_L2-OMMYDCLD_2007m0628t1730-o15705_v003-2015m0105t133007.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2007m0628t1730-o15705_v003-2015m0105t133007.he5.xml" [1]
+2016-05-05 18:49:42 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/069/OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml" [1]
+Deleting temp file. This file took 6.757429838180542
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/365/OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml
+Deleting temp file. This file took 1.5131299495697021
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/205/OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/089/OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml" [1]
+Deleting temp file. This file took 1.585686206817627
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/069/OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/276/OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml" [1]
+Deleting temp file. This file took 1.4905049800872803
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/089/OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/217/OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2006m0805t1722-o10943_v003-2014m1225t124015.he5.xml" [1]
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/137/OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml [2526] -> "OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml" [1]
+Deleting temp file. This file took 1.5001988410949707
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/276/OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/197/OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml" [1]
+Deleting temp file. This file took 1.5224380493164062
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/137/OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml
+Deleting temp file. This file took 1.52742600440979
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/197/OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/365/OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m1231t1613-o18413_v003-2015m0110t065204.he5.xml" [1]
+Deleting temp file. This file took 1.4419209957122803
+2016-05-05 18:49:43 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/205/OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml" [1]
+Deleting temp file. This file took 1.45206880569458
+2016-05-05 18:49:44 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/069/OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2013m0310t1703-o46024_v003-2015m0220t223911.he5.xml" [1]
+2016-05-05 18:49:44 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/089/OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2009m0330t1806-o25040_v003-2015m0119t083122.he5.xml" [1]
+Deleting temp file. This file took 1.5259120464324951
+Deleting temp file. This file took 1.4271042346954346
+2016-05-05 18:49:45 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/276/OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2013m1003t1758-o49039_v003-2015m0225t122459.he5.xml" [1]
+Deleting temp file. This file took 1.478808879852295
+2016-05-05 18:49:45 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/197/OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml [2527] -> "OMI-Aura_L2-OMMYDCLD_2009m0716t1655-o26612_v003-2015m0122t162856.he5.xml" [1]
+Deleting temp file. This file took 1.5112378597259521
+2016-05-05 18:49:45 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/137/OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml [2526] -> "OMI-Aura_L2-OMMYDCLD_2007m0517t1653-o15093_v003-2015m0104t083841.he5.xml" [1]
+Deleting temp file. This file took 1.6659910678863525
+2016-05-05 18:49:47 URL: ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/205/OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml [2528] -> "OMI-Aura_L2-OMMYDCLD_2007m0724t1628-o16083_v003-2015m0106t085703.he5.xml" [1]
+Deleting temp file. This file took 6.528645038604736
+Downloading ended after 13.184890031814575 s.
+Total of 1 iterations
+Length of Accumulator: 40
+
+Is this a test run?  True
+120 metadata files located
+No previous metadata detected. Downloading metadata
+Downloading began at  Thu May  5 20:23:17 2016
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/231/OMI-Aura_L2-OMMYDCLD_2005m0819t1800-o05832_v003-2014m1217t141620.he5.xml
+Deleting temp file. This file took 6.506181001663208
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/139/OMI-Aura_L2-OMMYDCLD_2012m0518t1621-o41713_v003-2015m0215t130409.he5.xml
+Deleting temp file. This file took 1.6520378589630127
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/226/OMI-Aura_L2-OMMYDCLD_2012m0813t0452-o42973_v003-2015m0217t073922.he5.xml
+Deleting temp file. This file took 1.5014441013336182
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/288/OMI-Aura_L2-OMMYDCLD_2013m1015t1821-o49214_v003-2015m0227t084515.he5.xml
+Deleting temp file. This file took 1.5346400737762451
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/310/OMI-Aura_L2-OMMYDCLD_2010m1106t1653-o33573_v003-2015m0202t232839.he5.xml
+Deleting temp file. This file took 1.508042812347412
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/232/OMI-Aura_L2-OMMYDCLD_2009m0820t1723-o27122_v003-2015m0123t122641.he5.xml
+Deleting temp file. This file took 1.558089017868042
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/292/OMI-Aura_L2-OMMYDCLD_2011m1019t1318-o38624_v003-2015m0210t125644.he5.xml
+Deleting temp file. This file took 1.5853650569915771
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/108/OMI-Aura_L2-OMMYDCLD_2011m0418t1732-o35947_v003-2015m0206t181724.he5.xml
+Deleting temp file. This file took 1.5799739360809326
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/128/OMI-Aura_L2-OMMYDCLD_2005m0508t1617-o04331_v003-2014m1216t005236.he5.xml
+Deleting temp file. This file took 1.5742509365081787
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/202/OMI-Aura_L2-OMMYDCLD_2005m0721t1654-o05409_v003-2014m1217t032017.he5.xml
+Deleting temp file. This file took 1.5902769565582275
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/129/OMI-Aura_L2-OMMYDCLD_2009m0509t1720-o25622_v003-2015m0120t100547.he5.xml
+Deleting temp file. This file took 1.526953935623169
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/130/OMI-Aura_L2-OMMYDCLD_2013m0510t1639-o46912_v003-2015m0221t185434.he5.xml
+Deleting temp file. This file took 1.452584981918335
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/079/OMI-Aura_L2-OMMYDCLD_2013m0320t1106-o46166_v003-2015m0221t022041.he5.xml
+Deleting temp file. This file took 2.445702075958252
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/243/OMI-Aura_L2-OMMYDCLD_2011m0831t1558-o37912_v003-2015m0209t150950.he5.xml
+Deleting temp file. This file took 1.5469470024108887
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/077/OMI-Aura_L2-OMMYDCLD_2012m0317t2237-o40814_v003-2015m0214t032000.he5.xml
+Deleting temp file. This file took 1.5582709312438965
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/360/OMI-Aura_L2-OMMYDCLD_2009m1226t1711-o28986_v003-2015m0126t211205.he5.xml
+Deleting temp file. This file took 6.567486047744751
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/193/OMI-Aura_L2-OMMYDCLD_2013m0712t1556-o47829_v003-2015m0223t141819.he5.xml
+Deleting temp file. This file took 1.5708880424499512
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/025/OMI-Aura_L2-OMMYDCLD_2007m0125t1641-o13462_v003-2014m1231t215242.he5.xml
+Deleting temp file. This file took 1.5111720561981201
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/350/OMI-Aura_L2-OMMYDCLD_2009m1216t1634-o28840_v003-2015m0126t190756.he5.xml
+Deleting temp file. This file took 6.666686058044434
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/291/OMI-Aura_L2-OMMYDCLD_2007m1018t1542-o17335_v003-2015m0108t151542.he5.xml
+Deleting temp file. This file took 1.5737040042877197
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/227/OMI-Aura_L2-OMMYDCLD_2012m0814t0853-o42990_v003-2015m0217t081238.he5.xml
+Deleting temp file. This file took 1.5706918239593506
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/162/OMI-Aura_L2-OMMYDCLD_2009m0611t1804-o26103_v003-2015m0121t192720.he5.xml
+Deleting temp file. This file took 1.5762760639190674
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/328/OMI-Aura_L2-OMMYDCLD_2011m1124t1607-o39150_v003-2015m0211t144629.he5.xml
+Deleting temp file. This file took 1.720918893814087
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/153/OMI-Aura_L2-OMMYDCLD_2007m0602t1654-o15326_v003-2015m0104t141225.he5.xml
+Deleting temp file. This file took 1.5115399360656738
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/102/OMI-Aura_L2-OMMYDCLD_2011m0412t1629-o35859_v003-2015m0206t165549.he5.xml
+Deleting temp file. This file took 1.4613368511199951
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/288/OMI-Aura_L2-OMMYDCLD_2010m1015t1732-o33253_v003-2015m0202t135258.he5.xml
+Deleting temp file. This file took 1.7384989261627197
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/335/OMI-Aura_L2-OMMYDCLD_2013m1201t1555-o49897_v003-2015m0227t204009.he5.xml
+Deleting temp file. This file took 1.6523261070251465
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/177/OMI-Aura_L2-OMMYDCLD_2007m0626t1604-o15675_v003-2015m0105t120851.he5.xml
+Deleting temp file. This file took 6.764153003692627
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2004/337/OMI-Aura_L2-OMMYDCLD_2004m1202t1637-o02045_v003-2014m1211t180727.he5.xml
+Deleting temp file. This file took 1.5190348625183105
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/236/OMI-Aura_L2-OMMYDCLD_2011m0824t1731-o37811_v003-2015m0209t144553.he5.xml
+Deleting temp file. This file took 1.4841539859771729
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/212/OMI-Aura_L2-OMMYDCLD_2009m0731t1611-o26830_v003-2015m0123t002533.he5.xml
+Deleting temp file. This file took 1.5076379776000977
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/284/OMI-Aura_L2-OMMYDCLD_2010m1011t1618-o33194_v003-2015m0202t113444.he5.xml
+Deleting temp file. This file took 1.857578992843628
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/057/OMI-Aura_L2-OMMYDCLD_2013m0226t1637-o45849_v003-2015m0220t161159.he5.xml
+Deleting temp file. This file took 1.585556983947754
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/249/OMI-Aura_L2-OMMYDCLD_2013m0906t1005-o48641_v003-2015m0224t095237.he5.xml
+Deleting temp file. This file took 1.7129268646240234
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/063/OMI-Aura_L2-OMMYDCLD_2011m0304t1619-o35291_v003-2015m0205t165317.he5.xml
+Deleting temp file. This file took 1.458427906036377
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/011/OMI-Aura_L2-OMMYDCLD_2012m0111t1746-o39850_v003-2015m0212t142859.he5.xml
+Deleting temp file. This file took 1.7912299633026123
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/111/OMI-Aura_L2-OMMYDCLD_2013m0421t1745-o46636_v003-2015m0221t122506.he5.xml
+Deleting temp file. This file took 1.5457539558410645
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/277/OMI-Aura_L2-OMMYDCLD_2012m1003t1650-o43723_v003-2015m0217t225525.he5.xml
+Deleting temp file. This file took 1.4470500946044922
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/239/OMI-Aura_L2-OMMYDCLD_2012m0826t1552-o43169_v003-2015m0217t134130.he5.xml
+Deleting temp file. This file took 1.5888919830322266
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/025/OMI-Aura_L2-OMMYDCLD_2010m0125t1725-o29423_v003-2015m0127t174843.he5.xml
+Deleting temp file. This file took 1.7147061824798584
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/291/OMI-Aura_L2-OMMYDCLD_2010m1018t1624-o33296_v003-2015m0202t144116.he5.xml
+Deleting temp file. This file took 1.5670199394226074
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/326/OMI-Aura_L2-OMMYDCLD_2009m1122t1724-o28491_v003-2015m0125t212602.he5.xml
+Deleting temp file. This file took 1.7561209201812744
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/358/OMI-Aura_L2-OMMYDCLD_2012m1223t1548-o44902_v003-2015m0219t075505.he5.xml
+Deleting temp file. This file took 1.7009029388427734
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/162/OMI-Aura_L2-OMMYDCLD_2010m0611t1730-o31418_v003-2015m0130t031537.he5.xml
+Deleting temp file. This file took 1.510801076889038
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/066/OMI-Aura_L2-OMMYDCLD_2009m0307t1757-o24705_v003-2015m0118t214009.he5.xml
+Deleting temp file. This file took 1.5565121173858643
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/314/OMI-Aura_L2-OMMYDCLD_2012m1109t1704-o44262_v003-2015m0218t134718.he5.xml
+Deleting temp file. This file took 1.5708801746368408
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2004/313/OMI-Aura_L2-OMMYDCLD_2004m1108t1728-o01696_v003-2014m1211t110404.he5.xml
+Deleting temp file. This file took 1.523979902267456
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/288/OMI-Aura_L2-OMMYDCLD_2013m1015t0332-o49205_v003-2015m0227t111218.he5.xml
+Deleting temp file. This file took 1.562089204788208
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/119/OMI-Aura_L2-OMMYDCLD_2008m0428t1804-o20147_v003-2015m0113t020958.he5.xml
+Deleting temp file. This file took 1.512995958328247
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/293/OMI-Aura_L2-OMMYDCLD_2005m1020t1627-o06734_v003-2014m1218t141340.he5.xml
+Deleting temp file. This file took 3.1208951473236084
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/236/OMI-Aura_L2-OMMYDCLD_2006m0824t1752-o11220_v003-2014m1226t192306.he5.xml
+Deleting temp file. This file took 1.562256097793579
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/083/OMI-Aura_L2-OMMYDCLD_2012m0323t1704-o40898_v003-2015m0214t045927.he5.xml
+Deleting temp file. This file took 1.5635161399841309
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/301/OMI-Aura_L2-OMMYDCLD_2007m1028t1618-o17481_v003-2015m0108t190641.he5.xml
+Deleting temp file. This file took 3.3046700954437256
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/249/OMI-Aura_L2-OMMYDCLD_2013m0906t1144-o48642_v003-2015m0224t094050.he5.xml
+Deleting temp file. This file took 1.5139801502227783
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/154/OMI-Aura_L2-OMMYDCLD_2011m0603t1747-o36617_v003-2015m0207t110249.he5.xml
+Deleting temp file. This file took 1.4640719890594482
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/072/OMI-Aura_L2-OMMYDCLD_2007m0313t1603-o14146_v003-2015m0102t095040.he5.xml
+Deleting temp file. This file took 1.4850459098815918
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/224/OMI-Aura_L2-OMMYDCLD_2009m0812t1813-o27006_v003-2015m0123t081222.he5.xml
+Deleting temp file. This file took 1.5588321685791016
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/181/OMI-Aura_L2-OMMYDCLD_2006m0630t1748-o10419_v003-2014m1224t054131.he5.xml
+Deleting temp file. This file took 1.5141031742095947
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/085/OMI-Aura_L2-OMMYDCLD_2009m0326t1651-o24981_v003-2015m0119t041230.he5.xml
+Deleting temp file. This file took 1.4944138526916504
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/321/OMI-Aura_L2-OMMYDCLD_2008m1116t1654-o23088_v003-2015m0116t224515.he5.xml
+Deleting temp file. This file took 6.567306041717529
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/059/OMI-Aura_L2-OMMYDCLD_2012m0228t1612-o40548_v003-2015m0213t211721.he5.xml
+Deleting temp file. This file took 1.574526071548462
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/042/OMI-Aura_L2-OMMYDCLD_2008m0211t1651-o19025_v003-2015m0111t071345.he5.xml
+Deleting temp file. This file took 1.5174307823181152
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/322/OMI-Aura_L2-OMMYDCLD_2013m1118t1627-o49708_v003-2015m0227t180750.he5.xml
+Deleting temp file. This file took 1.528203010559082
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/022/OMI-Aura_L2-OMMYDCLD_2009m0122t1547-o24063_v003-2015m0117t232707.he5.xml
+Deleting temp file. This file took 3.314307928085327
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/154/OMI-Aura_L2-OMMYDCLD_2011m0603t1608-o36616_v003-2015m0207t113132.he5.xml
+Deleting temp file. This file took 1.6016221046447754
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/019/OMI-Aura_L2-OMMYDCLD_2007m0119t1539-o13374_v003-2014m1231t195953.he5.xml
+Deleting temp file. This file took 1.5612080097198486
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/164/OMI-Aura_L2-OMMYDCLD_2008m0612t1557-o20801_v003-2015m0113t173629.he5.xml
+Deleting temp file. This file took 1.6018109321594238
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/231/OMI-Aura_L2-OMMYDCLD_2013m0819t1655-o48383_v003-2015m0224t021120.he5.xml
+Deleting temp file. This file took 1.5467841625213623
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/328/OMI-Aura_L2-OMMYDCLD_2007m1124t1556-o17874_v003-2015m0109t161452.he5.xml
+Deleting temp file. This file took 1.5288169384002686
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/354/OMI-Aura_L2-OMMYDCLD_2010m1220t1715-o34214_v003-2015m0203t172231.he5.xml
+Deleting temp file. This file took 1.5003530979156494
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/314/OMI-Aura_L2-OMMYDCLD_2011m1110t1556-o38946_v003-2015m0210t171908.he5.xml
+Deleting temp file. This file took 1.524533987045288
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/278/OMI-Aura_L2-OMMYDCLD_2007m1005t1753-o17147_v003-2015m0108t113520.he5.xml
+Deleting temp file. This file took 1.5214519500732422
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2007/350/OMI-Aura_L2-OMMYDCLD_2007m1216t1657-o18195_v003-2015m0110t013655.he5.xml
+Deleting temp file. This file took 1.4815599918365479
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/220/OMI-Aura_L2-OMMYDCLD_2007m0808t1544-o16301_v003-2015m0106t140502.he5.xml
+Deleting temp file. This file took 1.503436803817749
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/255/OMI-Aura_L2-OMMYDCLD_2012m0911t1729-o43403_v003-2015m0217t192156.he5.xml
+Deleting temp file. This file took 6.575013875961304
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/249/OMI-Aura_L2-OMMYDCLD_2012m0905t1807-o43316_v003-2015m0217t161937.he5.xml
+Deleting temp file. This file took 1.7064299583435059
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/235/OMI-Aura_L2-OMMYDCLD_2012m0822t1617-o43111_v003-2015m0217t115117.he5.xml
+Deleting temp file. This file took 1.4916021823883057
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/113/OMI-Aura_L2-OMMYDCLD_2006m0423t1630-o09428_v003-2014m1222t162630.he5.xml
+Deleting temp file. This file took 1.5021998882293701
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/253/OMI-Aura_L2-OMMYDCLD_2007m0910t1624-o16782_v003-2015m0107t150358.he5.xml
+Deleting temp file. This file took 1.656588077545166
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/217/OMI-Aura_L2-OMMYDCLD_2010m0805t1734-o32219_v003-2015m0131t132404.he5.xml
+Deleting temp file. This file took 1.698498010635376
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/013/OMI-Aura_L2-OMMYDCLD_2011m0113t1626-o34563_v003-2015m0204t171349.he5.xml
+Deleting temp file. This file took 1.6947970390319824
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/088/OMI-Aura_L2-OMMYDCLD_2007m0329t1744-o14380_v003-2015m0102t151448.he5.xml
+Deleting temp file. This file took 1.5704801082611084
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/145/OMI-Aura_L2-OMMYDCLD_2010m0525t1646-o31170_v003-2015m0130t000902.he5.xml
+Deleting temp file. This file took 1.567183017730713
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/098/OMI-Aura_L2-OMMYDCLD_2010m0408t1547-o30485_v003-2015m0129t021130.he5.xml
+Deleting temp file. This file took 1.5787410736083984
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/201/OMI-Aura_L2-OMMYDCLD_2005m0720t1750-o05395_v003-2014m1217t030007.he5.xml
+Deleting temp file. This file took 1.513580083847046
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/340/OMI-Aura_L2-OMMYDCLD_2012m1205t1740-o44641_v003-2015m0219t020114.he5.xml
+Deleting temp file. This file took 1.495671033859253
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/250/OMI-Aura_L2-OMMYDCLD_2010m0907t1635-o32699_v003-2015m0201t123319.he5.xml
+Deleting temp file. This file took 1.4617948532104492
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/009/OMI-Aura_L2-OMMYDCLD_2011m0109t1651-o34505_v003-2015m0204t154814.he5.xml
+Deleting temp file. This file took 1.583184003829956
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/103/OMI-Aura_L2-OMMYDCLD_2013m0413t1655-o46519_v003-2015m0221t082951.he5.xml
+Deleting temp file. This file took 1.449897050857544
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/242/OMI-Aura_L2-OMMYDCLD_2012m0829t1623-o43213_v003-2015m0217t141118.he5.xml
+Deleting temp file. This file took 1.4472038745880127
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/020/OMI-Aura_L2-OMMYDCLD_2009m0120t1739-o24035_v003-2015m0117t231343.he5.xml
+Deleting temp file. This file took 6.570785045623779
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/256/OMI-Aura_L2-OMMYDCLD_2005m0913t1752-o06196_v003-2014m1217t224426.he5.xml
+Deleting temp file. This file took 1.5604479312896729
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/005/OMI-Aura_L2-OMMYDCLD_2010m0105t1609-o29131_v003-2015m0127t112543.he5.xml
+Deleting temp file. This file took 1.550123929977417
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/191/OMI-Aura_L2-OMMYDCLD_2007m0710t1616-o15879_v003-2015m0105t152740.he5.xml
+Deleting temp file. This file took 1.705430030822754
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/124/OMI-Aura_L2-OMMYDCLD_2011m0504t1554-o36179_v003-2015m0207t040051.he5.xml
+Deleting temp file. This file took 1.9355578422546387
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/023/OMI-Aura_L2-OMMYDCLD_2006m0123t1542-o08117_v003-2014m1220t090204.he5.xml
+Deleting temp file. This file took 1.4895660877227783
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/215/OMI-Aura_L2-OMMYDCLD_2009m0803t1641-o26874_v003-2015m0123t024532.he5.xml
+Deleting temp file. This file took 1.5119481086730957
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/084/OMI-Aura_L2-OMMYDCLD_2009m0325t1747-o24967_v003-2015m0119t032704.he5.xml
+Deleting temp file. This file took 1.8526818752288818
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/175/OMI-Aura_L2-OMMYDCLD_2007m0624t1616-o15646_v003-2015m0105t103819.he5.xml
+Deleting temp file. This file took 1.5201401710510254
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2009/050/OMI-Aura_L2-OMMYDCLD_2009m0219t1754-o24472_v003-2015m0118t112052.he5.xml
+Deleting temp file. This file took 1.534749984741211
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/285/OMI-Aura_L2-OMMYDCLD_2013m1012t1433-o49168_v003-2015m0227t080906.he5.xml
+Deleting temp file. This file took 1.4462800025939941
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/215/OMI-Aura_L2-OMMYDCLD_2008m0802t1627-o21544_v003-2015m0114t220250.he5.xml
+Deleting temp file. This file took 1.5752100944519043
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/073/OMI-Aura_L2-OMMYDCLD_2008m0313t1749-o19477_v003-2015m0111t171259.he5.xml
+Deleting temp file. This file took 1.4958670139312744
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/311/OMI-Aura_L2-OMMYDCLD_2013m1107t1646-o49548_v003-2015m0227t133224.he5.xml
+Deleting temp file. This file took 1.5436320304870605
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/271/OMI-Aura_L2-OMMYDCLD_2011m0928t1619-o38320_v003-2015m0210t044312.he5.xml
+Deleting temp file. This file took 1.5268778800964355
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/310/OMI-Aura_L2-OMMYDCLD_2009m1106t1726-o28258_v003-2015m0125t151909.he5.xml
+Deleting temp file. This file took 1.4889030456542969
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/080/OMI-Aura_L2-OMMYDCLD_2013m0321t1825-o46185_v003-2015m0221t025753.he5.xml
+Deleting temp file. This file took 8.254219055175781
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2007/227/OMI-Aura_L2-OMMYDCLD_2007m0815t1549-o16403_v003-2015m0106t154918.he5.xml
+Deleting temp file. This file took 1.520848035812378
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/089/OMI-Aura_L2-OMMYDCLD_2012m0329t1628-o40985_v003-2015m0214t064922.he5.xml
+Deleting temp file. This file took 1.4974358081817627
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2012/017/OMI-Aura_L2-OMMYDCLD_2012m0117t1709-o39937_v003-2015m0212t180314.he5.xml
+Deleting temp file. This file took 1.6428699493408203
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/140/OMI-Aura_L2-OMMYDCLD_2010m0520t1807-o31098_v003-2015m0129t221522.he5.xml
+Deleting temp file. This file took 1.4772450923919678
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/299/OMI-Aura_L2-OMMYDCLD_2013m1026t1802-o49374_v003-2015m0227t093632.he5.xml
+Deleting temp file. This file took 1.709986925125122
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2010/028/OMI-Aura_L2-OMMYDCLD_2010m0128t1756-o29467_v003-2015m0127t193233.he5.xml
+Deleting temp file. This file took 1.577927827835083
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003/2008/283/OMI-Aura_L2-OMMYDCLD_2008m1009t1556-o22534_v003-2015m0116t093539.he5.xml
+Deleting temp file. This file took 1.578160047531128
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/083/OMI-Aura_L2-OMMYDCLD_2011m0324t1556-o35582_v003-2015m0206t094520.he5.xml
+Deleting temp file. This file took 1.561086893081665
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2006/106/OMI-Aura_L2-OMMYDCLD_2006m0416t1623-o09326_v003-2014m1222t143518.he5.xml
+Deleting temp file. This file took 1.5337119102478027
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2013/260/OMI-Aura_L2-OMMYDCLD_2013m0917t1621-o48805_v003-2015m0224t131742.he5.xml
+Deleting temp file. This file took 1.4959070682525635
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2009/194/OMI-Aura_L2-OMMYDCLD_2009m0713t1803-o26569_v003-2015m0122t145824.he5.xml
+Deleting temp file. This file took 1.7135670185089111
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2005/125/OMI-Aura_L2-OMMYDCLD_2005m0505t1545-o04287_v003-2014m1216t004338.he5.xml
+Deleting temp file. This file took 3.3176941871643066
+Start Download: 
+	ftp://aurapar2u.ecs.nasa.gov/data/s4pa///Aura_OMI_Level2/OMMYDCLD.003//2011/087/OMI-Aura_L2-OMMYDCLD_2011m0328t1711-o35641_v003-2015m0206t105322.he5.xml
+Deleting temp file. This file took 1.437911033630371
+Downloading ended after 30.44987916946411 s.
+Total of 1 iterations
+Length of Accumulator: 120
+Is this a test run?  True
+120 metadata files located
+Skipping metadata download. Database parse detected
+Data download began at  Thu May  5 20:24:26 2016
+Data download ended after 721.0686371326447 s.
+Total of 1 iterations
+Length of Accumulator: 120
+testing complete

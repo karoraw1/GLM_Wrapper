@@ -17,6 +17,8 @@ import time
 import os
 import LakeModel
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 
 def addtodict(vals, vars, dict):
     for var, val in zip(vars, vals):
@@ -127,12 +129,66 @@ ceres_path =mainFolder+"/CERES/"+"CERES_SSF_XTRK-MODIS_Edition3A_Subset_20100101
 
 test.read_GCHN(met_path)
 test.read_CERES_nc(ceres_path)
-lat = test.ceres_['lat']
-lon = test.ceres_['lon']
-c1 = lat.min()
-c3 = lon.min()
-lat_c = lat-c1
-lon_c = lon-c1
+test.read_GEODISC_cloud_data('cloud_data_5pt.csv')
+adapt_data = os.path.join(os.getcwd(), "Giovanni", 'test_data_adaptive.csv')
+adapt_data3n = os.path.join(os.getcwd(), "Giovanni", 'test_data_adaptive3n.csv')
+adaptive_fil = pd.read_csv(adapt_data, index_col = 0,parse_dates = ['start', 'end'],
+                                              infer_datetime_format = True)
+adaptive_3n = pd.read_csv(adapt_data3n, index_col = 0,parse_dates = ['start', 'end'],
+                                              infer_datetime_format = True)
+test.geodisc_clouds.cc_n.plot.hist(bins=30)
+
+cc_plt_df = test.geodisc_clouds.drop(['start', 'end', 'hdf5', 'i_out_2', 'checksum'], axis=1)
+cc_plt_df.columns = ['Mean Cloud Cover', 'Cloud Cover STD',
+                     'Cloud Cover Sample Size (n)', 'Latitude Std (deg)', 
+                     'Longitude Std (deg)' ]
+def getDuration(df, col1_i, col2_i, i):
+    date_format = '%Y-%m-%d %H:%M:%S'
+    end_s = str(test.geodisc_clouds.iloc[i, col2_i])
+    end_t = pd.datetime.strptime(end_s, date_format)
+    start_s = str(test.geodisc_clouds.iloc[i, col1_i])
+    start_t = pd.datetime.strptime(start_s, date_format)
+    return (end_t - start_t).seconds/60./60.
+
+def getPeriodicity(df, col1_i, time_d, i):
+    date_format = '%Y-%m-%d %H:%M:%S'
+    if i < time_d:
+        return np.nan
+    else:
+        end_s = str(test.geodisc_clouds.iloc[i, col1_i])
+        end_t = pd.datetime.strptime(end_s, date_format)
+        start_s = str(test.geodisc_clouds.iloc[i-time_d, col1_i])
+        start_t = pd.datetime.strptime(start_s, date_format)
+    return (end_t - start_t).seconds/60./60.
+
+rows, cols = cc_plt_df.shape
+cc_plt_df.insert(0, 'duration (hours)', np.zeros(rows))
+for n in range(rows):
+    cc_plt_df.iloc[n, 0] = getDuration(test.geodisc_clouds, 0, 1, n)
+
+cc_plt_df.hist(bins=30)
+
+sorted_df = test.geodisc_clouds.sort_values('start', axis = 0, ascending = True)
+sorted_df.insert(0, 'periodicity (hours)', np.zeros(rows))
+
+for m in range(rows):
+    sorted_df.iloc[m, 0] = getPeriodicity(test.geodisc_clouds, 1, 1, m)
+
+sorted_df.set_index('start', drop=True, inplace=True, verify_integrity=True)
+
+sorted_df_pre_agg, new_idx_cols = LakeModel.TimeIdx(sorted_df)
+null_col = sorted_df_pre_agg.notnull().cc_means
+sorted_df_pre_agg['Null Values'] = null_col
+cc_aggs_mu = LakeModel.makeAggregations(sorted_df_pre_agg, new_idx_cols, np.mean)
+cc_aggs_std = LakeModel.makeAggregations(sorted_df_pre_agg, new_idx_cols, np.std )
+cc_aggs_sum = LakeModel.makeAggregations(sorted_df_pre_agg, new_idx_cols, np.sum)
+
+plt.figure(3)
+plt.clf()
+plt.plot(cc_aggs_std['day_i'].index, cc_aggs_std['day_i'].cc_means)
+
+
+
 #
 #import matplotlib.pyplot as plt
 #plt.figure(1)

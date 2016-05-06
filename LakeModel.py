@@ -59,7 +59,9 @@ def z_score(df):
 def makeAggregations(df, indices, fxn):
     aggs = {}    
     for idx in indices:
-        aggs[idx] = df.groupby(df[idx]).agg(fxn)
+        new_df = df.copy().groupby(df[idx]).agg(fxn)
+        aggs[idx] = new_df.drop(indices, axis=1)
+    
     return aggs
     
 def show_agg_resolution(aggs, col_name):
@@ -493,7 +495,7 @@ class Lake(object):
             else:
                 self.ceres_df[key] = self.ceres_[key].values
         
-        self.histo = plotTemporalDist(self.ceres_df, 1, clear=False, bins=4)
+        # self.histo = plotTemporalDist(self.ceres_df, 1, clear=False, bins=4)
         
         self.ceres_zs = z_score(self.ceres_df)
         self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
@@ -509,10 +511,32 @@ class Lake(object):
                                                    "cloud_frac")
         printAutocorr(self.ceres_mean_aggs)
         #pass dataframe to insert new index columns
-        
-        
-        
         rootgrp.close()
+        
+    def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
+        if fname == None:
+            self.geodisc_f = 'cloud_data.csv'
+        else:
+            self.geodisc_f = fname
+        if data_dir == None:
+            self.geodisc_d = os.path.join(os.getcwd(), "Giovanni")
+        else:
+            self.geodisc_d = data_dir
+
+        self.geodisc_p = os.path.join(self.geodisc_d, self.geodisc_f)        
+        
+        try:
+            self.geodisc_clouds = pd.read_csv(self.geodisc_p, index_col = 0,
+                                              parse_dates = ['start', 'end'],
+                                              infer_datetime_format = True)
+        except IOError:
+            print "no file detected"
+            raise IOError
+
+        
+        
+        
+        
         
 
                                    

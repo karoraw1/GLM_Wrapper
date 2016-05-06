@@ -1,0 +1,23 @@
+Is this a test run?  False
+5198 metadata files located
+Skipping metadata download. Database parse detected
+Data download began at  Wed May  4 22:02:38 2016
+Data download ended after 28366.13752102852 s.
+Total of 1 iterations
+Length of Accumulator: 5197
+cloud fetch complete
+Is this a test run?  False
+5198 metadata files located
+Skipping metadata download. Database parse detected
+Data download began at  Thu May  5 11:29:18 2016
+Is this a test run?  False
+5198 metadata files located
+Skipping metadata download. Database parse detected
+Data download began at  Thu May  5 11:37:12 2016
+Is this a test run?  False
+5198 metadata files located
+Skipping metadata download. Database parse detected
+Data download began at  Thu May  5 11:50:06 2016
+Data download ended after 24236.24787902832 s.
+Total of 1 iterations
+Length of Accumulator: 5197
