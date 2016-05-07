@@ -20,6 +20,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+plt.style.use('fivethirtyeight')
+
+
 def addtodict(vals, vars, dict):
     for var, val in zip(vars, vals):
         dict[var] = val
@@ -137,23 +140,38 @@ test.read_GCHN(met_path)
 test.read_CERES_nc(ceres_path)
 test.read_GEODISC_cloud_data('cloud_data_5pt.csv',  GEODISC_path)
 
-adaptive_fil = pd.read_csv(adapt_data, index_col = 0,parse_dates = ['start', 'end'],
-                                              infer_datetime_format = True)
-adaptive_3n = pd.read_csv(adapt_data3n, index_col = 0,parse_dates = ['start', 'end'],
-                                              infer_datetime_format = True)
-test.geodisc_clouds.cc_n.plot.hist(bins=30)
+adaptive_n = pd.read_csv(adapt_data, index_col = 0, 
+                         parse_dates = ['start', 'end'], 
+                         infer_datetime_format = True)
+adaptive_3n = pd.read_csv(adapt_data3n, index_col = 0, 
+                          parse_dates = ['start', 'end'], 
+                          infer_datetime_format = True)
 
-cc_plt_df = test.geodisc_clouds.drop(['start', 'end', 'hdf5', 'i_out_2', 'checksum'], axis=1)
-cc_plt_df.columns = ['Mean Cloud Cover', 'Cloud Cover STD',
-                     'Cloud Cover Sample Size (n)', 'Latitude Std (deg)', 
-                     'Longitude Std (deg)' ]
-def getDuration(df, col1_i, col2_i, i):
-    date_format = '%Y-%m-%d %H:%M:%S'
-    end_s = str(test.geodisc_clouds.iloc[i, col2_i])
-    end_t = pd.datetime.strptime(end_s, date_format)
-    start_s = str(test.geodisc_clouds.iloc[i, col1_i])
-    start_t = pd.datetime.strptime(start_s, date_format)
-    return (end_t - start_t).seconds/60./60.
+adaptive = pd.concat([adaptive_3n, adaptive_n], ignore_index=True)
+flat_n = test.geodisc_clouds.sample(n=160)
+xlabs = ["Std. Deviation per Swath(n)", "Measurements per Swath (n)" ]
+col_names = ['cc_stds', 'cc_n']
+fignames = ['adaptiveVflat_stds.png', 'adaptiveVflat_n.png']
+colors1 = ['r', 'g']
+
+for xlab, col_name, fig_n, cs in zip(xlabs, col_names, fignames, colors1):
+    s1 = flat_n[col_name].values
+    s2 = adaptive[col_name].values
+    plot_vals = pd.Series(np.concatenate((s1,s2)))
+    labs1 = np.tile(np.array('0.3 Degree Threshold'), (160,))
+    labs2 = np.tile(np.array('Non-Zero Minimum Threshold'), (160,))
+    plot_grps = np.concatenate((labs1, labs2))
+    ax1, ax2 = plot_vals.hist(by=plot_grps, figsize=(12,6), color=cs)
+    ax1.set_xlabel(xlab)
+    ax2.set_xlabel(xlab)
+    ax1.set_ylabel("Swath Count")
+    plt.savefig(fig_n, dpi=300)
+
+
+def getStartTimes(df, col1_i, i):
+    a_time  = df.iloc[i, col1_i]
+    total_s = a_time.hour * 3600 + a_time.minute * 60 + a_time.second
+    return total_s/3600.
 
 def getPeriodicity(df, col1_i, time_d, i):
     date_format = '%Y-%m-%d %H:%M:%S'
@@ -166,10 +184,17 @@ def getPeriodicity(df, col1_i, time_d, i):
         start_t = pd.datetime.strptime(start_s, date_format)
     return (end_t - start_t).seconds/60./60.
 
+nondataCols = ['start', 'end', 'hdf5', 'i_out_2', 'checksum']
+cc_plt_df = test.geodisc_clouds.drop(nondataCols, axis=1)
+cc_plt_df.columns = ['Mean Cloud Cover', 'Cloud Cover STD',
+                     'Cloud Cover Sample Size (n)', 'Latitude Std (deg)', 
+                     'Longitude Std (deg)' ]
+
 rows, cols = cc_plt_df.shape
-cc_plt_df.insert(0, 'duration (hours)', np.zeros(rows))
+cc_plt_df.insert(0, 'Time of Day (hrs)', np.zeros(rows))
+
 for n in range(rows):
-    cc_plt_df.iloc[n, 0] = getDuration(test.geodisc_clouds, 0, 1, n)
+    cc_plt_df.iloc[n, 0] = getStartTimes(test.geodisc_clouds, 1, n)
 
 cc_plt_df.hist(bins=30)
 
@@ -190,7 +215,10 @@ cc_aggs_sum = LakeModel.makeAggregations(sorted_df_pre_agg, new_idx_cols, np.sum
 
 plt.figure(3)
 plt.clf()
-plt.plot(cc_aggs_std['day_i'].index, cc_aggs_std['day_i'].cc_means)
+plt.scatter(flat_n.cc_stds , flat_n.cc_n, c = 'r')
+plt.scatter(adaptive.cc_stds , adaptive.cc_n, c = 'b')
+plt.ylabel('Measurements (n)')
+plt.xlabel('Standard Deviation (n)')
 
 
 
