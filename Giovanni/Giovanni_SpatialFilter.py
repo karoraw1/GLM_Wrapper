@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed May  4 14:36:30 2016
+The class here is GEODISC_data.
+It is initialized using a list of FTP URLS and a database folder.
+Once initialized, an empty database is created. 
+The methods include:
+    __init__():
+    build_xml_db(): 
+    build_HDF_db():
+    parse_xml_db():
+    spatialFilter():
 
 @author: Keith
 """
@@ -8,7 +17,7 @@ import subprocess
 import numpy as np
 import h5py
 import os
-#import time
+import time
 
 def dl_parse_hdf(data_urls, data_vals, i, build = False):
     d_u = data_urls[i]

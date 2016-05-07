@@ -124,14 +124,19 @@ addtodict(bird_vals, bird_vars, value_dict)
 addtodict(outflow_vals, outflow_vars, value_dict)
 addtodict(inflow_vals, inflow_vars, value_dict)
 test = LakeModel.Lake(cases[0], newDirs[0], value_dict)
-met_path = mainFolder + "/" + "BostonLoganAirportWeather.csv"
-ceres_path =mainFolder+"/CERES/"+"CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
+
+met_path = os.path.join(mainFolder, "BostonLoganAirportWeather.csv")
+ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
+ceres_path = os.path.join(mainFolder, "CERES", ceres_fn)
+GEODISC_path = os.path.join(os.getcwd(), "Giovanni", "test_files")
+adapt_data = os.path.join(GEODISC_path, 'test_data_adaptive.csv')
+adapt_data3n = os.path.join(GEODISC_path, 'test_data_adaptive3n.csv')
+
 
 test.read_GCHN(met_path)
 test.read_CERES_nc(ceres_path)
-test.read_GEODISC_cloud_data('cloud_data_5pt.csv')
-adapt_data = os.path.join(os.getcwd(), "Giovanni", 'test_data_adaptive.csv')
-adapt_data3n = os.path.join(os.getcwd(), "Giovanni", 'test_data_adaptive3n.csv')
+test.read_GEODISC_cloud_data('cloud_data_5pt.csv',  GEODISC_path)
+
 adaptive_fil = pd.read_csv(adapt_data, index_col = 0,parse_dates = ['start', 'end'],
                                               infer_datetime_format = True)
 adaptive_3n = pd.read_csv(adapt_data3n, index_col = 0,parse_dates = ['start', 'end'],

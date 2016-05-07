@@ -157,7 +157,6 @@ samples = load(parallel_in, mmap_mode='r')
 
 time_m_dl = time.time()
 
-
 # Try to find previous evidence of download
 if test == False:
     m_csv_p = os.path.join(giovanni_path, "cloud_meta.csv")
@@ -206,6 +205,7 @@ if make_db == True:
         out_csv = os.path.join(giovanni_path, "test_meta.csv")
     
     cloud_df.to_csv(out_csv)
+
 
 # Else we move ahead to next set of downloads
 else:
