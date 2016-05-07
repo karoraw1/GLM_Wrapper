@@ -10,7 +10,7 @@ import h5py
 import os
 #import time
 
-def dl_parse_hdf(data_urls, data_vals, i):
+def dl_parse_hdf(data_urls, data_vals, i, build = False):
     d_u = data_urls[i]
     if (d_u[0:3] == 'ftp') and (d_u[:-4:-1] == '5eh'):
         #start = time.time()
@@ -64,7 +64,8 @@ def dl_parse_hdf(data_urls, data_vals, i):
         good_lats = latIndex[full_mask].copy()
         good_lons = lonIndex[full_mask].copy()
         
-        subprocess.call('rm '+hdf_f, shell = True, executable = '/bin/bash')
+        if build == False:
+            subprocess.call('rm '+hdf_f, shell = True, executable = '/bin/bash')
         
         if (good_recs.shape[0]!=0):
             return [i, good_recs.mean(), good_recs.std(), good_recs.shape[0], 
@@ -75,30 +76,3 @@ def dl_parse_hdf(data_urls, data_vals, i):
         print "not a hdf file"
         return [i, np.nan, np.nan, np.nan, np.nan, np.nan, hdf_f[-4:], np.nan]
         
-
-"""
-
-
-test_f = "OMI-Aura_L2-OMMYDCLD_2014m0101t1651-o50349_v003-2015m0228t154805.he5"
-test_time = "2014-01-01 16:51:19"
-path2obj = "/HDFEOS/SWATHS/CloudProduct/Data Fields/CloudFractionforO2"
-
-f = h5py.File(test_f)
-group = f['HDFEOS']['SWATHS']['CloudProduct']
-geoLoc = group['Geolocation Fields']
-dFields = group['Data Fields']
-time_2 = geoLoc['Time'].value
-latIndex = geoLoc['Latitude'].value
-lonIndex = geoLoc['Longitude'].value
-cloudFrac = dFields['CloudFractionforO2'].value
-
-deg_lim = 0.3
-
-times, img_slices = cloudFrac.shape
-naVal = dFields['CloudFractionforO2'].fillvalue
-lake = np.array([42.4317, -71.1483])
-filter_pos = (abs(latIndex - lake[0]) < deg_lim) & (abs(lonIndex - lake[1]) < deg_lim)
-filter_Nan = cloudFrac != naVal
-good_recs = cloudFrac[filter_pos & filter_Nan]
-print (time.time() - start)
-"""
