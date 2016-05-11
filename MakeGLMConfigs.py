@@ -22,6 +22,11 @@ import pandas as pd
 
 plt.style.use('fivethirtyeight')
 
+def subsectbydate(largedf, smalldf):
+    crit1 = largedf.index > smalldf.index[0]
+    crit2 = largedf.index < smalldf.index[-1]
+    bothCrit = crit1 & crit2
+    return largedf[bothCrit].copy()
 
 def addtodict(vals, vars, dict):
     for var, val in zip(vars, vals):
@@ -42,7 +47,7 @@ print ""
 cases = ["sunnyDay"]
 
 # this is the directory you want to work in
-mainFolder = '/home/login/GDrive/Documents/Landscape_Hydrology/Final Project'
+mainFolder = os.getcwd()
 
 # GLM starts from the command line and immediately searches in the current 
 # directory for `glm2.nml`. So we need a directory for each case and a 
@@ -50,12 +55,30 @@ mainFolder = '/home/login/GDrive/Documents/Landscape_Hydrology/Final Project'
 
 superDir = '/glm_case_folders'
 make_dir(mainFolder+superDir)
+met_fn = "BostonLoganAirportWeather.csv"
+met_path = os.path.join(mainFolder, 'weatherData', met_fn)
+
+ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
+ceres_path = os.path.join(mainFolder, 'weatherData', ceres_fn)
+
+GEODISC_path = os.path.join(mainFolder, "Giovanni", "test_files")
+adapt_data = os.path.join(GEODISC_path, 'test_data_adaptive.csv')
+adapt_data3n = os.path.join(GEODISC_path, 'test_data_adaptive3n.csv')
+
+context_pond = "Fresh_pond_air_and_water_temp.txt"
+inflow_fn = "aberjona_15min_discharge_precip_streamU_gageheight.txt"
+outflow_fn1 = "mystic_river_15min_water_temp_discharge2015_2016.txt"
+outflow_fn2 = "alewifedailydischarge2005-2016.txt"
+hobbs_fn = "HobbsBk_all.txt"
+flow_fns = [inflow_fn, outflow_fn1, outflow_fn2, hobbs_fn, context_pond]
+flow_ps = [os.path.join(os.getcwd(), 'waterdata', i) for i in flow_fns]
 
 newDirs = [mainFolder+superDir+"/"+x for x in cases]
 
 
 # the glm contains the following blocks:
 # &glm_setup: General simulation info and mixing parameters
+
 setup_vars = ['max_layers', 'min_layer_vol', 'min_layer_thick', 
               'max_layer_thick', 'Kw', 'coef_inf_entrain', 'coef_mix_conv', 
               'coef_wind_stir', 'coef_mix_shear', 'coef_mix_turb', 
@@ -126,20 +149,70 @@ addtodict(met_vals, met_vars, value_dict)
 addtodict(bird_vals, bird_vars, value_dict)
 addtodict(outflow_vals, outflow_vars, value_dict)
 addtodict(inflow_vals, inflow_vars, value_dict)
+
 test = LakeModel.Lake(cases[0], newDirs[0], value_dict)
 
-met_path = os.path.join(mainFolder, "BostonLoganAirportWeather.csv")
-ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
-ceres_path = os.path.join(mainFolder, "CERES", ceres_fn)
-GEODISC_path = os.path.join(os.getcwd(), "Giovanni", "test_files")
-adapt_data = os.path.join(GEODISC_path, 'test_data_adaptive.csv')
-adapt_data3n = os.path.join(GEODISC_path, 'test_data_adaptive3n.csv')
+BOS_weather = LakeModel.GHCN_weather_data(met_path)
+BOS_weather.clean_columns()
 
+CERES_data = LakeModel.CERES_nc(ceres_path)
 
-test.read_GCHN(met_path)
-test.read_CERES_nc(ceres_path)
 test.read_GEODISC_cloud_data('cloud_data_5pt.csv',  GEODISC_path)
 
+inflow = LakeModel.USGS_water_data(flow_ps[0])
+inflow.preprocess()
+inflow.read()
+inflow.print_metadata()
+
+mystic = LakeModel.USGS_water_data(flow_ps[1])
+mystic.preprocess()
+mystic.read()
+mystic.print_metadata()
+
+alewife = LakeModel.USGS_water_data(flow_ps[2])
+alewife.preprocess()
+alewife.read()
+alewife.print_metadata()
+
+FreshPond = LakeModel.USGS_water_data(flow_ps[4])
+FreshPond.preprocess()
+FreshPond.read()
+
+Hobbs = LakeModel.USGS_water_data(flow_ps[3])
+Hobbs.preprocess()
+Hobbs.read()
+Hobbs.print_metadata()
+
+
+old_cols = Hobbs.df.columns.values
+old_cols[7] = 'Water Temperature'
+old_cols[15] = 'Air Temperature'
+old_cols[9] = 'Specific conductance'
+Hobbs.df.columns = old_cols
+to_drop = list(old_cols)
+to_drop.remove(old_cols[7])
+to_drop.remove(old_cols[15])
+to_drop.remove(old_cols[9])
+temp_df = Hobbs.df.drop(to_drop, axis=1)
+temp_df = temp_df.resample('D').mean()
+temp_df2 = subsectbydate(FreshPond.df, temp_df)
+
+plt.style.use('ggplot')
+f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, figsize=(18,12) )
+ax3.plot(temp_df['Air Temperature'])
+ax3.plot(temp_df2['Temperature, air'])
+ax2.plot(temp_df['Water Temperature'])
+ax2.plot(temp_df2['Temperature, water'])
+ax1.plot(temp_df['Specific conductance'])
+ax1.plot(temp_df2['Specific conductance'])
+ax1.set_title('Specific conductance')
+ax2.set_title('Water Temperature')
+ax3.set_title('Air Temperature')
+f.legend( ax1.get_lines(), ['Hobbs Brook', 'Fresh Pond'], loc = (0.35, 0), ncol=2)
+f.savefig("ConductanceANDTemperatureat2sites.png")
+
+#test.mergedata()
+plt.style.use('fivethirtyeight')
 adaptive_n = pd.read_csv(adapt_data, index_col = 0, 
                          parse_dates = ['start', 'end'], 
                          infer_datetime_format = True)

@@ -21,7 +21,6 @@ from joblib import load, dump
 import tempfile
 from Giovanni_SpatialFilter import dl_parse_hdf
 
-
 def textDict(path, fname):
     f_path = os.path.join(path, fname)
     f = open(f_path, 'r')

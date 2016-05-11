@@ -8,6 +8,8 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 
 @author: login
 """
+import re
+import mmap
 import peakutils
 import os
 import numpy as np
@@ -425,93 +427,6 @@ class Lake(object):
         glm_handle.close()
         self.met_path = None
         self.raw_met = None
-    
-    def read_GCHN(self, met_path):
-        self.met_path = met_path
-        self.raw_met = pd.read_csv(met_path, parse_dates=[2], 
-                                   infer_datetime_format=True, 
-                                   na_values=[-9999])
-        
-        # TODO: play with dates in the way that we did in 
-        # WaterBalance.py to get different resamples & groupbys        
-        dates = self.raw_met.DATE
-        
-        #PRCP - Precipitation (tenths of mm)        
-        self.precip = self.raw_met.PRCP/10000
-        #AWND - Average daily wind speed (tenths of meters per second)        
-        self.wind_speed = self.raw_met.AWND/10
-        #TMAX - Maximum temperature (tenths of degrees C)
-        self.t_max = self.raw_met.TMAX/10
-        self.t_min = self.raw_met.TMIN/10
-        #SNOW - Snowfall (mm) -> meters
-        self.snow_fall = self.raw_met.SNOW/1000
-        #SNWD - Snow depth (mm) -> meters
-        self.snow_depth = self.raw_met.SNWD/1000
-        self.clean_cols = [self.precip, self.wind_speed, self.t_max, self.t_min, 
-                      self.snow_fall, self.snow_depth]
-        col_labels = ["precip", "wind_speed", "t_max", "t_min", "snow_fall",
-                      "snow_depth"]
-        self.net_GCHN = pd.DataFrame(index=self.raw_met.DATE, columns=col_labels)
-        for idx in range(len(self.clean_cols)):
-            self.net_GCHN.iloc[:, idx] = self.clean_cols[idx].values
-        
-        self.gchn_zs = z_score(self.net_GCHN)
-        printNaNWarning(self.net_GCHN, "GCHN data", None)
-        #self.GCHN_ac = printAutocorr(self.net_GCHN)        
-        
-    def read_CERES_nc(self, ceres_path):
-        rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
-        nc_attrs, nc_dims, nc_vars = ncdump(rootgrp, False)
-        # Temps in Kelvin        
-        # Fluxes in u'Watts per square meter'
-        # wind vectors in meters per second
-        # humididity & cloud cover in ?
-        toExtract = ["lon", "lat", "Time_of_observation", 
-                     "Surface_skin_temperature", "Surface_wind___U_vector",
-                     "Surface_wind___V_vector", 
-                     "Column_averaged_relative_humidity", 
-                     "Altitude_of_surface_above_sea_level",
-                     "PSF_wtd_MOD04_cloud_fraction_land",
-                     "CERES_net_LW_surface_flux___Model_B",
-                     "CERES_net_SW_surface_flux___Model_B"]
-        betterNames = ["lat", "lon", "time_J", "temp", "windU", "windV",
-                       "humidity", "altitude", "cloud_frac", "LW_rad", "SW_rad"]
-        self.ceres_ = {}
-        for var, nam in zip(toExtract, betterNames):
-            self.ceres_[nam] = pd.Series(rootgrp.variables[var][:])
-        gDays = [jd.caldate(j) for j in self.ceres_["time_J"]]
-        self.ceres_['date'] = pd.to_datetime(np.array(gDays))
-        
-        self.ceres_df = pd.DataFrame(index=self.ceres_['date'], 
-                                     columns=betterNames)
-        ignorable = ['lat', 'lon', 'time_J', 'altitude']
-        for key in self.ceres_.keys():
-            if key == 'temp':
-                self.ceres_df[key] = self.ceres_[key].values-273.15
-            elif key in ignorable:
-                self.ceres_df = self.ceres_df.drop(key, 1)
-            elif key not in self.ceres_df.columns.values:
-                pass
-            else:
-                self.ceres_df[key] = self.ceres_[key].values
-        
-        # self.histo = plotTemporalDist(self.ceres_df, 1, clear=False, bins=4)
-        
-        self.ceres_zs = z_score(self.ceres_df)
-        self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
-        self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
-        printNaNWarning(self.ceres_df, "CERES data", None)
-        self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)
-        self.ceres_mean_aggs = makeAggregations(self.ceres_reindex_zs, 
-                                                self.i_names, np.mean)
-                                                
-        self.humidity_scales = show_agg_resolution(self.ceres_mean_aggs, 
-                                                   "humidity")
-        self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
-                                                   "cloud_frac")
-        printAutocorr(self.ceres_mean_aggs)
-        #pass dataframe to insert new index columns
-        rootgrp.close()
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
         if fname == None:
@@ -532,15 +447,181 @@ class Lake(object):
         except IOError:
             print "no file detected"
             raise IOError
+        
+class USGS_water_data(object):
 
+    def __init__(self, fn):
+        self.fn = fn
+    
+    def preprocess(self):
+        f = open(self.fn)    
+        s = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        self.alt1 = False  
         
-        
-        
-        
-        
+        try:
+            header = s.find("#    DD parameter   Description")
+            s.seek(header)
+        except ValueError:
+            header = s.find("#    DD parameter statistic")
+            s.seek(header)
+            self.alt1=True            
 
-                                   
+        s.seek(header)
+        s.readline()
+        text = s.readline()
+        words = [splits for splits in text.split(" ") if splits is not ""]
+        dds, params, descrips  = [], [], []
+        
+        while words[0] != "#\n":
+            dds.append(words[1])
+            
+            if self.alt1 == False:
+                params.append(words[2])
+                descrips.append(" ".join(words[3:6])[:-1])
+            else:
+                params.append(words[2]+"_"+words[3])
+                descrips.append(" ".join(words[4:6])[:-1])
+                
+            text = s.readline()
+            words = [splits for splits in text.split(" ") if splits is not ""]
+        s.seek(0)        
+        line = s.readline()
+        com_lines = 0
+        while line[0] == '#':
+            line = s.readline()
+            com_lines +=1
+            
+        self.cols = line
+        re.split(r'\t+', self.cols)
+        self.skipRows = []
+        self.com_lines, counter2 = com_lines, com_lines
+        
+        while line[:4]!='USGS':
+            line = s.readline()
+            counter2+=1
+            self.skipRows.append(counter2)
+            
+        s.close()
+        f.close()
+        
+        col_keys = [i+"_"+j for i, j in zip(dds, params)]            
+        self.col_dict = {i:j for i, j in zip(col_keys, descrips)}
+        self.qual_cols = [i+"_cd" for i in col_keys]
+        
+    def read(self):
+        self.df = pd.read_csv(self.fn, sep="\t", header=self.com_lines, 
+                                  skiprows=self.skipRows, index_col=[2], 
+                                  parse_dates=[2], low_memory=False,
+                                  infer_datetime_format=True)
+        
+        new_cols = []
+        for vals in self.df.columns:
+            if self.col_dict.has_key(vals):
+                new_cols.append(self.col_dict[vals])
+            else:
+                new_cols.append(vals)
+        self.df.columns = new_cols
 
+    def print_metadata(self):
+        print "\n Metadata for %r" %os.path.basename(self.fn)
+        
+        for i in self.df.columns:
+            if i[-3:] == '_cd':
+               qual_col = self.df[i]
+               print i
+               print "\t%r" % qual_col.value_counts().index
+               print "\t%r" % qual_col.value_counts().values
+        print ""
+
+class GHCN_weather_data(object):
+    
+    def __init__(self, met_path):
+        self.met_path = met_path
+        self.raw_met = pd.read_csv(met_path, parse_dates=[2], 
+                                   infer_datetime_format=True, 
+                                   na_values=[-9999])
+
+    def clean_columns(self):
+        #PRCP - Precipitation (tenths of mm)        
+        self.precip = self.raw_met.PRCP/10000
+        #AWND - Average daily wind speed (tenths of meters per second)        
+        self.wind_speed = self.raw_met.AWND/10
+        #TMAX - Maximum temperature (tenths of degrees C)
+        self.t_max = self.raw_met.TMAX/10
+        self.t_min = self.raw_met.TMIN/10
+        #SNOW - Snowfall (mm) -> meters
+        self.snow_fall = self.raw_met.SNOW/1000
+        #SNWD - Snow depth (mm) -> meters
+        self.snow_depth = self.raw_met.SNWD/1000
+        self.clean_cols = [self.precip, self.wind_speed, self.t_max, self.t_min, 
+                      self.snow_fall, self.snow_depth]
+        col_labels = ["precip", "wind_speed", "t_max", "t_min", "snow_fall",
+                      "snow_depth"]
+        self.df = pd.DataFrame(index=self.raw_met.DATE, columns=col_labels)
+
+        for idx in range(len(self.clean_cols)):
+            self.df.iloc[:, idx] = self.clean_cols[idx].values
+        
+        self.gchn_zs = z_score(self.df)
+        printNaNWarning(self.df, "GCHN data", None)
+
+                                           
+class CERES_nc(object):
+    
+    def __init__(self, ceres_path):
+        rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
+        nc_attrs, nc_dims, nc_vars = ncdump(rootgrp, False)
+        # Temps in Kelvin        
+        # Fluxes in u'Watts per square meter'
+        # wind vectors in meters per second
+        # humididity & cloud cover in ?
+        toExtract = ["lon", "lat", "Time_of_observation", 
+                     "Surface_skin_temperature", "Surface_wind___U_vector",
+                     "Surface_wind___V_vector", 
+                     "Column_averaged_relative_humidity", 
+                     "Altitude_of_surface_above_sea_level",
+                     "PSF_wtd_MOD04_cloud_fraction_land",
+                     "CERES_net_LW_surface_flux___Model_B",
+                     "CERES_net_SW_surface_flux___Model_B"]
+        betterNames = ["lat", "lon", "time_J", "temp", "windU", "windV",
+                       "humidity", "altitude", "cloud_frac", "LW_rad", "SW_rad"]
+        self.ceres_ = {}
+        
+        for var, nam in zip(toExtract, betterNames):
+            self.ceres_[nam] = pd.Series(rootgrp.variables[var][:])
+        gDays = [jd.caldate(j) for j in self.ceres_["time_J"]]
+        self.ceres_['date'] = pd.to_datetime(np.array(gDays))
+        
+        self.ceres_df = pd.DataFrame(index=self.ceres_['date'], 
+                                     columns=betterNames)
+
+        ignorable = ['lat', 'lon', 'time_J', 'altitude']
+
+        for key in self.ceres_.keys():
+            if key == 'temp':
+                self.ceres_df[key] = self.ceres_[key].values-273.15
+            elif key in ignorable:
+                self.ceres_df = self.ceres_df.drop(key, 1)
+            elif key not in self.ceres_df.columns.values:
+                pass
+            else:
+                self.ceres_df[key] = self.ceres_[key].values
+        
+        self.ceres_zs = z_score(self.ceres_df)
+        self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
+        self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
+        printNaNWarning(self.ceres_df, "CERES data", None)
+        self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)
+        self.ceres_mean_aggs = makeAggregations(self.ceres_reindex_zs, 
+                                                self.i_names, np.mean)
+                                                
+        self.humidity_scales = show_agg_resolution(self.ceres_mean_aggs, 
+                                                   "humidity")
+        self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
+                                                   "cloud_frac")
+        printAutocorr(self.ceres_mean_aggs)
+        #pass dataframe to insert new index columns
+        rootgrp.close()
         
         
         
