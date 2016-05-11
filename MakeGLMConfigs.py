@@ -354,14 +354,42 @@ lon1df = CERES_data.df1.cldarea_total_daily.fillna(method='pad')
 lon2df = CERES_data.df2.cldarea_total_daily.fillna(method='pad')
 lon_dfs = [lon1df,lon2df ]
 lon_keys = list(CERES_data.lons_n)
-Geo_filled=Geodisc_clouds.fillna(method='pad')
+Geo_filled=Geodisc_clouds.interpolate()
 for srs, key in zip(lon_dfs, lon_keys):
     cld_C, cld_G = subsectbydate_2(srs,Geo_filled.cc_means)
     cld_1 = cld_G.resample('D').mean()
     cld_1 = cld_1.interpolate()*100.
     errors[key] = error_metrics(cld_1, cld_C)
-    
 
+lon1df_t, _ = subsectbydate_2(lon1df,Geo_filled.cc_means)
+lon2df_t, _ = subsectbydate_2(lon2df,Geo_filled.cc_means)
+errors['other'] = error_metrics(lon1df_t, lon2df_t)
+
+
+SSF_D = Geodisc_clouds.resample('D').mean()
+Geo_D = CERES_SSF.ceres_df.resample('D').mean()
+Geo_filled=SSF_D.interpolate()
+SSF_Filled=Geo_D.interpolate()
+cld_GE, cld_SSF = subsectbydate_2(Geo_filled,SSF_Filled.fillna(method='bfill'))
+cld_GE, cld_SSF = subsectbydate_2(Geo_filled,SSF_Filled.fillna(method='bfill'))
+errors['SSFvGEO'] = error_metrics(cld_SSF.cloud_frac.values, 
+                                  (cld_GE.cc_means*cld_SSF.cloud_frac.max()).values)
+lon_keys2 = ['df1', 'df2']
+filledagain = SSF_Filled.fillna(method='bfill')
+for srs, key in zip(lon_dfs, lon_keys2):
+    cld_C, cld_G = subsectbydate_2(srs,filledagain.cloud_frac)
+    cld_1 = cld_G.resample('D').mean()
+    cld_1 = cld_1.interpolate()*cld_C.max()
+    errors[key] = error_metrics(cld_1, cld_C)
+
+if plotting == True:    
+    f , ax5 = plt.subplots(1, 1, figsize=(12,12))
+    ax5.plot(cld_SSF.cloud_frac, label="CERES SSF Data")
+    ax5.plot((cld_GE.cc_means*cld_SSF.cloud_frac.max()), label="Goddard OMI Data")
+    ax5.legend()
+    ax5.set_ylim((-10, 100))
+    ax5.set_xlim(734503+90,734503+185)
+    f.savefig("CERES_SSFvOMMYCLD0.png")
 
 if plotting == True:    
     sorted_df.insert(0, 'periodicity (hours)', np.zeros(rows))
