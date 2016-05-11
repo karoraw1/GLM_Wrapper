@@ -568,61 +568,93 @@ class GHCN_weather_data(object):
                                            
 class CERES_nc(object):
     
-    def __init__(self, ceres_path):
-        rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
-        nc_attrs, nc_dims, nc_vars = ncdump(rootgrp, False)
-        # Temps in Kelvin        
-        # Fluxes in u'Watts per square meter'
-        # wind vectors in meters per second
-        # humididity & cloud cover in ?
-        toExtract = ["lon", "lat", "Time_of_observation", 
-                     "Surface_skin_temperature", "Surface_wind___U_vector",
-                     "Surface_wind___V_vector", 
-                     "Column_averaged_relative_humidity", 
-                     "Altitude_of_surface_above_sea_level",
-                     "PSF_wtd_MOD04_cloud_fraction_land",
-                     "CERES_net_LW_surface_flux___Model_B",
-                     "CERES_net_SW_surface_flux___Model_B"]
-        betterNames = ["lat", "lon", "time_J", "temp", "windU", "windV",
+    def __init__(self, ceres_path, type):
+        if type == "3":
+            rootgrp = Dataset(ceres_path, "r", format="NETCDF3_CLASSIC")
+            nc_attrs, nc_dims, nc_vars = ncdump(rootgrp, False)
+            # Temps in Kelvin        
+            # Fluxes in u'Watts per square meter'
+            # wind vectors in meters per second
+            # humididity & cloud cover in ?
+            toExtract = ["lon", "lat", "Time_of_observation", 
+                         "Surface_skin_temperature", "Surface_wind___U_vector",
+                         "Surface_wind___V_vector", 
+                         "Column_averaged_relative_humidity", 
+                         "Altitude_of_surface_above_sea_level",
+                         "PSF_wtd_MOD04_cloud_fraction_land",
+                         "CERES_net_LW_surface_flux___Model_B",
+                         "CERES_net_SW_surface_flux___Model_B"]
+        
+            betterNames = ["lat", "lon", "time_J", "temp", "windU", "windV",
                        "humidity", "altitude", "cloud_frac", "LW_rad", "SW_rad"]
-        self.ceres_ = {}
-        
-        for var, nam in zip(toExtract, betterNames):
-            self.ceres_[nam] = pd.Series(rootgrp.variables[var][:])
-        gDays = [jd.caldate(j) for j in self.ceres_["time_J"]]
-        self.ceres_['date'] = pd.to_datetime(np.array(gDays))
-        
-        self.ceres_df = pd.DataFrame(index=self.ceres_['date'], 
-                                     columns=betterNames)
-
-        ignorable = ['lat', 'lon', 'time_J', 'altitude']
-
-        for key in self.ceres_.keys():
-            if key == 'temp':
-                self.ceres_df[key] = self.ceres_[key].values-273.15
-            elif key in ignorable:
-                self.ceres_df = self.ceres_df.drop(key, 1)
-            elif key not in self.ceres_df.columns.values:
-                pass
-            else:
-                self.ceres_df[key] = self.ceres_[key].values
-        
-        self.ceres_zs = z_score(self.ceres_df)
-        self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
-        self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
-        printNaNWarning(self.ceres_df, "CERES data", None)
-        self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)
-        self.ceres_mean_aggs = makeAggregations(self.ceres_reindex_zs, 
-                                                self.i_names, np.mean)
-                                                
-        self.humidity_scales = show_agg_resolution(self.ceres_mean_aggs, 
-                                                   "humidity")
-        self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
-                                                   "cloud_frac")
-        printAutocorr(self.ceres_mean_aggs)
-        #pass dataframe to insert new index columns
-        rootgrp.close()
-        
+            self.ceres_ = {}
+            
+            for var, nam in zip(toExtract, betterNames):
+                self.ceres_[nam] = pd.Series(rootgrp.variables[var][:])
+            gDays = [jd.caldate(j) for j in self.ceres_["time_J"]]
+            self.ceres_['date'] = pd.to_datetime(np.array(gDays))
+            
+            self.ceres_df = pd.DataFrame(index=self.ceres_['date'], 
+                                         columns=betterNames)
+    
+            ignorable = ['lat', 'lon', 'time_J', 'altitude']
+    
+            for key in self.ceres_.keys():
+                if key == 'temp':
+                    self.ceres_df[key] = self.ceres_[key].values-273.15
+                elif key in ignorable:
+                    self.ceres_df = self.ceres_df.drop(key, 1)
+                elif key not in self.ceres_df.columns.values:
+                    pass
+                else:
+                    self.ceres_df[key] = self.ceres_[key].values
+            
+            self.ceres_zs = z_score(self.ceres_df)
+            self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
+            self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
+            printNaNWarning(self.ceres_df, "CERES data", None)
+            self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)
+            self.ceres_mean_aggs = makeAggregations(self.ceres_reindex_zs, 
+                                                    self.i_names, np.mean)
+                                                    
+            self.humidity_scales = show_agg_resolution(self.ceres_mean_aggs, 
+                                                       "humidity")
+            self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
+                                                       "cloud_frac")
+            printAutocorr(self.ceres_mean_aggs)
+            #pass dataframe to insert new index columns
+            rootgrp.close()
+        elif type == "4":
+            import xarray as xr
+            data = xr.open_dataset(ceres_path)
+            vars = data.keys()
+            self.lats_n = data['lat'].values
+            self.lons_n = data['lon'].values
+            self.time_n = data['time'].values
+            other_vars = vars[5:]
+            time_ns, lats_ns, lons_ns = data[vars[3]].values.shape
+            
+            row1 = data[vars[3]].values[:,0,0]
+            row2 = data[vars[4]].values[:,0,0]
+            stack = np.vstack((row1, row2))
+            for var in other_vars:
+                row3 = data[var].values[:,0,0]    
+                stack = np.vstack((stack, row3))
+            
+            self.df1 = pd.DataFrame(index=self.time_n, columns=vars[3:], data = stack.T.copy())
+                
+            
+            row1 = data[vars[3]].values[:,0,1]
+            row2 = data[vars[4]].values[:,0,1]
+            stack = np.vstack((row1, row2))
+            for var in other_vars:
+                row3 = data[var].values[:,0,1]
+                stack = np.vstack((stack, row3))
+            
+            self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], data = stack.T.copy())
+            
+            
+            
         
         
         
