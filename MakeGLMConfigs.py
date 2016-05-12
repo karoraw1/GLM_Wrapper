@@ -181,7 +181,6 @@ BOS_weather.clean_columns()
 
 CERES_SSF = LakeModel.CERES_nc(ceres_ssf, "3")
 CERES_data = LakeModel.CERES_nc(ceres_SYN1, "4")
-
 test.read_GEODISC_cloud_data('cloud_data_5pt.csv',  GEODISC_path)
 
 inflow = LakeModel.USGS_water_data(flow_ps[0])
