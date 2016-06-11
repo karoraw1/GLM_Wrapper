@@ -1,0 +1,337 @@
+"UNH ID #","Depth","Collection Date","MeasurementType","Project","Sub_Project","Cl (mg Cl/L)","NO3 (mg N/L)","SO4 (mg S/L)","Acetate (mg/L)","Formate (mg/L)","Oxalate (mg/L)"
+132319,"EB ","12-Aug-13",,"Mystic Lake","MIT Lake samples",5.36,0.055,0.163,0.09,0.046,0.027
+132318,"SB ","12-Aug-13",,"Mystic Lake","MIT Lake samples",5.241,0.057,0.141,0.474,0.05,0.001
+132317,"FB ","12-Aug-13",,"Mystic Lake","MIT Lake samples",144.286,0.794,5.63,2.412,0.409,0.016
+132316,22,"12-Aug-13",,"Mystic Lake","MIT Lake samples",393.507,0.053,1.471,0,0.088,0.075
+132315,21,"12-Aug-13",,"Mystic Lake","MIT Lake samples",320.569,0.05,1.549,2.63,0.068,0.008
+132314,20,"12-Aug-13",,"Mystic Lake","MIT Lake samples",402.243,0.056,2.048,0,0.037,0.04
+132313,19,"12-Aug-13",,"Mystic Lake","MIT Lake samples",4.918,0.005,1.724,0,0.075,0.076
+132312,17,"12-Aug-13",,"Mystic Lake","MIT Lake samples",388.421,0.047,3.874,0,0.061,0.015
+132310,14,"12-Aug-13",,"Mystic Lake","MIT Lake samples",333.159,0.388,5.054,1.69,0,0.008
+132308,12,"12-Aug-13",,"Mystic Lake","MIT Lake samples",139.347,0.69,3.053,0,0.001,0.001
+132307,11,"12-Aug-13",,"Mystic Lake","MIT Lake samples",290.36,1.031,6.183,0,0.191,0.028
+132306,9,"12-Aug-13",,"Mystic Lake","MIT Lake samples",292.974,1.448,6.257,0,0.067,0
+132305,8,"12-Aug-13",,"Mystic Lake","MIT Lake samples",288.018,1.416,6.228,,,
+132304,7,"12-Aug-13",,"Mystic Lake","MIT Lake samples",252.488,1.325,6.022,0,0.434,0.035
+132303,6,"12-Aug-13",,"Mystic Lake","MIT Lake samples",236.549,1.055,6.136,0,0.418,0
+132302,5,"12-Aug-13",,"Mystic Lake","MIT Lake samples",154.851,0.51,4.328,0,0.511,0.028
+132300,3,"12-Aug-13",,"Mystic Lake","MIT Lake samples",145.69,0.617,5.241,0,0.196,0
+132299,2,"12-Aug-13",,"Mystic Lake","MIT Lake samples",,,,0,0.162,0.001
+132298,1,"12-Aug-13",,"Mystic Lake","MIT Lake samples",138.119,0.601,4.787,0,0.298,0.027
+132297,"Negative","16-Aug-13","RNA","Mystic Lake","MIT Lake samples",4.887,0.049,0.093,0.264,0.206,0.001
+132296,"Negative","16-Aug-13","DNA","Mystic Lake","MIT Lake samples",5.203,0.057,0.136,0.086,0.057,0.001
+132295,12,"16-Aug-13","RNA","Mystic Lake","MIT Lake samples",229.014,0.827,5.671,0,0.421,0.034
+132294,15,"16-Aug-13","DNA","Mystic Lake","MIT Lake samples",351.559,0.061,4.469,0,0.216,0.034
+132293,8,"16-Aug-13","RNA","Mystic Lake","MIT Lake samples",122.356,0.528,4.605,0,0.048,0.001
+132292,2,"16-Aug-13","DNA","Mystic Lake","MIT Lake samples",396.523,0.056,2.108,0,0.067,0.027
+132291,8,"16-Aug-13","DNA","Mystic Lake","MIT Lake samples",285.854,1.39,6.199,0,0.311,0.027
+132290,12,"16-Aug-13","DNA","Mystic Lake","MIT Lake samples",327.779,1.313,5.879,1.19,0,0.002
+132289,20,"16-Aug-13","RNA","Mystic Lake","MIT Lake samples",348.581,0.054,2.091,0,0.156,0.066
+132288,"FB ","01-Apr-13",,"Mystic Lake","MIT Lake samples",5.661,0.054,0.229,0.541,0.39,0.036
+132287,20,"01-Apr-13",,"Mystic Lake","MIT Lake samples",397.205,0.054,2.436,1.464,0,0.069
+132286,13,"01-Apr-13",,"Mystic Lake","MIT Lake samples",310.567,0.946,6.076,0,0.089,0.078
+132284,22,"01-Apr-13",,"Mystic Lake","MIT Lake samples",408.252,0.051,2.274,0,0.217,0.069
+132283,0,"01-Apr-13",,"Mystic Lake","MIT Lake samples",247.539,1.114,6.79,0,0.13,0.001
+132282,10,"01-Apr-13",,"Mystic Lake","MIT Lake samples",307.842,1.065,6.449,0,0.039,0.001
+132281,18,"01-Apr-13",,"Mystic Lake","MIT Lake samples",406.559,0.056,3.004,0,0.114,0.054
+132280,6,"01-Apr-13",,"Mystic Lake","MIT Lake samples",275.1,1.088,6.445,0,0.332,0.02
+132279,15,"01-Apr-13",,"Mystic Lake","MIT Lake samples",324.581,0.474,4.997,0,0.336,0.016
+132278,4,"01-Apr-13",,"Mystic Lake","MIT Lake samples",261.086,1.119,6.733,0,0,0.002
+132277,14,"01-Apr-13",,"Mystic Lake","MIT Lake samples",341.645,0.673,5.477,0,0.165,0.027
+132276,2,"01-Apr-13",,"Mystic Lake","MIT Lake samples",250.446,1.145,6.943,0,0.189,0.006
+132275,"EB ","01-Apr-13",,"Mystic Lake","MIT Lake samples",5.201,0.053,0.162,0.181,0.071,0.027
+132274,8,"01-Apr-13",,"Mystic Lake","MIT Lake samples",267.004,1.017,5.982,0,0.046,0.002
+132273,16,"01-Apr-13",,"Mystic Lake","MIT Lake samples",382.617,0.132,4.37,0,0.018,0.003
+132272,22,"08-Nov-13",,"Mystic Lake","MIT Lake samples",412.704,0.055,1.273,3.649,0.546,0.061
+132271,21,"08-Nov-13",,"Mystic Lake","MIT Lake samples",417.219,0.047,1.461,0,0.104,0.055
+132270,20,"08-Nov-13",,"Mystic Lake","MIT Lake samples",370.481,0.049,1.467,0,0.094,0.084
+132269,19,"08-Nov-13",,"Mystic Lake","MIT Lake samples",303.602,0.055,1.309,0,0.066,0.045
+132268,18,"08-Nov-13",,"Mystic Lake","MIT Lake samples",389.181,0.053,1.743,,,
+132267,17,"08-Nov-13",,"Mystic Lake","MIT Lake samples",395.378,0.048,2.079,0,0.12,0.079
+132266,16,"08-Nov-13",,"Mystic Lake","MIT Lake samples",372.617,0.055,2.589,0.881,0,0.046
+132265,15,"08-Nov-13",,"Mystic Lake","MIT Lake samples",379.984,0.053,3.595,1.352,0.179,0.036
+132264,14,"08-Nov-13",,"Mystic Lake","MIT Lake samples",344.946,0.05,4.636,0,0.126,0.005
+132263,13,"08-Nov-13",,"Mystic Lake","MIT Lake samples",332.53,0.601,5.446,1.302,0,0
+132262,12,"08-Nov-13",,"Mystic Lake","MIT Lake samples",307.643,0.708,5.566,0,0.039,0.039
+132261,11,"08-Nov-13",,"Mystic Lake","MIT Lake samples",155.37,1.257,6.815,1.239,0.191,0.016
+132260,10,"08-Nov-13",,"Mystic Lake","MIT Lake samples",179.558,0.657,5.004,0,0.049,0.03
+132259,9,"08-Nov-13",,"Mystic Lake","MIT Lake samples",73.465,0.306,2.796,0,0.02,0.002
+132258,8,"08-Nov-13",,"Mystic Lake","MIT Lake samples",147.101,0.521,5.525,0,0.375,0.03
+132257,7,"08-Nov-13",,"Mystic Lake","MIT Lake samples",189.868,0.683,6.662,0,0.07,0.028
+132256,5,"08-Nov-13",,"Mystic Lake","MIT Lake samples",187.433,0.662,6.789,0,0.309,0
+132255,3,"08-Nov-13",,"Mystic Lake","MIT Lake samples",201.487,0.697,6.902,0,0.397,0.027
+132253,1,"08-Nov-13",,"Mystic Lake","MIT Lake samples",203.585,0.698,6.846,2.096,0.161,0.003
+132251,20,"04-Oct-13",,"Mystic Lake","MIT Lake samples",336.175,0.051,1.475,0,0.041,0.027
+132249,17,"04-Oct-13",,"Mystic Lake","MIT Lake samples",393.342,0.052,2.25,0,0.068,0.072
+132247,15,"04-Oct-13",,"Mystic Lake","MIT Lake samples",340.809,0.054,3.852,1.015,0,0.019
+132246,14,"04-Oct-13",,"Mystic Lake","MIT Lake samples",220.309,0.099,3.395,0,0.023,0.031
+132245,13,"04-Oct-13",,"Mystic Lake","MIT Lake samples",330.262,0.44,5.35,0,0.097,0.028
+132244,12,"04-Oct-13",,"Mystic Lake","MIT Lake samples",320.467,1.06,5.982,0,0.155,0.001
+132243,11,"04-Oct-13",,"Mystic Lake","MIT Lake samples",289.718,1.34,5.741,0,0.105,0.032
+132242,10,"04-Oct-13",,"Mystic Lake","MIT Lake samples",309.959,1.439,6.151,1.475,0,0.011
+132241,9,"04-Oct-13",,"Mystic Lake","MIT Lake samples",195.443,0.963,4.273,0,0.033,0
+132240,8,"04-Oct-13",,"Mystic Lake","MIT Lake samples",287.496,1.355,6.102,0,0.065,0.028
+132239,7,"04-Oct-13",,"Mystic Lake","MIT Lake samples",243.988,0.917,6.124,0,0.065,0.027
+132238,6,"04-Oct-13",,"Mystic Lake","MIT Lake samples",182.36,0.626,6.347,1.584,0.3,0
+132237,5,"04-Oct-13",,"Mystic Lake","MIT Lake samples",161.234,0.56,6.183,0,0.065,0.015
+132236,4,"04-Oct-13",,"Mystic Lake","MIT Lake samples",71.213,0.285,3.09,0,0.056,0.031
+132235,3,"04-Oct-13",,"Mystic Lake","MIT Lake samples",146.132,0.505,6.057,0,0.426,0.033
+132234,2,"04-Oct-13",,"Mystic Lake","MIT Lake samples",163.885,0.557,6.253,0,0.22,0
+132233,1,"04-Oct-13",,"Mystic Lake","MIT Lake samples",163.317,0.54,6.117,0,0.111,0.001
+132231,22,"17-Jul-13",,"Mystic Lake","MIT Lake samples",262.429,0.055,1.363,0,0.195,0.025
+132230,20,"17-Jul-13",,"Mystic Lake","MIT Lake samples",201.415,0.047,1.169,0,0.128,0.024
+132229,18,"17-Jul-13",,"Mystic Lake","MIT Lake samples",413.884,0.054,2.495,1.844,0.321,0.031
+132228,16,"17-Jul-13",,"Mystic Lake","MIT Lake samples",395.514,0.054,3.617,2.024,0,0.025
+132227,14,"17-Jul-13",,"Mystic Lake","MIT Lake samples",349.714,0.429,5.344,0,0.225,0.003
+132226,12,"17-Jul-13",,"Mystic Lake","MIT Lake samples",250.448,0.842,4.893,0,0.036,0.004
+132225,11,"17-Jul-13",,"Mystic Lake","MIT Lake samples",265.334,0.979,5.48,0,0.044,0.003
+132224,10,"17-Jul-13",,"Mystic Lake","MIT Lake samples",287.388,1.03,5.907,0,0.319,0.003
+132223,9,"17-Jul-13",,"Mystic Lake","MIT Lake samples",280.595,1.004,6.015,2.472,0.241,0.02
+132222,8,"17-Jul-13",,"Mystic Lake","MIT Lake samples",284.284,1.057,6.306,0,0.064,0
+132221,7,"17-Jul-13",,"Mystic Lake","MIT Lake samples",264.882,1.004,6.156,0,0.151,0.028
+132220,6,"17-Jul-13",,"Mystic Lake","MIT Lake samples",227.497,0.894,5.68,2.065,0.359,0.004
+132219,5,"17-Jul-13",,"Mystic Lake","MIT Lake samples",155.37,0.681,4.324,0,0.375,0.039
+132218,4,"17-Jul-13",,"Mystic Lake","MIT Lake samples",133.341,0.62,3.795,2.306,0.55,0.043
+132216,2,"17-Jul-13",,"Mystic Lake","MIT Lake samples",315.918,1.05,6.013,1.766,1.009,0.03
+132214,"FB  ","17-Jun-13",,"Mystic Lake","MIT Lake samples",103.658,0.538,3.254,0,0.026,0.029
+132213,21,"17-Jun-13",,"Mystic Lake","MIT Lake samples",339.384,0.051,2.037,0,0.439,0.079
+132212,19,"17-Jun-13",,"Mystic Lake","MIT Lake samples",403.416,0.055,2.451,0,0.284,0.042
+132211,17,"17-Jun-13",,"Mystic Lake","MIT Lake samples",404.098,0.047,3.53,0,0.173,0.038
+132210,15,"17-Jun-13",,"Mystic Lake","MIT Lake samples",364.497,0.233,4.881,0,0.241,0.024
+132209,13,"17-Jun-13",,"Mystic Lake","MIT Lake samples",124.051,0.444,3.877,0.000,0.428,0.034
+132208,11,"17-Jun-13",,"Mystic Lake","MIT Lake samples",177.834,0.588,4.602,0,0.2,0.02
+132207,9,"17-Jun-13",,"Mystic Lake","MIT Lake samples",151.813,1.248,7.169,0.000,0.183,0.034
+132205,5,"17-Jun-13",,"Mystic Lake","MIT Lake samples",173.596,0.765,4.75,0,0.301,0.037
+132203,1,"17-Jun-13",,"Mystic Lake","MIT Lake samples",125.807,0.61,3.662,0.899,0.567,0.047
+132202,22,"27-Mar-13",,"Mystic Lake","MIT Lake samples",406.257,0.054,0.609,1.422,0,0.112
+132201,20,"27-Mar-13",,"Mystic Lake","MIT Lake samples",408.877,0.055,1.923,0,0.29,0.053
+132200,19,"27-Mar-13",,"Mystic Lake","MIT Lake samples",402.998,0.293,3.757,0,0.077,0.029
+132199,18,"27-Mar-13",,"Mystic Lake","MIT Lake samples",294.932,0.356,3.287,0,0.021,0.001
+132198,17,"27-Mar-13",,"Mystic Lake","MIT Lake samples",310.11,0.545,4.116,0,0.059,0.027
+132197,16,"27-Mar-13",,"Mystic Lake","MIT Lake samples",197.099,0.472,3.46,0,0.05,0.028
+132196,15,"27-Mar-13",,"Mystic Lake","MIT Lake samples",358.796,0.916,5.903,0,0.059,0.001
+132195,14,"27-Mar-13",,"Mystic Lake","MIT Lake samples",,,,1.024,0,0.004
+132194,13,"27-Mar-13",,"Mystic Lake","MIT Lake samples",304.353,0.936,5.588,0,0.1,0.028
+132193,12,"27-Mar-13",,"Mystic Lake","MIT Lake samples",241.747,0.767,4.534,0,0.03,0
+132192,11,"27-Mar-13",,"Mystic Lake","MIT Lake samples",313.432,1.008,6.035,0,0.049,0.005
+132191,10,"27-Mar-13",,"Mystic Lake","MIT Lake samples",315.226,1.033,5.93,0.976,0,0.001
+132190,9,"27-Mar-13",,"Mystic Lake","MIT Lake samples",315.47,1.013,5.362,0,0.073,0.028
+132189,8,"27-Mar-13",,"Mystic Lake","MIT Lake samples",197.973,0.721,4.493,0.847,0,0
+132188,7,"27-Mar-13",,"Mystic Lake","MIT Lake samples",129.2,0.499,3.601,0,0.035,0.001
+132187,6,"27-Mar-13",,"Mystic Lake","MIT Lake samples",225.766,0.801,4.857,0,0.024,0
+132186,5,"27-Mar-13",,"Mystic Lake","MIT Lake samples",114.935,0.439,3.069,0,0.041,0.001
+132184,3,"27-Mar-13",,"Mystic Lake","MIT Lake samples",229.768,0.921,4.918,0,0.104,0.003
+132182,0,"27-Mar-13",,"Mystic Lake","MIT Lake samples",321.789,1.125,6.468,0,0.05,0
+132181,22,"14-Jan-13",,"Mystic Lake","MIT Lake samples",290.597,0.049,0.312,0,0.059,0.062
+132180,21,"14-Jan-13",,"Mystic Lake","MIT Lake samples",428.433,0.049,0.501,0,0.063,0.088
+132178,19,"14-Jan-13",,"Mystic Lake","MIT Lake samples",330.396,0.054,0.602,1.453,0,0.044
+132176,17,"14-Jan-13",,"Mystic Lake","MIT Lake samples",394.546,0.063,1.34,0,0.14,0.063
+132175,16,"14-Jan-13",,"Mystic Lake","MIT Lake samples",295.405,0.054,1.322,0.99,0,0.036
+132174,14,"14-Jan-13",,"Mystic Lake","MIT Lake samples",183.067,0.925,5.894,0,0.047,0
+132173,12,"14-Jan-13",,"Mystic Lake","MIT Lake samples",77.947,0.431,3.18,,,
+132172,10,"14-Jan-13",,"Mystic Lake","MIT Lake samples",178.104,0.879,5.52,0,0.052,0.002
+132171,8,"14-Jan-13",,"Mystic Lake","MIT Lake samples",183.331,0.871,5.246,1.358,0,0.002
+132170,6,"14-Jan-13",,"Mystic Lake","MIT Lake samples",104.025,0.524,4.335,0,0.036,0.027
+132169,5,"14-Jan-13",,"Mystic Lake","MIT Lake samples",171.59,0.822,5.286,0,0.061,0.027
+132168,4,"14-Jan-13",,"Mystic Lake","MIT Lake samples",170.417,0.845,5.55,0,0.069,0.002
+132167,3,"14-Jan-13",,"Mystic Lake","MIT Lake samples",187.418,0.869,5.826,0,0.058,0.008
+132166,2,"14-Jan-13",,"Mystic Lake","MIT Lake samples",163.971,0.791,5.232,0,0.219,0.001
+132165,1,"14-Jan-13",,"Mystic Lake","MIT Lake samples",164.604,0.788,5.145,0,0.045,0.027
+132164,0,"14-Jan-13",,"Mystic Lake","MIT Lake samples",111.286,0.555,3.667,0,0.005,0.027
+132163,"SB  ","04-Dec-12",,"Mystic Lake","MIT Lake samples",4.687,0.052,0.081,0.206,0.05,0.005
+132161,20,"04-Dec-12",,"Mystic Lake","MIT Lake samples",434.932,0.054,0.804,0.993,0,0.042
+132159,16,"04-Dec-12",,"Mystic Lake","MIT Lake samples",231.489,0.047,1.707,0,0.047,0.007
+132158,14,"04-Dec-12",,"Mystic Lake","MIT Lake samples",317.597,0.056,3.148,0,0.043,0.011
+132157,12,"04-Dec-12",,"Mystic Lake","MIT Lake samples",194.258,0.877,6.896,0,0.044,0
+132155,8,"04-Dec-12",,"Mystic Lake","MIT Lake samples",181.707,0.754,6.246,1.353,0,0
+132154,6,"04-Dec-12",,"Mystic Lake","MIT Lake samples",176.517,0.746,6.207,0,0.05,0.027
+132153,4,"04-Dec-12",,"Mystic Lake","MIT Lake samples",181.313,0.741,6.168,1.211,0.122,0.001
+132152,2,"04-Dec-12",,"Mystic Lake","MIT Lake samples",127.608,0.553,5.152,0,0.038,0.001
+132151,0,"04-Dec-12",,"Mystic Lake","MIT Lake samples",152.791,0.642,5.464,0,0.07,0.036
+117568,22.4,"01-May-13",,"Mystic Lake","Sarah Preheim",322.328,0,2.299,,,
+117567,20.2,"01-May-13",,"Mystic Lake","Sarah Preheim",318.007,0,2.632,,,
+117566,20,"01-May-13",,"Mystic Lake","Sarah Preheim",1820.983,2.341,0.711,,,
+117565,18.5,"01-May-13",,"Mystic Lake","Sarah Preheim",2099.29,2.553,0.438,,,
+117564,17.5,"01-May-13",,"Mystic Lake","Sarah Preheim",1834.181,1.026,0.913,,,
+117563,17,"01-May-13",,"Mystic Lake","Sarah Preheim",1530.364,0.792,0.9,,,
+117562,16.5,"01-May-13",,"Mystic Lake","Sarah Preheim",1218.281,0,0.666,,,
+117561,16,"01-May-13",,"Mystic Lake","Sarah Preheim",693.897,0.043,0.369,,,
+117560,12,"01-May-13",,"Mystic Lake","Sarah Preheim",418.327,0.704,6.643,,,
+117559,9,"01-May-13",,"Mystic Lake","Sarah Preheim",241.192,0.861,5.427,,,
+117558,6,"01-May-13",,"Mystic Lake","Sarah Preheim",251.357,0.978,6.159,,,
+117557,3,"01-May-13",,"Mystic Lake","Sarah Preheim",157.948,0.576,3.267,,,
+117556,22,"14-Dec-12",,"Mystic Lake","Sarah Preheim",229.994,2.097,3.655,,,
+117555,18,"14-Dec-12",,"Mystic Lake","Sarah Preheim",145.615,1.348,2.33,,,
+117554,12,"14-Dec-12",,"Mystic Lake","Sarah Preheim",106.171,0.969,1.868,,,
+117553,6,"14-Dec-12",,"Mystic Lake","Sarah Preheim",204.604,1.861,3.509,,,
+117552,0,"14-Dec-12",,"Mystic Lake","Sarah Preheim",146.13,1.352,2.217,,,
+117551,"River","12-Nov-12",,"Mystic Lake","Sarah Preheim",164.115,1.172,7.705,,,
+117550,22,"12-Nov-12",,"Mystic Lake","Sarah Preheim",171.818,0,0.512,,,
+117549,21,"12-Nov-12",,"Mystic Lake","Sarah Preheim",205.231,0,0.957,,,
+117548,20,"12-Nov-12",,"Mystic Lake","Sarah Preheim",107.755,0,0.341,,,
+117547,19,"12-Nov-12",,"Mystic Lake","Sarah Preheim",162.884,0,0.804,,,
+117546,18,"12-Nov-12",,"Mystic Lake","Sarah Preheim",182.447,0,0.932,,,
+117545,17,"12-Nov-12",,"Mystic Lake","Sarah Preheim",248.774,0,1.564,,,
+117544,16,"12-Nov-12",,"Mystic Lake","Sarah Preheim",203.659,0.046,2.373,,,
+117543,15,"12-Nov-12",,"Mystic Lake","Sarah Preheim",222.272,0,1.912,,,
+117542,14,"12-Nov-12",,"Mystic Lake","Sarah Preheim",207.94,0,2.614,,,
+117541,13,"12-Nov-12",,"Mystic Lake","Sarah Preheim",198.641,0,3.42,,,
+117540,12,"12-Nov-12",,"Mystic Lake","Sarah Preheim",161.758,0.26,3.34,,,
+117539,11,"12-Nov-12",,"Mystic Lake","Sarah Preheim",149.217,0.503,3.979,,,
+117538,10,"12-Nov-12",,"Mystic Lake","Sarah Preheim",136.495,0.553,4.47,,,
+117537,9,"12-Nov-12",,"Mystic Lake","Sarah Preheim",160.313,0.699,5.772,,,
+117536,8,"12-Nov-12",,"Mystic Lake","Sarah Preheim",145.335,0.707,5.768,,,
+117535,7,"12-Nov-12",,"Mystic Lake","Sarah Preheim",133.123,0.642,5.103,,,
+117534,6,"12-Nov-12",,"Mystic Lake","Sarah Preheim",96.755,0.476,4.392,,,
+117533,5,"12-Nov-12",,"Mystic Lake","Sarah Preheim",150.435,0.758,5.752,,,
+117532,4,"12-Nov-12",,"Mystic Lake","Sarah Preheim",100.455,0.478,4.255,,,
+117531,3,"12-Nov-12",,"Mystic Lake","Sarah Preheim",102.723,0.496,3.642,,,
+117530,2,"12-Nov-12",,"Mystic Lake","Sarah Preheim",93.585,0.46,3.271,,,
+117529,1,"12-Nov-12",,"Mystic Lake","Sarah Preheim",144.77,0.711,5.63,,,
+117528,0,"12-Nov-12",,"Mystic Lake","Sarah Preheim",145.451,0.699,5.581,,,
+117527,22,"02-Nov-12",,"Mystic Lake","Sarah Preheim",238.827,0,0.644,,,
+117526,21,"02-Nov-12",,"Mystic Lake","Sarah Preheim",62.076,0.028,0.248,,,
+117525,20,"02-Nov-12",,"Mystic Lake","Sarah Preheim",231.969,0,0.643,,,
+117524,18,"02-Nov-12",,"Mystic Lake","Sarah Preheim",262.807,0.038,1.096,,,
+117523,16,"02-Nov-12",,"Mystic Lake","Sarah Preheim",240.795,0,1.566,,,
+117522,14,"02-Nov-12",,"Mystic Lake","Sarah Preheim",272.34,0,3.79,,,
+117521,12,"02-Nov-12",,"Mystic Lake","Sarah Preheim",185.35,0.142,3.879,,,
+117520,11,"02-Nov-12",,"Mystic Lake","Sarah Preheim",232.944,0.611,6.019,,,
+117519,10,"02-Nov-12",,"Mystic Lake","Sarah Preheim",55.421,0.158,1.683,,,
+117518,9,"02-Nov-12",,"Mystic Lake","Sarah Preheim",121.716,0.479,4.794,,,
+117517,8,"02-Nov-12",,"Mystic Lake","Sarah Preheim",120.13,0.568,4.996,,,
+117516,7,"02-Nov-12",,"Mystic Lake","Sarah Preheim",97.296,0.504,4.593,,,
+117515,5,"02-Nov-12",,"Mystic Lake","Sarah Preheim",110.706,0.537,4.856,,,
+117514,3,"02-Nov-12",,"Mystic Lake","Sarah Preheim",129.387,0.703,5.738,,,
+117513,2,"02-Nov-12",,"Mystic Lake","Sarah Preheim",92.317,0.492,4.754,,,
+117512,0,"02-Nov-12",,"Mystic Lake","Sarah Preheim",101.673,0.536,4.963,,,
+117511,22,"09-Oct-12",,"Mystic Lake","Sarah Preheim",112.481,0,0.27,,,
+117510,21,"09-Oct-12",,"Mystic Lake","Sarah Preheim",140.295,0,0.342,,,
+117509,20,"09-Oct-12",,"Mystic Lake","Sarah Preheim",170.053,0,0.533,,,
+117508,19,"09-Oct-12",,"Mystic Lake","Sarah Preheim",89.432,0,0.491,,,
+117507,18,"09-Oct-12",,"Mystic Lake","Sarah Preheim",185.483,0,0.795,,,
+117506,17,"09-Oct-12",,"Mystic Lake","Sarah Preheim",145.994,0,0.744,,,
+117505,16,"09-Oct-12",,"Mystic Lake","Sarah Preheim",92.87,0,1.01,,,
+117504,15,"09-Oct-12",,"Mystic Lake","Sarah Preheim",298.528,0,3.538,,,
+117503,14,"09-Oct-12",,"Mystic Lake","Sarah Preheim",220.575,0.113,3.202,,,
+117502,13,"09-Oct-12",,"Mystic Lake","Sarah Preheim",106.164,0.079,2.159,,,
+117501,12,"09-Oct-12",,"Mystic Lake","Sarah Preheim",104.676,0.231,2.35,,,
+117500,11,"09-Oct-12",,"Mystic Lake","Sarah Preheim",141.426,0.482,4.032,,,
+117499,10,"09-Oct-12",,"Mystic Lake","Sarah Preheim",114.101,0.4,3.539,,,
+117498,9,"09-Oct-12",,"Mystic Lake","Sarah Preheim",54.624,0.226,1.954,,,
+117497,8,"09-Oct-12",,"Mystic Lake","Sarah Preheim",92.649,0.293,3.521,,,
+117496,7,"09-Oct-12",,"Mystic Lake","Sarah Preheim",89.905,0.487,5.143,,,
+117495,6,"09-Oct-12",,"Mystic Lake","Sarah Preheim",97.845,0.478,4.909,,,
+117494,5,"09-Oct-12",,"Mystic Lake","Sarah Preheim",88.456,0.426,5.117,,,
+117493,4,"09-Oct-12",,"Mystic Lake","Sarah Preheim",109.59,0.512,5.377,,,
+117492,3,"09-Oct-12",,"Mystic Lake","Sarah Preheim",275.337,0.898,6.46,,,
+117491,2,"09-Oct-12",,"Mystic Lake","Sarah Preheim",98.094,0.46,4.249,,,
+117490,1,"09-Oct-12",,"Mystic Lake","Sarah Preheim",110.823,0.518,5.571,,,
+117489,0,"09-Oct-12",,"Mystic Lake","Sarah Preheim",72.853,0.327,4.159,,,
+117488,"River","02-Oct-12",,"Mystic Lake","Sarah Preheim",95.872,1.175,6.322,,,
+117487,22,"02-Oct-12",,"Mystic Lake","Sarah Preheim",346.306,0,0.501,,,
+117486,21,"02-Oct-12",,"Mystic Lake","Sarah Preheim",303.529,0,0.834,,,
+117485,19,"02-Oct-12",,"Mystic Lake","Sarah Preheim",277.662,0,1.066,,,
+117484,18,"02-Oct-12",,"Mystic Lake","Sarah Preheim",258.524,0,1.287,,,
+117483,17,"02-Oct-12",,"Mystic Lake","Sarah Preheim",298.949,0,1.752,,,
+117482,16,"02-Oct-12",,"Mystic Lake","Sarah Preheim",285.333,0,2.034,,,
+117481,15,"02-Oct-12",,"Mystic Lake","Sarah Preheim",208.322,0,2.246,,,
+117480,14,"02-Oct-12",,"Mystic Lake","Sarah Preheim",201.231,0.32,6.422,,,
+117479,13,"02-Oct-12",,"Mystic Lake","Sarah Preheim",222.468,0,4.134,,,
+117478,12,"02-Oct-12",,"Mystic Lake","Sarah Preheim",109.852,0.132,2.515,,,
+117477,11,"02-Oct-12",,"Mystic Lake","Sarah Preheim",78.727,0.2,2.197,,,
+117476,10,"02-Oct-12",,"Mystic Lake","Sarah Preheim",148.934,0.585,4.576,,,
+117475,9,"02-Oct-12",,"Mystic Lake","Sarah Preheim",124.729,0.504,4.033,,,
+117474,8,"02-Oct-12",,"Mystic Lake","Sarah Preheim",176.331,0.662,5.497,,,
+117473,7,"02-Oct-12",,"Mystic Lake","Sarah Preheim",76.268,0.273,3.432,,,
+117472,6,"02-Oct-12",,"Mystic Lake","Sarah Preheim",98.625,0.417,5.221,,,
+117471,5,"02-Oct-12",,"Mystic Lake","Sarah Preheim",111.344,0.434,5.233,,,
+117470,4,"02-Oct-12",,"Mystic Lake","Sarah Preheim",114.25,0.447,5.647,,,
+117469,3,"02-Oct-12",,"Mystic Lake","Sarah Preheim",134.02,0.522,6.34,,,
+117468,2,"02-Oct-12",,"Mystic Lake","Sarah Preheim",104.571,0.408,5.6,,,
+117467,1,"02-Oct-12",,"Mystic Lake","Sarah Preheim",140.837,0.575,6.527,,,
+117466,"Dock","30-Aug-12",,"Mystic Lake","Sarah Preheim",21.789,0.077,1.584,,,
+117465,"Bridge","30-Aug-12",,"Mystic Lake","Sarah Preheim",103.577,0.625,4.759,,,
+117464,"MBTA","30-Aug-12",,"Mystic Lake","Sarah Preheim",161.374,1.183,6.95,,,
+117463,22,"29-Aug-12",,"Mystic Lake","Sarah Preheim",347.412,0,0.807,,,
+117462,21,"29-Aug-12",,"Mystic Lake","Sarah Preheim",167.769,0,0.525,,,
+117461,19,"29-Aug-12",,"Mystic Lake","Sarah Preheim",338.972,0,1.517,,,
+117460,17,"29-Aug-12",,"Mystic Lake","Sarah Preheim",331.781,0.081,2.795,,,
+117459,16,"29-Aug-12",,"Mystic Lake","Sarah Preheim",134.159,0,1.11,,,
+117458,15,"29-Aug-12",,"Mystic Lake","Sarah Preheim",205.957,0,2.423,,,
+117457,14,"29-Aug-12",,"Mystic Lake","Sarah Preheim",288.3,0,4.098,,,
+117456,13,"29-Aug-12",,"Mystic Lake","Sarah Preheim",144.011,0,2.475,,,
+117455,12,"29-Aug-12",,"Mystic Lake","Sarah Preheim",144.973,0.241,3.05,,,
+117454,11,"29-Aug-12",,"Mystic Lake","Sarah Preheim",183.721,0.691,5.195,,,
+117453,10,"29-Aug-12",,"Mystic Lake","Sarah Preheim",124.304,0.458,0,,,
+117452,9,"29-Aug-12",,"Mystic Lake","Sarah Preheim",209.964,1.244,6.178,,,
+117451,8,"29-Aug-12",,"Mystic Lake","Sarah Preheim",124.275,0.613,5.128,,,
+117450,7,"29-Aug-12",,"Mystic Lake","Sarah Preheim",201.674,1.036,6.84,,,
+117449,6,"29-Aug-12",,"Mystic Lake","Sarah Preheim",139.119,0.457,5.053,,,
+117448,5,"29-Aug-12",,"Mystic Lake","Sarah Preheim",83.382,0.262,3.361,,,
+117447,4,"29-Aug-12",,"Mystic Lake","Sarah Preheim",96.485,0.383,5.088,,,
+117446,3,"29-Aug-12",,"Mystic Lake","Sarah Preheim",83.657,0.324,4.262,,,
+117445,2,"29-Aug-12",,"Mystic Lake","Sarah Preheim",99.867,0.404,5.112,,,
+117444,1,"29-Aug-12",,"Mystic Lake","Sarah Preheim",125.007,0.53,5.815,,,
+117443,0,"29-Aug-12",,"Mystic Lake","Sarah Preheim",57.624,0.231,3.135,,,
+117442,22,"10-Aug-12",,"Mystic Lake","Sarah Preheim",145.861,0,0.793,,,
+117441,21,"10-Aug-12",,"Mystic Lake","Sarah Preheim",136.134,0,0.642,,,
+117440,19,"10-Aug-12",,"Mystic Lake","Sarah Preheim",102.535,0,0.648,,,
+117439,17,"10-Aug-12",,"Mystic Lake","Sarah Preheim",249.218,0,1.83,,,
+117438,15,"10-Aug-12",,"Mystic Lake","Sarah Preheim",125.267,0,1.595,,,
+117437,13,"10-Aug-12",,"Mystic Lake","Sarah Preheim",106.063,0,1.947,,,
+117436,12,"10-Aug-12",,"Mystic Lake","Sarah Preheim",138.239,0.44,3.9,,,
+117435,11,"10-Aug-12",,"Mystic Lake","Sarah Preheim",108.465,0.464,3.576,,,
+117434,10,"10-Aug-12",,"Mystic Lake","Sarah Preheim",148.457,0.634,5.011,,,
+117433,9,"10-Aug-12",,"Mystic Lake","Sarah Preheim",89.83,0.403,3.487,,,
+117432,8,"10-Aug-12",,"Mystic Lake","Sarah Preheim",229.965,1.19,7.002,,,
+117431,7,"10-Aug-12",,"Mystic Lake","Sarah Preheim",119.993,0.412,4.316,,,
+117430,6,"10-Aug-12",,"Mystic Lake","Sarah Preheim",100.957,0.317,4.139,,,
+117429,5,"10-Aug-12",,"Mystic Lake","Sarah Preheim",100.208,0.335,4.165,,,
+117428,4,"10-Aug-12",,"Mystic Lake","Sarah Preheim",136.727,0.548,6.207,,,
+117427,3,"10-Aug-12",,"Mystic Lake","Sarah Preheim",147.015,0.486,5.892,,,
+117426,2,"10-Aug-12",,"Mystic Lake","Sarah Preheim",95.71,0.34,5.342,,,
+117425,1,"10-Aug-12",,"Mystic Lake","Sarah Preheim",113.015,0.412,5.973,,,
+104441,"End","02-Nov-11",,"Mystic Lake","Sarah Preheim",2.442,0.006,0.033,,,
+104440,"Blank","02-Nov-11",,"Mystic Lake","Sarah Preheim",2.566,0.002,0.051,,,
+104439,22,"02-Nov-11",,"Mystic Lake","Sarah Preheim",413.835,0.021,2.683,,,
+104438,21,"02-Nov-11",,"Mystic Lake","Sarah Preheim",414.041,0.004,2.793,,,
+104437,20,"02-Nov-11",,"Mystic Lake","Sarah Preheim",390.111,0.018,2.698,,,
+104436,19,"02-Nov-11",,"Mystic Lake","Sarah Preheim",416.413,0.019,3.264,,,
+104435,18,"02-Nov-11",,"Mystic Lake","Sarah Preheim",414.816,0.005,3.223,,,
+104434,17,"02-Nov-11",,"Mystic Lake","Sarah Preheim",411.821,0,3.641,,,
+104433,16,"02-Nov-11",,"Mystic Lake","Sarah Preheim",413.441,0.004,4.02,,,
+104432,15,"02-Nov-11",,"Mystic Lake","Sarah Preheim",408.68,0,4.856,,,
+104431,14,"02-Nov-11",,"Mystic Lake","Sarah Preheim",404.669,0,5.439,,,
+104430,13,"02-Nov-11",,"Mystic Lake","Sarah Preheim",397.329,0.004,5.991,,,
+104429,12,"02-Nov-11",,"Mystic Lake","Sarah Preheim",389.452,0.185,6.424,,,
+104428,11,"02-Nov-11",,"Mystic Lake","Sarah Preheim",376.616,0.449,6.717,,,
+104427,10,"02-Nov-11",,"Mystic Lake","Sarah Preheim",339.322,0.73,6.729,,,
+104426,9,"02-Nov-11",,"Mystic Lake","Sarah Preheim",255.951,0.847,5.544,,,
+104425,7,"02-Nov-11",,"Mystic Lake","Sarah Preheim",202.958,0.891,5.095,,,
+104424,5,"02-Nov-11",,"Mystic Lake","Sarah Preheim",177.658,0.899,5.078,,,
+104423,3,"02-Nov-11",,"Mystic Lake","Sarah Preheim",159.06,0.889,5.017,,,
+104422,0,"02-Nov-11",,"Mystic Lake","Sarah Preheim",161.296,0.903,5.026,,,
+104421,"Blank","13-Aug-08",,"Mystic Lake","Sarah Preheim",2.482,0.007,0.038,,,
+104420,22,"13-Aug-08",,"Mystic Lake","Sarah Preheim",355.114,0.013,4.225,,,
+104419,21,"13-Aug-08",,"Mystic Lake","Sarah Preheim",326.177,0.01,4.581,,,
+104418,20,"13-Aug-08",,"Mystic Lake","Sarah Preheim",356.654,0.016,5.368,,,
+104417,19,"13-Aug-08",,"Mystic Lake","Sarah Preheim",359.189,0.017,5.204,,,
+104416,18,"13-Aug-08",,"Mystic Lake","Sarah Preheim",349.938,0.016,5.481,,,
+104415,17,"13-Aug-08",,"Mystic Lake","Sarah Preheim",372.511,0.009,5.999,,,
+104414,16,"13-Aug-08",,"Mystic Lake","Sarah Preheim",339.385,0.014,6.268,,,
+104413,15,"13-Aug-08",,"Mystic Lake","Sarah Preheim",326.774,0.059,6.939,,,
+104412,14,"13-Aug-08",,"Mystic Lake","Sarah Preheim",252.005,0.261,5.474,,,
+104411,13,"13-Aug-08",,"Mystic Lake","Sarah Preheim",293.186,0.575,7.294,,,
+104410,12,"13-Aug-08",,"Mystic Lake","Sarah Preheim",281.437,1.039,7.649,,,
+104409,11,"13-Aug-08",,"Mystic Lake","Sarah Preheim",271.625,1.535,7.507,,,
+104408,10,"13-Aug-08",,"Mystic Lake","Sarah Preheim",256.708,1.856,7.757,,,
+104407,9,"13-Aug-08",,"Mystic Lake","Sarah Preheim",254.17,1.8,7.358,,,
+104406,8,"13-Aug-08",,"Mystic Lake","Sarah Preheim",251.465,1.846,8.002,,,
+104405,8,"13-Aug-08",,"Mystic Lake","Sarah Preheim",195.125,1.415,6.695,,,
+104404,7,"13-Aug-08",,"Mystic Lake","Sarah Preheim",244.927,1.635,7.908,,,
+104403,6,"13-Aug-08",,"Mystic Lake","Sarah Preheim",238.478,1.393,7.833,,,
+104402,5,"13-Aug-08",,"Mystic Lake","Sarah Preheim",160.291,0.808,6.199,,,
+104401,4,"13-Aug-08",,"Mystic Lake","Sarah Preheim",135.197,0.824,5.593,,,
+104400,1.5,"13-Aug-08",,"Mystic Lake","Sarah Preheim",118.073,0.734,5.066,,,
+104399,0,"13-Aug-08",,"Mystic Lake","Sarah Preheim",115.991,0.713,4.997,,,
