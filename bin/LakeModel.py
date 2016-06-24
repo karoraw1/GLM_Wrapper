@@ -11,7 +11,6 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 from scipy.stats import pearsonr
 import re
 import mmap
-import peakutils
 import os
 import numpy as np
 import pandas as pd
@@ -38,6 +37,7 @@ def import_data(return_type):
                 "csv_point_fname", "csv_point_at", "csv_point_nvars",
                 "csv_point_vars", "csv_outlet_allinone", "csv_outlet_fname",
                 "csv_outlet_nvars", "csv_outlet_vars", "csv_ovrflw_fname"]
+                
     init_vars = ["lake_depth", "num_depths", "the_depths", "the_temps", "the_sals",
                  "num_wq_vars", "wq_names", "wq_init_vals" ]
     met_vars = ["met_sw", "lw_type", "rain_sw", "snow_sw", "atm_stab", "catchrain",
@@ -77,23 +77,31 @@ def import_data(return_type):
     morpho_vals = ["'UpperMysticLake'", 42.4317, -71.1483, 
                    "1073.637,", "632.60,", 24]
     time_vals = [2, "'2012-01-01 00:00:00'", "'2014-01-01 00:00:00'", 3600.0, 5.0]
+    
     output_vals = ["", "out", 12, "'lake'", 1, "'WQ_'", "17.", 2, 
                 ["'temp',", "'salt',", "'OXY_oxy',"], ".false.", 'outlet_', 3,
                 ["'flow',", "'temp',", "'salt',", "'OXY_oxy',"], "\"overflow\""]
+                
     met_vals = [".true.", "'LW_IN'", ".false.", ".false.", ".false.", ".false.", 
                 1, 1, 4, ".false.", "'met_hourly.csv'", 1.0, 1.0, 1.0, 1.0, 1.0, 
                 1.0, 0.0013, 0.0013, 0.0013, 0.01, 0.3]
-    expectations = [ wq_vals, morpho_vals, time_vals, output_vals, init_vals, 
-                    met_vals, bird_vals, outflow_vals, inflow_vals, setup_vals ]
-    parameters =  [ wq_vars, morpho_vars, time_vars, output_vars, init_vars, 
-                    met_vars, bird_vars, outflow_vars, inflow_vars, setup_vars ]
+                
+    expectations = { "setup": setup_vals, "wq": wq_vals, 'morpho': morpho_vals, 
+                    'time': time_vals, 'output': output_vals, 
+                    'init': init_vals, 'met': met_vals, 'bird': bird_vals, 
+                    'outflow': outflow_vals, 'inflow': inflow_vals}
+                    
+    parameters =  { "setup": setup_vars, "wq": wq_vars, 'morpho': morpho_vars,
+                   'time': time_vars, 'output': output_vars, 'init': init_vars,
+                   'met': met_vars, 'bird': bird_vars, 'outflow': outflow_vars,
+                   'inflow': inflow_vars }
+                   
     if return_type == 'Mystic_Vals':
         return expectations
     elif return_type == "Parameters":
         return parameters
     elif return_type == "Custom":
         print "Custom Return Type Selected"
-
 
 def error_metrics(Obs, Sim):
     Err = Sim - Obs
@@ -387,31 +395,27 @@ class Lake(object):
         self.glm_path = self.dir_path+"/glm2.nml"        
         self.parameters = import_data("Parameters")
 
-    def fill_parameters_set(self, val_set = "Mystic Values"):
-        self.expectations = import_data("Mystic Values")
-        self.value_dict = {}    
-        for p, e in zip(self.parameters, self.expectations):
-            addtodict(e, p, self.value_dict)
-            
-        self.value_dict['sim_name'] = "'"+self.name+"'"
-        self.value_dict["out_fn"] = self.value_dict["out_fn"] + "_"+self.name
-        #make output dir
-        self.value_dict["out_dir"] = self.dir_path+"/output"
-        safe_dir(self.value_dict["out_dir"])
-        # start writing config file
-        glm_handle = open(self.glm_path, 'w+')    
+    def fill_parameters_set(self, val_set = "Mystic_Vals"):
         
-        glm_handle.write("&glm_setup\n")
-        for var in self.setup_vars:
-            glm_handle.write("\t{0} = {1}\n".format(var, self.value_dict[var]))
+        self.expectations = import_data(val_set)
+        self.expectations['output'][1] = self.expectations['output'][1] + "_"+self.name
+        self.expectations['output'][0] = self.dir_path+"/output"        
+
+        safe_dir(self.expectations['output'][0])
+        # start writing config file
+        glm_handle = open(self.glm_path, 'w+')
+        
+        glm_handle.write("&glm_setup\n")        
+        for var,val in zip(self.parameters["setup"],self.expectations['setup']):
+            glm_handle.write("\t{0} = {1}\n".format(var, val))
 
         glm_handle.write("/\n&wq_setup\n")
-        for var in self.wq_vars:
-            glm_handle.write("\t{0} = {1}\n".format(var, self.value_dict[var]))
+        for var,val in zip(self.parameters["wq"],self.expectations['wq']):
+            glm_handle.write("\t{0} = {1}\n".format(var, val))
 
         glm_handle.write("/\n&morphometry\n")
-        for var in self.morpho_vars:
-            glm_handle.write("\t{0} = {1}\n".format(var, self.value_dict[var]))
+        for var, val in zip(self.parameters['morpho'],self.expectations['morpho']):
+            glm_handle.write("\t{0} = {1}\n".format(var, val))
 
         # Input Bathy data
         glm_handle.write("\tH = ")
@@ -432,13 +436,13 @@ class Lake(object):
                 glm_handle.write("{0}, ".format(self.area[idx]))
             else:
                 glm_handle.write("{0}\n/\n".format(self.area[idx]))
+            
         glm_handle.write("&time\n")
-        for var in self.time_vars:
-            glm_handle.write("\t{0} = {1}\n".format(var, self.value_dict[var]))
-        glm_handle.write("/\n&output\n")
-        
-        for var in self.output_vars:
-            val = self.value_dict[var]            
+        for var,val in zip(self.parameters["time"],self.expectations['time']):
+            glm_handle.write("\t{0} = {1}\n".format(var, val))
+            
+        glm_handle.write("/\n&output\n")           
+        for var, val in zip(self.parameters["output"], self.expectations["output"]):
             if type(val) == list:
                 glm_handle.write("\t{0} = {1}\n".format(var, val[0]))
                 for idx in np.array(range(len(val)-1))+1:
@@ -449,8 +453,7 @@ class Lake(object):
                 glm_handle.write("\t{0} = {1}\n".format(var, val))
         
         glm_handle.write("/\n&init_profiles\n")
-        for var in self.init_vars:
-            val = self.value_dict[var]
+        for var, val in zip(self.parameters["init"],self.expectations["init"]):
             if type(val) == float or type(val) == int:
                 glm_handle.write("\t{0} = {1}\n".format(var, val))
             elif type(val) == list:
@@ -474,22 +477,19 @@ class Lake(object):
                         glm_handle.write("{0}, ".format(val[row][elmt]))
        
         glm_handle.write("\n/\n&meteorology\n")
-        for var in self.met_vars:
-            val = self.value_dict[var]
+        for var, val in zip(self.parameters["met"],self.expectations["met"]):
             glm_handle.write("\t{0} = {1}\n".format(var, val))
 
         glm_handle.write("/\n&bird_model\n")
-        for var in self.bird_vars:
-            val = self.value_dict[var]
+        for var, val in zip(self.parameters["bird"],self.expectations["bird"]):
             glm_handle.write("\t{0} = {1}\n".format(var, val))
         
         glm_handle.write("/\n&outflows\n")
-        for var in self.outflow_vars:
-            val = self.value_dict[var]
+        for var, val in zip(self.parameters["outflow"],self.expectations["outflow"]):
             glm_handle.write("\t{0} = {1}\n".format(var, val))
+            
         glm_handle.write("/\n&inflows\n")        
-        for var in self.inflow_vars:
-            val = self.value_dict[var]
+        for var, val in zip(self.parameters["inflow"],self.expectations["inflow"]):
             if type(val) != list:
                 glm_handle.write("\t{0} = {1}\n".format(var, val))
             else:

@@ -31,40 +31,38 @@ print ""
 cases = ["testcase"]
 
 # this is the directory you want to work in
-mainFolder = os.getcwd()
+mainFolder = os.path.dirname(os.getcwd())
 
 # GLM starts from the command line and immediately searches in the current 
 # directory for `glm2.nml`. So we need a directory for each case and a 
 # directory to hold them all which will be:
 
 superDir = '/glm_case_folders'
-LakeModel.make_dir(mainFolder+superDir)
 met_fn = "BostonLoganAirportWeather.csv"
-met_path = os.path.join(mainFolder, 'weatherData', met_fn)
-
 ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
-ceres_ssf = os.path.join(mainFolder, 'weatherData', ceres_fn)
 ceres_fn2 = "CERES_SYN1deg-Day_200508-201406.nc"
-ceres_SYN1 = os.path.join(mainFolder, 'weatherData', ceres_fn2)
-
-GEODISC_path = os.path.join(mainFolder, "GEODESC", "test_files")
-adapt_data = os.path.join(GEODISC_path, 'test_data_adaptive.csv')
-adapt_data3n = os.path.join(GEODISC_path, 'test_data_adaptive3n.csv')
-
 context_pond = "Fresh_pond_air_and_water_temp.txt"
 inflow_fn = "aberjona_15min_discharge_precip_streamU_gageheight.txt"
 outflow_fn1 = "mystic_river_15min_water_temp_discharge2015_2016.txt"
 outflow_fn2 = "alewifedailydischarge2005-2016.txt"
 hobbs_fn = "HobbsBk_all.txt"
 lake_temp_f = "MysticLake_TimeDepthTemp.csv"
+ceres_SYN1 = os.path.join(mainFolder, 'weatherData', ceres_fn2)
+met_path = os.path.join(mainFolder, 'weatherData', met_fn)
+ceres_ssf = os.path.join(mainFolder, 'weatherData', ceres_fn)
+GEODISC_path = os.path.join(mainFolder, "GEODESC", "test_files")
+adapt_data = os.path.join(GEODISC_path, 'test_data_adaptive.csv')
+adapt_data3n = os.path.join(GEODISC_path, 'test_data_adaptive3n.csv')
+
 flow_fns = [inflow_fn, outflow_fn1, outflow_fn2, hobbs_fn, context_pond,
             lake_temp_f]
 flow_ps = [os.path.join(os.getcwd(), 'waterdata', i) for i in flow_fns]
 
 newDirs = [mainFolder+superDir+"/"+x for x in cases]
-
+LakeModel.make_dir(mainFolder+superDir)
 test = LakeModel.Lake(cases[0], newDirs[0])
-test.fill_parameters_set("Mystic_Data")
+
+test.fill_parameters_set("Mystic_Vals")
 
 BOS_weather = LakeModel.GHCN_weather_data(met_path)
 BOS_weather.clean_columns()
