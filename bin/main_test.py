@@ -50,13 +50,13 @@ lake_temp_f = "MysticLake_TimeDepthTemp.csv"
 ceres_SYN1 = os.path.join(mainFolder, 'weatherData', ceres_fn2)
 met_path = os.path.join(mainFolder, 'weatherData', met_fn)
 ceres_ssf = os.path.join(mainFolder, 'weatherData', ceres_fn)
-GEODISC_path = os.path.join(mainFolder, "GEODESC", "test_files")
+GEODISC_path = os.path.join(mainFolder, "test_files")
 adapt_data = os.path.join(GEODISC_path, 'test_data_adaptive.csv')
 adapt_data3n = os.path.join(GEODISC_path, 'test_data_adaptive3n.csv')
 
 flow_fns = [inflow_fn, outflow_fn1, outflow_fn2, hobbs_fn, context_pond,
             lake_temp_f]
-flow_ps = [os.path.join(os.getcwd(), 'waterdata', i) for i in flow_fns]
+flow_ps = [os.path.join(mainFolder, 'waterdata', i) for i in flow_fns]
 
 newDirs = [mainFolder+superDir+"/"+x for x in cases]
 LakeModel.make_dir(mainFolder+superDir)
