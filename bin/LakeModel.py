@@ -606,7 +606,16 @@ class USGS_water_data(object):
                print "\t%r" % qual_col.value_counts().index
                print "\t%r" % qual_col.value_counts().values
         print ""
-
+        
+    def removeQuals(self):
+        for column in self.df.columns:
+            if '_cd' in column:
+                self.df.drop(column, axis=1, inplace=True)
+            elif 'site_' in column:
+                self.df.drop(column, axis=1, inplace=True)
+            else:
+                print "{0} is a valid column".format(column)
+                
 class GHCN_weather_data(object):
     
     def __init__(self, met_path):
