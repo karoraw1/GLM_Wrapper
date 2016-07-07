@@ -82,8 +82,8 @@ def import_data(return_type):
                 ["'temp',", "'salt',", "'OXY_oxy',"], ".false.", 'outlet_', 3,
                 ["'flow',", "'temp',", "'salt',", "'OXY_oxy',"], "\"overflow\""]
                 
-    met_vals = [".true.", "'LW_IN'", ".false.", ".false.", ".false.", ".false.", 
-                1, 1, 4, ".false.", "'met_hourly.csv'", 1.0, 1.0, 1.0, 1.0, 1.0, 
+    met_vals = [".true.", "'LW_IN'", ".false.", ".true.", ".false.", ".false.", 
+                0, 1, 4, ".false.", "'met_daily.csv'", 1.0, 1.0, 1.0, 1.0, 1.0, 
                 1.0, 0.0013, 0.0013, 0.0013, 0.01, 0.3]
                 
     expectations = { "setup": setup_vals, "wq": wq_vals, 'morpho': morpho_vals, 
@@ -395,7 +395,7 @@ class Lake(object):
         self.glm_path = self.dir_path+"/glm2.nml"        
         self.parameters = import_data("Parameters")
 
-    def fill_parameters_set(self, val_set = "Mystic_Vals"):
+    def fill_parameters_set(self, val_set = "Mystic_Vals", wq = False):
         
         self.expectations = import_data(val_set)
         self.expectations['output'][1] = self.expectations['output'][1] + "_"+self.name
@@ -408,10 +408,11 @@ class Lake(object):
         glm_handle.write("&glm_setup\n")        
         for var,val in zip(self.parameters["setup"],self.expectations['setup']):
             glm_handle.write("\t{0} = {1}\n".format(var, val))
-
-        glm_handle.write("/\n&wq_setup\n")
-        for var,val in zip(self.parameters["wq"],self.expectations['wq']):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
+        
+        if wq == True:
+            glm_handle.write("/\n&wq_setup\n")
+            for var,val in zip(self.parameters["wq"],self.expectations['wq']):
+                glm_handle.write("\t{0} = {1}\n".format(var, val))
 
         glm_handle.write("/\n&morphometry\n")
         for var, val in zip(self.parameters['morpho'],self.expectations['morpho']):
@@ -500,7 +501,6 @@ class Lake(object):
         glm_handle.write("/")
         glm_handle.close()
         self.met_path = None
-        self.raw_met = None
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
         if fname == None:
@@ -521,7 +521,36 @@ class Lake(object):
         except IOError:
             print "no file detected"
             raise IOError
+    def create_metcsv(self, ShortWave,LongWave, AirTemp, RelHum, WindSpeed, Rain, Snow):
+        """
+        This fxn does temporal alignment of input datasets. It pulls the 
+        the expected file name from the `expectations` object and writes a 
+        csv to that location. 
+        """
+        metPack = [ShortWave,LongWave, AirTemp,RelHum, WindSpeed,Rain,Snow]
+        colLabels = [i.name for i in metPack]
+        firstDay = np.max([i.index[0] for i in metPack])
+        lastDay = np.min([i.index[-1] for i in metPack])
+        frontCrit = [i.index >= firstDay for i in metPack]
+        backCrit = [i.index <= lastDay for i in metPack]
+        metRePack = [k[i & j].copy() for i, j, k in zip(frontCrit, backCrit, metPack)]
         
+        self.config_dir = os.path.dirname(self.glm_path)
+        met_fn = self.expectations['met'][10][1:-1]
+        self.metcsv_path = os.path.join(self.config_dir, met_fn)
+        self.date_range = pd.date_range(start=firstDay, end=lastDay)
+        self.met_df = pd.DataFrame(index= self.date_range, columns= colLabels)
+        for i in metRePack:
+            self.met_df[i.name] = i
+        print "\tWriting met.csv"
+        self.met_df.to_csv(path_or_buf=self.metcsv_path, index_label='time')
+        
+        
+        #time,ShortWave,LongWave, AirTemp,RelHum, WindSpeed,Rain,Snow
+        #1997-01-01,128.1119583,273.7329402,15.48908333,76.07847214, 0.950309798, 0,0
+        #time,ShortWave,LongWave,AirTemp,RelHum,WindSpeed,Rain,Snow
+        #2010-01-01,36.9014792442,283.979217529,-0.8,38.4049110413, 3.4, 0.0, 0.0
+
 class USGS_water_data(object):
 
     def __init__(self, fn):
@@ -544,6 +573,7 @@ class USGS_water_data(object):
         s.readline()
         text = s.readline()
         words = [splits for splits in text.split(" ") if splits is not ""]
+        self.words = words
         dds, params, descrips  = [], [], []
         
         while words[0] != "#\n":
@@ -551,10 +581,10 @@ class USGS_water_data(object):
             
             if self.alt1 == False:
                 params.append(words[2])
-                descrips.append(" ".join(words[3:-1])[:-1])
+                descrips.append(" ".join(words[3:])[:-1])
             else:
                 params.append(words[2]+"_"+words[3])
-                descrips.append(" ".join(words[4:-1])[:-1])
+                descrips.append(" ".join(words[4:])[:-1])
                 
             text = s.readline()
             words = [splits for splits in text.split(" ") if splits is not ""]
@@ -619,16 +649,27 @@ class USGS_water_data(object):
 class GHCN_weather_data(object):
     
     def __init__(self, met_path):
+        """this creates an dataframe object called `raw met` that contains all
+        information within the csv provided at `met_path`"""
+        
         self.met_path = met_path
         self.raw_met = pd.read_csv(met_path, parse_dates=[2], 
                                    infer_datetime_format=True, 
                                    na_values=[-9999])
 
     def clean_columns(self):
+        """
+        This converts precipitation from tenths of mm to meters. Windspeed is
+        converted from tenths of meters per second to meters per second. 
+        Max & min temperatures are converted to celsius. Snowfall is converted 
+        to meters. This also modifies the column names.
+        """
         #PRCP - Precipitation (tenths of mm)        
         self.precip = self.raw_met.PRCP/10000
+        
         #AWND - Average daily wind speed (tenths of meters per second)        
         self.wind_speed = self.raw_met.AWND/10
+        
         #TMAX - Maximum temperature (tenths of degrees C)
         self.t_max = self.raw_met.TMAX/10
         self.t_min = self.raw_met.TMIN/10
@@ -724,7 +765,9 @@ class CERES_nc(object):
                 row3 = data[var].values[:,0,0]    
                 stack = np.vstack((stack, row3))
             
-            self.df1 = pd.DataFrame(index=self.time_n, columns=vars[3:], data = stack.T.copy())
+            self.df1 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
+                                    data = stack.T.copy())
+            self.df1.aux_skint_daily = self.df1.aux_skint_daily - 273.15
                 
             
             row1 = data[vars[3]].values[:,0,1]
@@ -734,4 +777,6 @@ class CERES_nc(object):
                 row3 = data[var].values[:,0,1]
                 stack = np.vstack((stack, row3))
             
-            self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], data = stack.T.copy())
+            self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
+                                    data = stack.T.copy())
+                

@@ -42,7 +42,7 @@ met_fn = "BostonLoganAirportWeather.csv"
 ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
 ceres_fn2 = "CERES_SYN1deg-Day_200508-201406.nc"
 
-waterDataFiles = { 'in' : "Aberjona_Discharge.txt",
+waterDataFiles = { 'in' : "Aberjona_Discharge_Precip_GH_SV.txt",
                    'fresh' : "Fresh_Discharge_WaterT_AirT_Cond_Precip.txt",
                    'Ho' : "Hobbs_Out_Discharge_WaterT_AirT_Cond_Precip.txt",
                    'Hi1' : "Hobbs_in1_discharge_waterT_cond.txt",
@@ -52,7 +52,7 @@ waterDataFiles = { 'in' : "Aberjona_Discharge.txt",
                    'ML' : "MysticLake_TimeDepthTemp.csv",
                    'out_d' : "MysticRiver_Discharge.txt",
                    'out2' : "MysticRiver2_Discharge.txt",
-                   'out_t' : "MysticRiver_WaterTemp_15min.txt",
+                   'out_t' : "MysticRiver_GH_WaterTemp_15min.txt",
                    'ground' : "Wilmington_groundwater.txt"}
 
 met_path = os.path.join(mainFolder, 'weatherData', met_fn)
@@ -95,21 +95,37 @@ for h in waterOjbects:
 
 GroundW. df['GroundwaterLevel'] = (GroundW.df[GroundW.df.columns[0]]-96.6)*-1
 
-if not os.path.exists("../donePlots/DammedDischarge.png"):
-    mystic_d.df.interpolate(inplace=True)
-    inflow_s, mystic_ds = LakeModel.subsectbydate_2(inflow.df, mystic_d.df)
-    ground_s, _ = LakeModel.subsectbydate_2(GroundW.df, mystic_d.df)
-    plt.plot(inflow_s.index, inflow_s.values, label='inflow')
-    plt.plot(mystic_ds.index, mystic_ds.values, label='outflow')
-    plt.plot(ground_s.index, ground_s.values, label='groundwater')
-    plt.legend(loc='best')
-    plt.savefig("DammedDischarge.png")
-
 Lake_temps = pd.read_csv(waterDataPaths['ML'], index_col=0, 
                          parse_dates=['datetime'])
 
-errors = {}
-lon1df = CERES_data.df1.cldarea_total_daily.fillna(method='pad')
+CERES_data.df1.cldarea_total_daily.fillna(method='pad', inplace=True)
+
 SSF_D = CERES_SSF.ceres_df.resample('D').mean()
 SSF_Filled = SSF_D.interpolate()
 filledagain = SSF_Filled.fillna(method='bfill')
+
+
+longWaveIn = CERES_data.df1['sfc_comp_lw-down_all_daily']
+longWaveIn.name = "LongWave"
+shortWaveNet = CERES_data.df1['sfc_comp_sw-down_all_daily'] - CERES_data.df1['sfc_comp_sw-up_all_daily']
+shortWaveNet.name = "ShortWave"
+airTemp = (BOS_weather.df.t_max + BOS_weather.df.t_min) / 2.0
+airTemp.name = "AirTemp"
+relHumidity = SSF_Filled.humidity
+relHumidity.name = "RelHum"
+windSpeed = BOS_weather.df.wind_speed
+windSpeed.name = "WindSpeed"
+precipR = BOS_weather.df.precip
+precipR.name = "Rain"
+precipS = BOS_weather.df.snow_fall
+precipS.name = "Snow"
+
+test.create_metcsv(shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed,
+                   precipR, precipS)
+
+
+
+
+
+
+

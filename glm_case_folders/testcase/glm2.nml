@@ -12,14 +12,6 @@
 	coef_mix_KH = 0.3
 	coef_mix_hyp = 0.5
 /
-&wq_setup
-	wq_lib = 'aed2'
-	ode_method = 1
-	split_factor = 1
-	bioshade_feedback = .true.
-	repair_state = .true.
-	multi_ben = 'fabm.nml'
-/
 &morphometry
 	lake_name = 'UpperMysticLake'
 	latitude = 42.4317
@@ -92,14 +84,14 @@
 	met_sw = .true.
 	lw_type = 'LW_IN'
 	rain_sw = .false.
-	snow_sw = .false.
+	snow_sw = .true.
 	atm_stab = .false.
 	catchrain = .false.
-	rad_mode = 1
+	rad_mode = 0
 	albedo_mode = 1
 	cloud_mode = 4
 	subdaily = .false.
-	meteo_fl = 'met_hourly.csv'
+	meteo_fl = 'met_daily.csv'
 	wind_factor = 1.0
 	sw_factor = 1.0
 	lw_factor = 1.0
