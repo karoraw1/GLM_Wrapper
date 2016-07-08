@@ -23,6 +23,10 @@ import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import JD_converter as jd
 
+def run_model(meta_model):
+    """This function accesses the locations of each glm configuration, creates
+    
+
 def import_data(return_type):
     
     # the glm contains the following blocks:
