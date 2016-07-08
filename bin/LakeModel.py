@@ -8,7 +8,12 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 
 @author: login
 """
-from scipy.stats import pearsonr
+
+from mpl_toolkits.mplot3d import Axes3D
+from functools import partial
+import sys
+import glob
+import scipy.stats as st
 import re
 import mmap
 import os
@@ -21,22 +26,56 @@ import JD_converter as jd
 def import_data(return_type):
     
     # the glm contains the following blocks:
-    # &glm_setup: General simulation info and mixing parameters
+    # &glm_setup: 13 general simulation info and mixing parameters    
+    setup_vars = {'max_layers' :500, 
+                  'min_layer_vol' :0.025, 
+                  'min_layer_thick' :0.50, 
+                  'max_layer_thick' :1.500,  
+                  'Kw' : 0.6, 
+                  'coef_inf_entrain' : 0., 
+                  'coef_mix_conv' : 0.125, 
+                  'coef_wind_stir' : 0.23, 
+                  'coef_mix_shear' : 0.20, 
+                  'coef_mix_turb' : 0.51, 
+                  'coef_mix_KH' : 0.30, 
+                  'coef_mix_hyp' : 0.5,
+                  'deep_mixing':'.true.'}
+    # &morphometry: 8 vars
+    morpho_vars = {"lake_name": "'UpperMysticLake'", 
+                   "latitude": 42.4317,  
+                   "longitude": -71.1483,
+                   "bsn_len": 1073.637,
+                   "bsn_wid": 632.60, 
+                   "bsn_vals": None,
+                   "H": [-23.384, -20.336, -17.288, -14.24, -11.192, -8.144, 
+                         -5.096, -2.048, 1.00],
+                   "A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69, 
+                        397077.50, 460778.04, 524802.66, 560051.22]}
+                        
+    morpho_vars['bsn_vals'] = len(morpho_vars['H'])
+    assert len(morpho_vars['H']) == len(morpho_vars['H'])
     
-    setup_vars = ['max_layers', 'min_layer_vol', 'min_layer_thick', 
-                  'max_layer_thick', 'Kw', 'coef_inf_entrain', 'coef_mix_conv', 
-                  'coef_wind_stir', 'coef_mix_shear', 'coef_mix_turb', 
-                  'coef_mix_KH', 'coef_mix_hyp']
-                  # kw is the extinction coefficient of PAR
-    wq_vars = ['wq_lib', 'ode_method', 'split_factor', 'bioshade_feedback', 
-               'repair_state', 'multi_ben']           
-    morpho_vars = ["lake_name", "latitude", "longitude",
-                   "bsn_len", "bsn_wid", "bsn_vals"]
-    time_vars = ["timefmt", "start", "stop", "dt", "timezone"]
-    output_vars = ["out_dir", "out_fn", "nsave", "csv_lake_fname", "csv_point_nlevs",
-                "csv_point_fname", "csv_point_at", "csv_point_nvars",
-                "csv_point_vars", "csv_outlet_allinone", "csv_outlet_fname",
-                "csv_outlet_nvars", "csv_outlet_vars", "csv_ovrflw_fname"]
+    # &time block 5 vars if 'timefmt' is 2
+    time_vars = {"timefmt" : 2, 
+                 "start" : "'2012-01-01 00:00:00'", 
+                 "stop" : "'2014-01-01 00:00:00'", 
+                 "dt" : 3600.0,
+                 "timezone" : 5.0 }
+    # &output 14 vars 
+    output_vars = {"out_dir" : "", 
+                   "out_fn" : "'output'",
+                   "nsave" : 12, 
+                   "csv_lake_fname" : "'lake'",
+                   "csv_point_nlevs" : 1,
+                   "csv_point_fname" : "'WQ_'",
+                   "csv_point_at" : "17.",
+                   "csv_point_nvars" : 2,
+                   "csv_point_vars" : [ "'temp'", "'salt'"],
+                   "csv_outlet_allinone" : ".false.",
+                   "csv_outlet_fname" : "'outlet_'",
+                   "csv_outlet_nvars" : 3,
+                   "csv_outlet_vars" : ["'flow'," "'temp'", "'salt',"],
+                   "csv_ovrflw_fname" : "\"overflow\"" } 
                 
     init_vars = ["lake_depth", "num_depths", "the_depths", "the_temps", "the_sals",
                  "num_wq_vars", "wq_names", "wq_init_vals" ]
@@ -46,7 +85,8 @@ def import_data(return_type):
                 "rain_factor", "ce", "ch", "cd", "rain_threshold", "runoff_coef"]
     bird_vars = ["AP", "Oz", "WatVap", "AOD500", "AOD380", "Albedo"]
     outflow_vars = ["num_outlet", "flt_off_sw", "outl_elvs", "bsn_len_outl", 
-                "bsn_wid_outl", "outflow_fl", "outflow_factor"]
+                    "bsn_wid_outl", "outflow_fl", "outflow_factor"]
+                
     inflow_vars = ["num_inflows", "names_of_strms", "subm_flag", "strm_hf_angle", 
                    "strmbd_slope", "strmbd_drag", "inflow_factor", "inflow_fl", 
                    "inflow_varnum", "inflow_vars", "coef_inf_entrain"]
@@ -71,16 +111,7 @@ def import_data(return_type):
                             [5.1, 5.2, 5.3, 1.2, 1.3],
                             [6.1, 6.2, 6.3, 1.2, 1.3]])]
     
-    setup_vals = [500, 0.025, 0.50, 1.500, 0.6, 0., 0.125, 
-                  0.23, 0.20, 0.51, 0.30, 0.5]
-    wq_vals = ["'aed2'", 1, 1, '.true.', '.true.', "'fabm.nml'", '.true.']             
-    morpho_vals = ["'UpperMysticLake'", 42.4317, -71.1483, 
-                   "1073.637,", "632.60,", 24]
-    time_vals = [2, "'2012-01-01 00:00:00'", "'2014-01-01 00:00:00'", 3600.0, 5.0]
     
-    output_vals = ["", "out", 12, "'lake'", 1, "'WQ_'", "17.", 2, 
-                ["'temp',", "'salt',", "'OXY_oxy',"], ".false.", 'outlet_', 3,
-                ["'flow',", "'temp',", "'salt',", "'OXY_oxy',"], "\"overflow\""]
                 
     met_vals = [".true.", "'LW_IN'", ".false.", ".true.", ".false.", ".false.", 
                 0, 1, 4, ".false.", "'met_daily.csv'", 1.0, 1.0, 1.0, 1.0, 1.0, 
@@ -108,7 +139,7 @@ def error_metrics(Obs, Sim):
     MSE = np.mean(Err**2)
     rMSE = np.sqrt(MSE)
     NSE = 1 - (MSE/np.var(Obs))
-    r = pearsonr(Obs, Sim)
+    r = st.pearsonr(Obs, Sim)
     a = np.std(Sim) / np.std(Obs)
     b = np.mean(Sim) / np.mean(Obs)
     # Kling-Gupta Efficiency
@@ -372,14 +403,7 @@ class Lake(object):
     
     def __init__(self, name, dir_path):
         
-        self.area = np.array([  77373.8, 99499.81098205, 124404.590076,
-                              150649.64403947, 168609.73032884, 187580.97034902,
-                              207020.52054899, 225715.75772409, 245219.05086584,
-                              267726.76155245, 295060.85089366, 323723.31628528,
-                              348395.92365881, 368505.54150352, 389179.36005101,
-                              410522.51421128, 432500.14410228, 455050.82895077,
-                              477078.71675217, 499253.70320025, 521932.40482378,
-                              535409.21116882, 547660.91761877, 560051.22])
+        self.area = 
         self.elevation =  np.array([-23.384, -22.32382609, -21.26365217, 
                                     -20.20347826, -19.14330435, -18.08313043, 
                                     -17.02295652, -15.96278261, -14.9026087, 
@@ -521,35 +545,61 @@ class Lake(object):
         except IOError:
             print "no file detected"
             raise IOError
-    def create_metcsv(self, ShortWave,LongWave, AirTemp, RelHum, WindSpeed, Rain, Snow):
+    
+    def temporal_clipping(self, data_pack):
+        
+        self.firstDay = np.max([i.index[0] for i in data_pack])
+        self.lastDay = np.min([i.index[-1] for i in data_pack])
+        frontCrit = [i.index >= self.firstDay for i in data_pack]
+        backCrit = [i.index <= self.lastDay for i in data_pack]
+        self.aligned_columns = {}
+        
+        for i, j, k in zip(frontCrit, backCrit, data_pack):
+            self.aligned_columns[k.name] = k[i & j].copy()
+
+        self.date_range = pd.date_range(start=self.firstDay, end=self.lastDay)
+        
+    def create_metcsv(self, metPack):
+        """
+        This creates the meteorological variable CSV. It pulls the 
+        the expected file name from the `expectations` object and writes a 
+        csv to that location. The format is as follows:
+        #time,ShortWave,LongWave, AirTemp,RelHum, WindSpeed,Rain,Snow
+        #1997-01-01,128.1119583,273.7329402,15.48908333,76.07847214, 0.950309798, 0,0       
+        """
+        self.config_dir = os.path.dirname(self.glm_path)
+        met_fn = self.expectations['met'][10][1:-1]
+        self.metcsv_path = os.path.join(self.config_dir, met_fn)
+        self.met_df = pd.DataFrame(index= self.date_range, columns= metPack)
+        for i in metPack:
+            self.met_df[i] = self.aligned_columns[i]
+            
+        print "\tWriting met.csv"
+        self.met_df.to_csv(path_or_buf=self.metcsv_path, index_label='time')
+        
+    def create_flowcsvs(self, InPack, OutPack):
         """
         This fxn does temporal alignment of input datasets. It pulls the 
         the expected file name from the `expectations` object and writes a 
         csv to that location. 
         """
-        metPack = [ShortWave,LongWave, AirTemp,RelHum, WindSpeed,Rain,Snow]
-        colLabels = [i.name for i in metPack]
-        firstDay = np.max([i.index[0] for i in metPack])
-        lastDay = np.min([i.index[-1] for i in metPack])
-        frontCrit = [i.index >= firstDay for i in metPack]
-        backCrit = [i.index <= lastDay for i in metPack]
-        metRePack = [k[i & j].copy() for i, j, k in zip(frontCrit, backCrit, metPack)]
+        out_fn = self.expectations['outflow'][5][1:-1]
+        in_fn = self.expectations['inflow'][7][1:-1]
+        self.incsv_path = os.path.join(self.config_dir, in_fn)
+        self.outcsv_path = os.path.join(self.config_dir, out_fn)
+        self.out_df = pd.DataFrame(index= self.date_range, columns= OutPack)
+        self.in_df = pd.DataFrame(index= self.date_range, columns= InPack)
         
-        self.config_dir = os.path.dirname(self.glm_path)
-        met_fn = self.expectations['met'][10][1:-1]
-        self.metcsv_path = os.path.join(self.config_dir, met_fn)
-        self.date_range = pd.date_range(start=firstDay, end=lastDay)
-        self.met_df = pd.DataFrame(index= self.date_range, columns= colLabels)
-        for i in metRePack:
-            self.met_df[i.name] = i
-        print "\tWriting met.csv"
-        self.met_df.to_csv(path_or_buf=self.metcsv_path, index_label='time')
-        
-        
-        #time,ShortWave,LongWave, AirTemp,RelHum, WindSpeed,Rain,Snow
-        #1997-01-01,128.1119583,273.7329402,15.48908333,76.07847214, 0.950309798, 0,0
-        #time,ShortWave,LongWave,AirTemp,RelHum,WindSpeed,Rain,Snow
-        #2010-01-01,36.9014792442,283.979217529,-0.8,38.4049110413, 3.4, 0.0, 0.0
+        for i in InPack:
+            self.in_df[i] = self.aligned_columns[i]
+        for i in OutPack:
+            self.out_df[i] = self.aligned_columns[i]
+            
+        print "\tWriting inflow.csv"
+        self.met_df.to_csv(path_or_buf=self.incsv_path, index_label='time')
+        print "\tWriting outflow.csv"
+        self.met_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
+
 
 class USGS_water_data(object):
 
@@ -780,3 +830,14 @@ class CERES_nc(object):
             self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
                                     data = stack.T.copy())
                 
+
+class meta_lake(object):
+    """This object is initialized with a list of lake models 
+    To calculate the posterior, we find the prior and the likelhood for each 
+    value of in the range of each given variable, and for the marginal likelhood, 
+    we replace the integral with the equivalent sum. 
+    
+    """
+    #pool = Pool(processes=procs)
+    #pool.map(maybe_download, samples)
+    

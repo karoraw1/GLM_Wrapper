@@ -72,18 +72,6 @@
 !                     GLM specific option for FABM to do benthic fluxes only
 !                     in bottom layer, or on flanks of all layers (.true.)
 !-------------------------------------------------------------------------------
-&wq_setup
-!-- Choose 'aed2' or 'fabm' (aed2 is the default)
-   wq_lib = 'fabm'
-   wq_nml_file = 'fabm.nml'
-   ode_method = 1
-   split_factor = 1
-   bioshade_feedback = .true.
-   repair_state = .true.
-!  mobility_off = .false.
-!  multi_ben = .true.
-   benthic_mode = 1
-/
 
 !-------------------------------------------------------------------------------
 ! lake details

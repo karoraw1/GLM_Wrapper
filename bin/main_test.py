@@ -42,7 +42,7 @@ met_fn = "BostonLoganAirportWeather.csv"
 ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
 ceres_fn2 = "CERES_SYN1deg-Day_200508-201406.nc"
 
-waterDataFiles = { 'in' : "Aberjona_Discharge_Precip_GH_SV.txt",
+waterDataFiles = { 'in' : "Aberjona_Discharge.txt",
                    'fresh' : "Fresh_Discharge_WaterT_AirT_Cond_Precip.txt",
                    'Ho' : "Hobbs_Out_Discharge_WaterT_AirT_Cond_Precip.txt",
                    'Hi1' : "Hobbs_in1_discharge_waterT_cond.txt",
@@ -104,7 +104,7 @@ SSF_D = CERES_SSF.ceres_df.resample('D').mean()
 SSF_Filled = SSF_D.interpolate()
 filledagain = SSF_Filled.fillna(method='bfill')
 
-
+#Pack up met.csv variables
 longWaveIn = CERES_data.df1['sfc_comp_lw-down_all_daily']
 longWaveIn.name = "LongWave"
 shortWaveNet = CERES_data.df1['sfc_comp_sw-down_all_daily'] - CERES_data.df1['sfc_comp_sw-up_all_daily']
@@ -120,8 +120,27 @@ precipR.name = "Rain"
 precipS = BOS_weather.df.snow_fall
 precipS.name = "Snow"
 
-test.create_metcsv(shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed,
-                   precipR, precipS)
+# Pack up variables for flow csvs 
+Out_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']*0
+Out_Discharge.name = "OutDischarge"
+In_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']
+In_Discharge.name = "InDischarge"
+In_Temp = Hobbs_o.df['Temperature, water, degrees Celsius (Mean)'].interpolate()
+In_Temp.name = "InflowTemp"
+In_Salt = Hobbs_o.df[Hobbs_o.df.columns[6]].interpolate()
+In_Salt.name = "InflowSalt"
+
+data_pack = [shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed, 
+             precipR, precipS, Out_Discharge, In_Discharge, In_Temp, In_Salt]
+             
+test.temporal_clipping(data_pack)
+
+metPack = ['ShortWave','LongWave','AirTemp','RelHum','WindSpeed','Rain','Snow']
+inPack = ['InDischarge','InflowTemp','InflowSalt']
+outPack = ['OutDischarge']
+test.create_metcsv(metPack)
+test.create_flowcsvs(inPack, outPack)
+
 
 
 
