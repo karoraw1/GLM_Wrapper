@@ -21,7 +21,12 @@ for j in execution_range:
 edits = ["file_handle", "job_name", "nodes", "partition"]
 
 replacement_pack = {i:[] for i in edits}
+command_steps = ["module load netcdf/intel/4.3.3.1 glm",
+                 "cd /home-3/karoraw1@jhu.edu/work/kaw/GLM_Wrapper/GLM_Executables/examples_2.2/coldlake/fabm",
+                 "glm"]
+                 
 handle2 = open(base_path+"/master_batch.sh", "a")
+
 for i in trios:
     if i[2] == 'shared':
         nodes = i[0]        
@@ -40,14 +45,17 @@ for i in trios:
     handle.write("\n#SBATCH --partition=")
     handle.write(str(i[2]))
     handle.write("\n\n")
+    for execs in range(i[1]):
+        for line in range(len(command_steps)):
+            handle.write(command_steps[line]+"\n")
+        handle.write("\n")
+    
     handle.close()
     handle2.write("sbatch "+fn+"\n")
 handle2.close()
 
     
-#command_steps = ["module load netcdf/intel/4.3.3.1 glm",
-#                 "cd /home-3/karoraw1@jhu.edu/work/kaw/GLM_Wrapper/GLM_Executables/examples_2.2/coldlake/fabm",
-#                 "glm"]
+
 #
 #
 #
