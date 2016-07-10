@@ -24,6 +24,10 @@ replacement_pack = {i:[] for i in edits}
 command_steps = ["module load netcdf/intel/4.3.3.1 glm",
                  "cd /home-3/karoraw1@jhu.edu/work/kaw/GLM_Wrapper/GLM_Executables/examples_2.2/coldlake/fabm",
                  "glm"]
+master_name = base_path+"/master_batch.sh"
+if os.path.exists(master_name):
+    os.remove(master_name)
+    print "Removed"+master_name
                  
 handle2 = open(base_path+"/master_batch.sh", "a")
 

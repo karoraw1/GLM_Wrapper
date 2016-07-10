@@ -1,0 +1,144 @@
+       JobID    JobName  Partition    Account  AllocCPUS      State ExitCode 
+------------ ---------- ---------- ---------- ---------- ---------- -------- 
+7419043       kaw_build     shared   sprehei1          2  COMPLETED      0:0 
+7419043.bat+      batch              sprehei1          1  COMPLETED      0:0 
+7419043.0      run01.sh              sprehei1          1     FAILED      8:0 
+7419043.1      run02.sh              sprehei1          1     FAILED      8:0 
+7419044             no2   parallel   sprehei1         48  COMPLETED      0:0 
+7419044.bat+      batch              sprehei1         24  COMPLETED      0:0 
+7419044.0      run01.sh              sprehei1          1     FAILED      8:0 
+7419044.1      run02.sh              sprehei1          1     FAILED      8:0 
+7419046             no2   parallel   sprehei1         24  COMPLETED      0:0 
+7419046.bat+      batch              sprehei1         24  COMPLETED      0:0 
+7419046.0      run02.sh              sprehei1          1     FAILED      8:0 
+7419046.1      run01.sh              sprehei1          1     FAILED      8:0 
+7419047             no2   parallel   sprehei1         24  COMPLETED      0:0 
+7419047.bat+      batch              sprehei1         24  COMPLETED      0:0 
+7419047.0      run01.sh              sprehei1          1     FAILED      8:0 
+7419047.1      run02.sh              sprehei1          1     FAILED      8:0 
+7419053             no2   parallel   sprehei1         24  COMPLETED      0:0 
+7419053.bat+      batch              sprehei1         24  COMPLETED      0:0 
+7419055             no3   parallel   sprehei1         48  COMPLETED      0:0 
+7419055.bat+      batch              sprehei1         24  COMPLETED      0:0 
+7419136             no4   parallel   sprehei1         48  COMPLETED      0:0 
+7419136.bat+      batch              sprehei1         24  COMPLETED      0:0 
+7419138            no24   parallel   sprehei1        576    TIMEOUT      1:0 
+7419138.bat+      batch              sprehei1         24  CANCELLED     0:15 
+7419187      no24_wQti+   parallel   sprehei1         24 CANCELLED+      0:0 
+7419188      sereial_n+     shared   sprehei1         24    TIMEOUT      1:0 
+7419188.bat+      batch              sprehei1          1  CANCELLED     0:15 
+7419192      sereial_n+     shared   sprehei1         24    TIMEOUT      1:0 
+7419192.bat+      batch              sprehei1          1  CANCELLED     0:15 
+7419197         no24_3_   parallel   sprehei1        576    TIMEOUT      1:0 
+7419197.bat+      batch              sprehei1         24  CANCELLED     0:15 
+7419233         no24_4_   parallel   sprehei1         24    TIMEOUT      1:0 
+7419233.bat+      batch              sprehei1         24  CANCELLED     0:15 
+7419263      serial_no+     shared   sprehei1         24  COMPLETED      0:0 
+7419263.bat+      batch              sprehei1          1  COMPLETED      0:0 
+7421973      serial_n1+     shared   sprehei1         24  COMPLETED      0:0 
+7421973.bat+      batch              sprehei1          2  COMPLETED      0:0 
+7421985      serial_n1+     shared   sprehei1         24 CANCELLED+      0:0 
+7422189      ser_24_60+     shared   sprehei1         24 CANCELLED+      0:0 
+7422239      ser_24_60+     shared   sprehei1         24 CANCELLED+      0:0 
+7422287      ser_96_60+     shared   sprehei1         96  COMPLETED      0:0 
+7422287.bat+      batch              sprehei1          1  COMPLETED      0:0 
+7422289      ser_48_60+     shared   sprehei1         48  COMPLETED      0:0 
+7422289.bat+      batch              sprehei1          1  COMPLETED      0:0 
+7422339      ser_24_60+     shared   sprehei1         24  COMPLETED      0:0 
+7422339.bat+      batch              sprehei1          1  COMPLETED      0:0 
+7425112      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425113      glm_1_nod+   parallel   sprehei1         24    RUNNING      0:0 
+7425114      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425115      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425116      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425117      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425118      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425119      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425120      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425121      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425122      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425123      glm_6_nod+   parallel   sprehei1        144    RUNNING      0:0 
+7425124      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425125      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425126      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425127      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425128      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425129      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425130      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425131      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425132      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425133      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425134      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425135      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
+7425136      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425137      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425138      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425139      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425140      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425141      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425142      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425143      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425144      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425145      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425146      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425147      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
+7425148      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425149      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425150      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425151      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425152      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425153      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425154      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425155      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425156      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425157      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425158      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425159      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
+7425160      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425161      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425162      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425163      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425164      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425165      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425166      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425167      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425168      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425169      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425170      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425171      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
+7425172      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425173      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425174      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425175      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425176      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425177      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425178      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425179      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425180      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425181      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425182      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425183      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
+7425184      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425185      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425186      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425187      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425188      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425189      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425190      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425191      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425192      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425193      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425194      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425195      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
+7425196      glm_1_nod+     shared   sprehei1          1    RUNNING      0:0 
+7425197      glm_1_nod+   parallel   sprehei1          1    PENDING      0:0 
+7425198      glm_2_nod+     shared   sprehei1          2    RUNNING      0:0 
+7425199      glm_2_nod+   parallel   sprehei1          2    PENDING      0:0 
+7425200      glm_4_nod+     shared   sprehei1          4    RUNNING      0:0 
+7425201      glm_3_nod+   parallel   sprehei1          3    PENDING      0:0 
+7425202      glm_8_nod+     shared   sprehei1          8    RUNNING      0:0 
+7425203      glm_4_nod+   parallel   sprehei1          4    PENDING      0:0 
+7425204      glm_16_no+     shared   sprehei1         16    RUNNING      0:0 
+7425205      glm_5_nod+   parallel   sprehei1          5    PENDING      0:0 
+7425206      glm_24_no+     shared   sprehei1         24    RUNNING      0:0 
+7425207      glm_6_nod+   parallel   sprehei1          6    PENDING      0:0 
