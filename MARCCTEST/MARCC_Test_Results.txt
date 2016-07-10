@@ -1,0 +1,192 @@
+SLURM Job_id=7425112 Name=glm_1_nodes_2_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425112 Name=glm_1_nodes_2_calls_shared.sh Ended, Run time 00:44:38, COMPLETED, ExitCode 0
+SLURM Job_id=7425113 Name=glm_1_nodes_2_calls_parallel.sh Began, Queued time 00:00:01
+SLURM Job_id=7425113 Name=glm_1_nodes_2_calls_parallel.sh Ended, Run time 00:49:26, COMPLETED, ExitCode 0
+SLURM Job_id=7425114 Name=glm_2_nodes_2_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425114 Name=glm_2_nodes_2_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425115 Name=glm_2_nodes_2_calls_parallel.sh Began, Queued time 05:01:21
+SLURM Job_id=7425115 Name=glm_2_nodes_2_calls_parallel.sh Ended, Run time 00:51:00, COMPLETED, ExitCode 0
+SLURM Job_id=7425116 Name=glm_4_nodes_2_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425116 Name=glm_4_nodes_2_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425117 Name=glm_3_nodes_2_calls_parallel.sh Began, Queued time 04:20:21
+SLURM Job_id=7425117 Name=glm_3_nodes_2_calls_parallel.sh Ended, Run time 00:30:55, COMPLETED, ExitCode 0
+SLURM Job_id=7425118 Name=glm_8_nodes_2_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425118 Name=glm_8_nodes_2_calls_shared.sh Ended, Run time 01:45:32, COMPLETED, ExitCode 0
+SLURM Job_id=7425119 Name=glm_4_nodes_2_calls_parallel.sh Began, Queued time 03:20:19
+SLURM Job_id=7425119 Name=glm_4_nodes_2_calls_parallel.sh Ended, Run time 00:33:58, COMPLETED, ExitCode 0
+SLURM Job_id=7425120 Name=glm_16_nodes_2_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425120 Name=glm_16_nodes_2_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425121 Name=glm_5_nodes_2_calls_parallel.sh Began, Queued time 01:19:55
+SLURM Job_id=7425121 Name=glm_5_nodes_2_calls_parallel.sh Ended, Run time 01:14:30, COMPLETED, ExitCode 0
+SLURM Job_id=7425122 Name=glm_24_nodes_2_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425122 Name=glm_24_nodes_2_calls_shared.sh Ended, Run time 01:19:43, COMPLETED, ExitCode 0
+SLURM Job_id=7425123 Name=glm_6_nodes_2_calls_parallel.sh Began, Queued time 00:00:02
+SLURM Job_id=7425123 Name=glm_6_nodes_2_calls_parallel.sh Ended, Run time 00:52:32, COMPLETED, ExitCode 0
+SLURM Job_id=7425124 Name=glm_1_nodes_4_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425124 Name=glm_1_nodes_4_calls_shared.sh Ended, Run time 02:58:23, COMPLETED, ExitCode 0
+SLURM Job_id=7425125 Name=glm_1_nodes_4_calls_parallel.sh Began, Queued time 05:10:09
+SLURM Job_id=7425125 Name=glm_1_nodes_4_calls_parallel.sh Ended, Run time 01:48:28, COMPLETED, ExitCode 0
+SLURM Job_id=7425126 Name=glm_2_nodes_4_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425126 Name=glm_2_nodes_4_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425127 Name=glm_2_nodes_4_calls_parallel.sh Began, Queued time 05:01:41
+SLURM Job_id=7425127 Name=glm_2_nodes_4_calls_parallel.sh Ended, Run time 01:51:11, COMPLETED, ExitCode 0
+SLURM Job_id=7425128 Name=glm_4_nodes_4_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425128 Name=glm_4_nodes_4_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425129 Name=glm_3_nodes_4_calls_parallel.sh Began, Queued time 04:20:21
+SLURM Job_id=7425129 Name=glm_3_nodes_4_calls_parallel.sh Ended, Run time 01:25:41, COMPLETED, ExitCode 0
+SLURM Job_id=7425130 Name=glm_8_nodes_4_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425130 Name=glm_8_nodes_4_calls_shared.sh Ended, Run time 02:58:31, COMPLETED, ExitCode 0
+SLURM Job_id=7425131 Name=glm_4_nodes_4_calls_parallel.sh Began, Queued time 03:20:24
+SLURM Job_id=7425131 Name=glm_4_nodes_4_calls_parallel.sh Ended, Run time 00:53:20, COMPLETED, ExitCode 0
+SLURM Job_id=7425132 Name=glm_16_nodes_4_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425132 Name=glm_16_nodes_4_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425133 Name=glm_5_nodes_4_calls_parallel.sh Began, Queued time 01:47:09
+SLURM Job_id=7425133 Name=glm_5_nodes_4_calls_parallel.sh Ended, Run time 01:34:01, COMPLETED, ExitCode 0
+SLURM Job_id=7425134 Name=glm_24_nodes_4_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425134 Name=glm_24_nodes_4_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425135 Name=glm_6_nodes_4_calls_parallel.sh Began, Queued time 00:16:07
+SLURM Job_id=7425135 Name=glm_6_nodes_4_calls_parallel.sh Ended, Run time 02:30:38, COMPLETED, ExitCode 0
+SLURM Job_id=7425136 Name=glm_1_nodes_6_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425136 Name=glm_1_nodes_6_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425137 Name=glm_1_nodes_6_calls_parallel.sh Began, Queued time 05:10:09
+SLURM Job_id=7425137 Name=glm_1_nodes_6_calls_parallel.sh Ended, Run time 02:26:27, COMPLETED, ExitCode 0
+SLURM Job_id=7425138 Name=glm_2_nodes_6_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425138 Name=glm_2_nodes_6_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425139 Name=glm_2_nodes_6_calls_parallel.sh Began, Queued time 05:02:48
+SLURM Job_id=7425139 Name=glm_2_nodes_6_calls_parallel.sh Ended, Run time 02:25:04, COMPLETED, ExitCode 0
+SLURM Job_id=7425140 Name=glm_4_nodes_6_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425140 Name=glm_4_nodes_6_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425141 Name=glm_3_nodes_6_calls_parallel.sh Began, Queued time 04:29:07
+SLURM Job_id=7425141 Name=glm_3_nodes_6_calls_parallel.sh Ended, Run time 02:18:43, COMPLETED, ExitCode 0
+SLURM Job_id=7425142 Name=glm_8_nodes_6_calls_shared.sh Began, Queued time 00:00:02
+SLURM Job_id=7425142 Name=glm_8_nodes_6_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425143 Name=glm_4_nodes_6_calls_parallel.sh Began, Queued time 03:20:24
+SLURM Job_id=7425143 Name=glm_4_nodes_6_calls_parallel.sh Ended, Run time 01:18:58, COMPLETED, ExitCode 0
+SLURM Job_id=7425144 Name=glm_16_nodes_6_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425144 Name=glm_16_nodes_6_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425145 Name=glm_5_nodes_6_calls_parallel.sh Began, Queued time 01:51:30
+SLURM Job_id=7425145 Name=glm_5_nodes_6_calls_parallel.sh Ended, Run time 02:03:52, COMPLETED, ExitCode 0
+SLURM Job_id=7425146 Name=glm_24_nodes_6_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425146 Name=glm_24_nodes_6_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425147 Name=glm_6_nodes_6_calls_parallel.sh Began, Queued time 00:40:43
+SLURM Job_id=7425147 Name=glm_6_nodes_6_calls_parallel.sh Ended, Run time 02:38:28, COMPLETED, ExitCode 0
+SLURM Job_id=7425148 Name=glm_1_nodes_8_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425148 Name=glm_1_nodes_8_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425149 Name=glm_1_nodes_8_calls_parallel.sh Began, Queued time 05:16:54
+SLURM Job_id=7425149 Name=glm_1_nodes_8_calls_parallel.sh Ended, Run time 02:43:41, COMPLETED, ExitCode 0
+SLURM Job_id=7425150 Name=glm_2_nodes_8_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425150 Name=glm_2_nodes_8_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425151 Name=glm_2_nodes_8_calls_parallel.sh Began, Queued time 05:04:05
+SLURM Job_id=7425151 Name=glm_2_nodes_8_calls_parallel.sh Ended, Run time 02:49:39, COMPLETED, ExitCode 0
+SLURM Job_id=7425152 Name=glm_4_nodes_8_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425152 Name=glm_4_nodes_8_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425153 Name=glm_3_nodes_8_calls_parallel.sh Began, Queued time 04:29:06
+SLURM Job_id=7425153 Name=glm_3_nodes_8_calls_parallel.sh Ended, Run time 02:56:16, COMPLETED, ExitCode 0
+SLURM Job_id=7425154 Name=glm_8_nodes_8_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425154 Name=glm_8_nodes_8_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425155 Name=glm_4_nodes_8_calls_parallel.sh Began, Queued time 03:21:09
+SLURM Job_id=7425155 Name=glm_4_nodes_8_calls_parallel.sh Ended, Run time 01:55:45, COMPLETED, ExitCode 0
+SLURM Job_id=7425156 Name=glm_16_nodes_8_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425156 Name=glm_16_nodes_8_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425157 Name=glm_5_nodes_8_calls_parallel.sh Began, Queued time 01:58:06
+SLURM Job_id=7425157 Name=glm_5_nodes_8_calls_parallel.sh Ended, Run time 02:20:37, COMPLETED, ExitCode 0
+SLURM Job_id=7425158 Name=glm_24_nodes_8_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425158 Name=glm_24_nodes_8_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425159 Name=glm_6_nodes_8_calls_parallel.sh Began, Queued time 00:52:33
+SLURM Job_id=7425159 Name=glm_6_nodes_8_calls_parallel.sh Ended, Run time 03:00:08, TIMEOUT
+SLURM Job_id=7425160 Name=glm_1_nodes_10_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425160 Name=glm_1_nodes_10_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425161 Name=glm_1_nodes_10_calls_parallel.sh Began, Queued time 05:16:54
+SLURM Job_id=7425161 Name=glm_1_nodes_10_calls_parallel.sh Ended, Run time 02:56:29, COMPLETED, ExitCode 0
+SLURM Job_id=7425162 Name=glm_2_nodes_10_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425162 Name=glm_2_nodes_10_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425163 Name=glm_2_nodes_10_calls_parallel.sh Began, Queued time 05:04:20
+SLURM Job_id=7425163 Name=glm_2_nodes_10_calls_parallel.sh Ended, Run time 03:00:18, TIMEOUT
+SLURM Job_id=7425164 Name=glm_4_nodes_10_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425164 Name=glm_4_nodes_10_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425165 Name=glm_3_nodes_10_calls_parallel.sh Began, Queued time 04:29:06
+SLURM Job_id=7425165 Name=glm_3_nodes_10_calls_parallel.sh Ended, Run time 03:00:23, TIMEOUT
+SLURM Job_id=7425166 Name=glm_8_nodes_10_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425166 Name=glm_8_nodes_10_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425167 Name=glm_4_nodes_10_calls_parallel.sh Began, Queued time 04:13:43
+SLURM Job_id=7425167 Name=glm_4_nodes_10_calls_parallel.sh Ended, Run time 03:00:30, TIMEOUT
+SLURM Job_id=7425168 Name=glm_16_nodes_10_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425168 Name=glm_16_nodes_10_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425169 Name=glm_5_nodes_10_calls_parallel.sh Began, Queued time 02:11:17
+SLURM Job_id=7425169 Name=glm_5_nodes_10_calls_parallel.sh Ended, Run time 02:39:57, COMPLETED, ExitCode 0
+SLURM Job_id=7425170 Name=glm_24_nodes_10_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425170 Name=glm_24_nodes_10_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425171 Name=glm_6_nodes_10_calls_parallel.sh Began, Queued time 01:01:17
+SLURM Job_id=7425171 Name=glm_6_nodes_10_calls_parallel.sh Ended, Run time 03:00:30, TIMEOUT
+SLURM Job_id=7425172 Name=glm_1_nodes_20_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425172 Name=glm_1_nodes_20_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425173 Name=glm_1_nodes_20_calls_parallel.sh Began, Queued time 05:16:54
+SLURM Job_id=7425173 Name=glm_1_nodes_20_calls_parallel.sh Ended, Run time 03:00:29, TIMEOUT
+SLURM Job_id=7425174 Name=glm_2_nodes_20_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425174 Name=glm_2_nodes_20_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425175 Name=glm_2_nodes_20_calls_parallel.sh Began, Queued time 05:09:16
+SLURM Job_id=7425175 Name=glm_2_nodes_20_calls_parallel.sh Ended, Run time 03:00:29, TIMEOUT
+SLURM Job_id=7425176 Name=glm_4_nodes_20_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425176 Name=glm_4_nodes_20_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425177 Name=glm_3_nodes_20_calls_parallel.sh Began, Queued time 04:29:06
+SLURM Job_id=7425177 Name=glm_3_nodes_20_calls_parallel.sh Ended, Run time 03:00:23, TIMEOUT
+SLURM Job_id=7425178 Name=glm_8_nodes_20_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425178 Name=glm_8_nodes_20_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425179 Name=glm_4_nodes_20_calls_parallel.sh Began, Queued time 04:16:07
+SLURM Job_id=7425179 Name=glm_4_nodes_20_calls_parallel.sh Ended, Run time 03:00:06, TIMEOUT
+SLURM Job_id=7425180 Name=glm_16_nodes_20_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425180 Name=glm_16_nodes_20_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425181 Name=glm_5_nodes_20_calls_parallel.sh Began, Queued time 02:34:23
+SLURM Job_id=7425181 Name=glm_5_nodes_20_calls_parallel.sh Ended, Run time 03:00:18, TIMEOUT
+SLURM Job_id=7425182 Name=glm_24_nodes_20_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425182 Name=glm_24_nodes_20_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425183 Name=glm_6_nodes_20_calls_parallel.sh Began, Queued time 01:14:56
+SLURM Job_id=7425183 Name=glm_6_nodes_20_calls_parallel.sh Ended, Run time 03:00:16, TIMEOUT
+SLURM Job_id=7425184 Name=glm_1_nodes_40_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425184 Name=glm_1_nodes_40_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425185 Name=glm_1_nodes_40_calls_parallel.sh Began, Queued time 05:16:53
+SLURM Job_id=7425185 Name=glm_1_nodes_40_calls_parallel.sh Ended, Run time 03:00:29, TIMEOUT
+SLURM Job_id=7425186 Name=glm_2_nodes_40_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425186 Name=glm_2_nodes_40_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425187 Name=glm_2_nodes_40_calls_parallel.sh Began, Queued time 05:09:15
+SLURM Job_id=7425187 Name=glm_2_nodes_40_calls_parallel.sh Ended, Run time 03:00:29, TIMEOUT
+SLURM Job_id=7425188 Name=glm_4_nodes_40_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425188 Name=glm_4_nodes_40_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425189 Name=glm_3_nodes_40_calls_parallel.sh Began, Queued time 04:29:05
+SLURM Job_id=7425189 Name=glm_3_nodes_40_calls_parallel.sh Ended, Run time 03:00:23, TIMEOUT
+SLURM Job_id=7425190 Name=glm_8_nodes_40_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425190 Name=glm_8_nodes_40_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425191 Name=glm_4_nodes_40_calls_parallel.sh Began, Queued time 04:18:48
+SLURM Job_id=7425191 Name=glm_4_nodes_40_calls_parallel.sh Ended, Run time 03:00:26, TIMEOUT
+SLURM Job_id=7425192 Name=glm_16_nodes_40_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425192 Name=glm_16_nodes_40_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425193 Name=glm_5_nodes_40_calls_parallel.sh Began, Queued time 02:46:43
+SLURM Job_id=7425193 Name=glm_5_nodes_40_calls_parallel.sh Ended, Run time 03:00:05, TIMEOUT
+SLURM Job_id=7425194 Name=glm_24_nodes_40_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425194 Name=glm_24_nodes_40_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425195 Name=glm_6_nodes_40_calls_parallel.sh Began, Queued time 01:18:11
+SLURM Job_id=7425195 Name=glm_6_nodes_40_calls_parallel.sh Ended, Run time 03:00:36, TIMEOUT
+SLURM Job_id=7425196 Name=glm_1_nodes_80_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425196 Name=glm_1_nodes_80_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425197 Name=glm_1_nodes_80_calls_parallel.sh Began, Queued time 05:17:25
+SLURM Job_id=7425197 Name=glm_1_nodes_80_calls_parallel.sh Ended, Run time 03:00:30, TIMEOUT
+SLURM Job_id=7425198 Name=glm_2_nodes_80_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425198 Name=glm_2_nodes_80_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425199 Name=glm_2_nodes_80_calls_parallel.sh Began, Queued time 05:10:04
+SLURM Job_id=7425199 Name=glm_2_nodes_80_calls_parallel.sh Ended, Run time 03:00:09, TIMEOUT
+SLURM Job_id=7425200 Name=glm_4_nodes_80_calls_shared.sh Began, Queued time 00:00:00
+SLURM Job_id=7425200 Name=glm_4_nodes_80_calls_shared.sh Ended, Run time 03:00:45, TIMEOUT
+SLURM Job_id=7425201 Name=glm_3_nodes_80_calls_parallel.sh Began, Queued time 04:51:10
+SLURM Job_id=7425201 Name=glm_3_nodes_80_calls_parallel.sh Ended, Run time 03:00:36, TIMEOUT
+SLURM Job_id=7425202 Name=glm_8_nodes_80_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425202 Name=glm_8_nodes_80_calls_shared.sh Ended, Run time 03:00:40, TIMEOUT
+SLURM Job_id=7425203 Name=glm_4_nodes_80_calls_parallel.sh Began, Queued time 04:18:44
+SLURM Job_id=7425203 Name=glm_4_nodes_80_calls_parallel.sh Ended, Run time 03:00:26, TIMEOUT
+SLURM Job_id=7425204 Name=glm_16_nodes_80_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425204 Name=glm_16_nodes_80_calls_shared.sh Ended, Run time 03:00:40, TIMEOUT
+SLURM Job_id=7425205 Name=glm_5_nodes_80_calls_parallel.sh Began, Queued time 03:19:06
+SLURM Job_id=7425205 Name=glm_5_nodes_80_calls_parallel.sh Ended, Run time 03:00:44, TIMEOUT
+SLURM Job_id=7425206 Name=glm_24_nodes_80_calls_shared.sh Began, Queued time 00:00:01
+SLURM Job_id=7425206 Name=glm_24_nodes_80_calls_shared.sh Ended, Run time 03:00:40, TIMEOUT
+SLURM Job_id=7425207 Name=glm_6_nodes_80_calls_parallel.sh Began, Queued time 01:19:49
+SLURM Job_id=7425207 Name=glm_6_nodes_80_calls_parallel.sh Ended, Run time 03:00:25, TIMEOUT
