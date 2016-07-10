@@ -1,0 +1,6 @@
+
+1. what was the average queue time per node per partition?
+2. what was the average run time per call?
+3. what was the average run time per call per node?
+4. what was the average run time per call per node per partition?
+

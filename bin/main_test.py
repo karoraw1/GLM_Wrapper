@@ -66,7 +66,7 @@ newDirs = [mainFolder+superDir+"/"+x for x in cases]
 LakeModel.make_dir(mainFolder+superDir)
 test = LakeModel.Lake(cases[0], newDirs[0])
 
-test.fill_parameters_set("Mystic_Vals")
+test.write_glm_config()
 
 BOS_weather = LakeModel.GHCN_weather_data(met_path)
 BOS_weather.clean_columns()

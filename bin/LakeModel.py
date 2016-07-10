@@ -25,27 +25,27 @@ import JD_converter as jd
 
 def run_model(meta_model):
     """This function accesses the locations of each glm configuration, creates
+    """
     
 
-def import_data(return_type):
-    
+def import_config():
     # the glm contains the following blocks:
     # &glm_setup: 13 general simulation info and mixing parameters    
-    setup_vars = {'max_layers' :500, 
-                  'min_layer_vol' :0.025, 
-                  'min_layer_thick' :0.50, 
-                  'max_layer_thick' :1.500,  
-                  'Kw' : 0.6, 
-                  'coef_inf_entrain' : 0., 
-                  'coef_mix_conv' : 0.125, 
-                  'coef_wind_stir' : 0.23, 
-                  'coef_mix_shear' : 0.20, 
-                  'coef_mix_turb' : 0.51, 
-                  'coef_mix_KH' : 0.30, 
-                  'coef_mix_hyp' : 0.5,
-                  'deep_mixing':'.true.'}
+    glm_setup = {'max_layers' :500, 
+                 'min_layer_vol' :0.025, 
+                 'min_layer_thick' :0.50, 
+                 'max_layer_thick' :1.500,  
+                 'Kw' : 0.6, 
+                 'coef_inf_entrain' : 0., 
+                 'coef_mix_conv' : 0.125, 
+                 'coef_wind_stir' : 0.23, 
+                 'coef_mix_shear' : 0.20, 
+                 'coef_mix_turb' : 0.51, 
+                 'coef_mix_KH' : 0.30, 
+                 'coef_mix_hyp' : 0.5,
+                 'deep_mixing':'.true.'}
     # &morphometry: 8 vars
-    morpho_vars = {"lake_name": "'UpperMysticLake'", 
+    morphometry = {"lake_name": "'UpperMysticLake'", 
                    "latitude": 42.4317,  
                    "longitude": -71.1483,
                    "bsn_len": 1073.637,
@@ -56,87 +56,106 @@ def import_data(return_type):
                    "A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69, 
                         397077.50, 460778.04, 524802.66, 560051.22]}
                         
-    morpho_vars['bsn_vals'] = len(morpho_vars['H'])
-    assert len(morpho_vars['H']) == len(morpho_vars['H'])
+    morphometry['bsn_vals'] = len(morphometry['H'])
+    assert len(morphometry['H']) == len(morphometry['H'])
     
     # &time block 5 vars if 'timefmt' is 2
-    time_vars = {"timefmt" : 2, 
-                 "start" : "'2012-01-01 00:00:00'", 
-                 "stop" : "'2014-01-01 00:00:00'", 
-                 "dt" : 3600.0,
-                 "timezone" : 5.0 }
+    time = {"timefmt" : 2, 
+            "start" : "'2012-01-01 00:00:00'", 
+            "stop" : "'2014-01-01 00:00:00'", 
+            "dt" : 3600.0,
+            "timezone" : 5.0 }
     # &output 14 vars 
-    output_vars = {"out_dir" : "", 
-                   "out_fn" : "'output'",
-                   "nsave" : 12, 
-                   "csv_lake_fname" : "'lake'",
-                   "csv_point_nlevs" : 1,
-                   "csv_point_fname" : "'WQ_'",
-                   "csv_point_at" : "17.",
-                   "csv_point_nvars" : 2,
-                   "csv_point_vars" : [ "'temp'", "'salt'"],
-                   "csv_outlet_allinone" : ".false.",
-                   "csv_outlet_fname" : "'outlet_'",
-                   "csv_outlet_nvars" : 3,
-                   "csv_outlet_vars" : ["'flow'," "'temp'", "'salt',"],
-                   "csv_ovrflw_fname" : "\"overflow\"" } 
-                
-    init_vars = ["lake_depth", "num_depths", "the_depths", "the_temps", "the_sals",
-                 "num_wq_vars", "wq_names", "wq_init_vals" ]
-    met_vars = ["met_sw", "lw_type", "rain_sw", "snow_sw", "atm_stab", "catchrain",
-                "rad_mode", "albedo_mode", "cloud_mode", "subdaily", "meteo_fl",
-                "wind_factor", "sw_factor", "lw_factor", "at_factor", "rh_factor",
-                "rain_factor", "ce", "ch", "cd", "rain_threshold", "runoff_coef"]
-    bird_vars = ["AP", "Oz", "WatVap", "AOD500", "AOD380", "Albedo"]
-    outflow_vars = ["num_outlet", "flt_off_sw", "outl_elvs", "bsn_len_outl", 
-                    "bsn_wid_outl", "outflow_fl", "outflow_factor"]
-                
-    inflow_vars = ["num_inflows", "names_of_strms", "subm_flag", "strm_hf_angle", 
-                   "strmbd_slope", "strmbd_drag", "inflow_factor", "inflow_fl", 
-                   "inflow_varnum", "inflow_vars", "coef_inf_entrain"]
+    output = {"out_dir" : "", 
+              "out_fn" : "'output_'",
+              "nsave" : 12, 
+              "csv_lake_fname" : "'lake'",
+              "csv_point_nlevs" : 1,
+              "csv_point_fname" : "'WQ_'",
+              "csv_point_at" : "17.",
+              "csv_point_nvars" : 2,
+              "csv_point_vars" : [ "'temp'", "'salt'"],
+              "csv_outlet_allinone" : ".false.",
+              "csv_outlet_fname" : "'outlet_'",
+              "csv_outlet_nvars" : 3,
+              "csv_outlet_vars" : ["'flow'," "'temp'", "'salt',"],
+              "csv_ovrflw_fname" : "\"overflow\"" }
+              
+    #&init_profiles            
+    init_profiles = {"lake_depth": 22.0, 
+                     "num_depths": 5, 
+                     "the_depths": [1, 5, 9, 13, 17, 21], 
+                     "the_temps": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0], 
+                     "the_sals": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+                     "num_wq_vars": 0, 
+                     "wq_names": [], 
+                     "wq_init_vals": "" }
+                     
+    #&meteorology                 
+    meteorology = {"met_sw" : ".true.",
+                   "lw_type" : "'LW_IN'", 
+                   "rain_sw" : ".false.", 
+                   "snow_sw" :  ".true.",
+                   "atm_stab" : ".false.",
+                   "catchrain" : ".false.",
+                   "rad_mode": 1,
+                   "albedo_mode": 3, 
+                   "cloud_mode": 3, 
+                   "subdaily": '.false.', 
+                   "meteo_fl": "'met_daily.csv'",
+                   "wind_factor": 1.0,
+                   "sw_factor":  1.0,
+                   "lw_factor": 1.0, 
+                   "at_factor": 1.0,
+                   "rh_factor": 1.0,
+                   "rain_factor": 1.0,
+                   "ce":  0.0013, 
+                   "ch": 0.0013, 
+                   "cd": 0.0013, 
+                   "rain_threshold": 0.01, 
+                   "runoff_coef":  0.3}
+    #&bird_model            
+    bird = {"AP" : 973, 
+            "Oz" : 0.279, 
+            "WatVap" : 1.1, 
+            "AOD500" : 0.033, 
+            "AOD380" : 0.038, 
+            "Albedo" : 0.2}
     
-    inflow_vals = [1, "'Aberjona'", ".false.", 65.0, 2.0, 0.0160, 1.0, 
-                   "'inflow.csv'", 4, ['FLOW', 'TEMP', 'SALT', 'OXY_oxy', 
-                   'SIL_rsi', 'NIT_amm', 'NIT_nit', 'PHS_frp', 'OGM_don', 
-                   'OGM_pon', 'OGM_dop', 'OGM_pop', 'OGM_doc', 'OGM_poc', 
-                   'PHY_green', 'PHY_crypto', 'PHY_diatom'], 0.]
-    outflow_vals = [1, ".false.", -215.5, 799, 399, "'outflow.csv'", 0.8]
-    bird_vals = [973, 0.279, 1.1, 0.033, 0.038, 0.2]
-    init_vals = [ 22.0, 5, [1, 5, 9, 13, 17, 21],
-                  [4.0, 4.0, 4.0, 4.0, 4.0, 4.0],
-                  [0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-                  6, ["'OGM_don',", "'OGM_pon',",
-                      "'OGM_dop',", "'OGM_pop',",
-                      "'OGM_doc',", "'OGM_poc'"],
-                  np.array([[1.1, 1.2, 1.3, 1.2, 1.3],
-                            [2.1, 2.2, 2.3, 1.2, 1.3],
-                            [3.1, 3.2, 3.3, 1.2, 1.3],
-                            [4.1, 4.2, 4.3, 1.2, 1.3],
-                            [5.1, 5.2, 5.3, 1.2, 1.3],
-                            [6.1, 6.2, 6.3, 1.2, 1.3]])]
-    
-    
+    #&inflow                
+    inflow = {"num_inflows": 1,
+              "names_of_strms": "'Aberjona'", 
+              "subm_flag": ".false.", 
+              "strm_hf_angle": 65.0, 
+              "strmbd_slope": 2.0, 
+              "strmbd_drag": 0.0160, 
+              "inflow_factor": 1.0, 
+              "inflow_fl": "'inflow.csv'", 
+              "inflow_varnum": 4, 
+              "inflow_vars": ['FLOW', 'TEMP', 'SALT'],
+              "coef_inf_entrain": 0. }
+              
+    #&outflow
+    outflow = {"num_outlet": 1,
+               "flt_off_sw": ".false.",
+               "outl_elvs": -215.5,
+               "bsn_len_outl": 799, 
+               "bsn_wid_outl" : 399,
+               "outflow_fl" : "'outflow.csv'",
+               "outflow_factor": 0.8 }
                 
-    met_vals = [".true.", "'LW_IN'", ".false.", ".true.", ".false.", ".false.", 
-                0, 1, 4, ".false.", "'met_daily.csv'", 1.0, 1.0, 1.0, 1.0, 1.0, 
-                1.0, 0.0013, 0.0013, 0.0013, 0.01, 0.3]
-                
-    expectations = { "setup": setup_vals, "wq": wq_vals, 'morpho': morpho_vals, 
-                    'time': time_vals, 'output': output_vals, 
-                    'init': init_vals, 'met': met_vals, 'bird': bird_vals, 
-                    'outflow': outflow_vals, 'inflow': inflow_vals}
-                    
-    parameters =  { "setup": setup_vars, "wq": wq_vars, 'morpho': morpho_vars,
-                   'time': time_vars, 'output': output_vars, 'init': init_vars,
-                   'met': met_vars, 'bird': bird_vars, 'outflow': outflow_vars,
-                   'inflow': inflow_vars }
-                   
-    if return_type == 'Mystic_Vals':
-        return expectations
-    elif return_type == "Parameters":
-        return parameters
-    elif return_type == "Custom":
-        print "Custom Return Type Selected"
+    glm_config = { "glm_setup" : glm_setup, 
+                   "wq_setup" : {}, 
+                   "morpho" : morphometry, 
+                   "time" : time,
+                   "output" : output,
+                   "init" : init_profiles,
+                   "met" : meteorology,
+                   "bird" : bird, 
+                   "outflow" : outflow,
+                   "inflow" : inflow }
+
+    return glm_config
 
 def error_metrics(Obs, Sim):
     Err = Sim - Obs
@@ -281,8 +300,6 @@ def printAutocorr(aggs, threshold=None):
 
 # TODO: def plotfrequencydomain():
 
-
-
 def TimeIdx(df, dates=None, insertAt=0):
     """this inserts day of the year, month of the year, and season of the year
     columns into a dataframe for use by the groupby function"""
@@ -406,129 +423,28 @@ def safe_dir(s):
 class Lake(object):
     
     def __init__(self, name, dir_path):
-        
-        self.area = 
-        self.elevation =  np.array([-23.384, -22.32382609, -21.26365217, 
-                                    -20.20347826, -19.14330435, -18.08313043, 
-                                    -17.02295652, -15.96278261, -14.9026087, 
-                                    -13.84243478, -12.78226087, -11.72208696,
-                                    -10.66191304, -9.60173913, -8.54156522,
-                                    -7.4813913, -6.42121739, -5.36104348, 
-                                    -4.30086957, -3.24069565, -2.18052174, 
-                                    -1.12034783, -0.06017391, 1.])
 
         self.name = name
         self.dir_path = dir_path
         make_dir(dir_path)
-        self.glm_path = self.dir_path+"/glm2.nml"        
-        self.parameters = import_data("Parameters")
+        self.glm_path = os.path.join(self.dir_path,"glm2.nml")      
+        self.glm_config = import_config()
 
-    def fill_parameters_set(self, val_set = "Mystic_Vals", wq = False):
-        
-        self.expectations = import_data(val_set)
-        self.expectations['output'][1] = self.expectations['output'][1] + "_"+self.name
-        self.expectations['output'][0] = self.dir_path+"/output"        
+    def write_glm_config(self):
+        self.glm_config['output']['out_dir'] = self.dir_path        
+        self.glm_config['output']['out_fn'] += self.name
+        safe_dir(self.glm_config['output']['out_dir'])
 
-        safe_dir(self.expectations['output'][0])
         # start writing config file
         glm_handle = open(self.glm_path, 'w+')
-        
-        glm_handle.write("&glm_setup\n")        
-        for var,val in zip(self.parameters["setup"],self.expectations['setup']):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
-        
-        if wq == True:
-            glm_handle.write("/\n&wq_setup\n")
-            for var,val in zip(self.parameters["wq"],self.expectations['wq']):
-                glm_handle.write("\t{0} = {1}\n".format(var, val))
-
-        glm_handle.write("/\n&morphometry\n")
-        for var, val in zip(self.parameters['morpho'],self.expectations['morpho']):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
-
-        # Input Bathy data
-        glm_handle.write("\tH = ")
-        layers = range(len(self.elevation))
-        for idx in layers:
-            if ((idx%4) == 0) and idx !=0:
-                glm_handle.write("\n\t    ")            
-            if idx !=layers[-1]:
-                glm_handle.write("{0}, ".format(self.elevation[idx]))
-            else:
-                glm_handle.write("{0}\n".format(self.elevation[idx]))
-        glm_handle.write("\tA = ")
-
-        for idx in layers:
-            if ((idx%4) == 0) and idx !=0:
-                glm_handle.write("\n\t    ")
-            if idx !=layers[-1]:
-                glm_handle.write("{0}, ".format(self.area[idx]))
-            else:
-                glm_handle.write("{0}\n/\n".format(self.area[idx]))
-            
-        glm_handle.write("&time\n")
-        for var,val in zip(self.parameters["time"],self.expectations['time']):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
-            
-        glm_handle.write("/\n&output\n")           
-        for var, val in zip(self.parameters["output"], self.expectations["output"]):
-            if type(val) == list:
-                glm_handle.write("\t{0} = {1}\n".format(var, val[0]))
-                for idx in np.array(range(len(val)-1))+1:
-                    glm_handle.write("\t\t\t\t     {}\n".format(val[idx]))
-            elif var == 'out_dir' or var == 'out_fn':
-                glm_handle.write("\t{0} = '{1}'\n".format(var, val))
-            else:
-                glm_handle.write("\t{0} = {1}\n".format(var, val))
-        
-        glm_handle.write("/\n&init_profiles\n")
-        for var, val in zip(self.parameters["init"],self.expectations["init"]):
-            if type(val) == float or type(val) == int:
-                glm_handle.write("\t{0} = {1}\n".format(var, val))
-            elif type(val) == list:
-                if type(val[0]) == str:
-                    glm_handle.write("\t{0} =     {1}\n".format(var, val[0]))
-                    for idx in np.array(range(len(val)-1))+1:
-                        glm_handle.write("\t\t\t       {}\n".format(val[idx]))
-                else:
-                    glm_handle.write("\t{0} = {1},".format(var, val[0]))
-                    for idx in np.array(range(len(val)-2))+1:
-                        glm_handle.write("{},".format(val[idx]))
-                    glm_handle.write("{}\n".format(val[-1]))
-            else:
-                glm_handle.write("\t{0} =  ".format(var))
-                depths, wqs = val.shape
-                for idx in range(wqs):
-                    glm_handle.write("{0}, ".format(val[0][idx]))
-                for row in np.array(range(depths-1))+1:
-                    glm_handle.write("\n                    ")
-                    for elmt in range(wqs):
-                        glm_handle.write("{0}, ".format(val[row][elmt]))
-       
-        glm_handle.write("\n/\n&meteorology\n")
-        for var, val in zip(self.parameters["met"],self.expectations["met"]):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
-
-        glm_handle.write("/\n&bird_model\n")
-        for var, val in zip(self.parameters["bird"],self.expectations["bird"]):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
-        
-        glm_handle.write("/\n&outflows\n")
-        for var, val in zip(self.parameters["outflow"],self.expectations["outflow"]):
-            glm_handle.write("\t{0} = {1}\n".format(var, val))
-            
-        glm_handle.write("/\n&inflows\n")        
-        for var, val in zip(self.parameters["inflow"],self.expectations["inflow"]):
-            if type(val) != list:
-                glm_handle.write("\t{0} = {1}\n".format(var, val))
-            else:
-                glm_handle.write("\t{0} = '{1}',\n".format(var, val[0]))
-                for idx in np.array(range(len(val)-1))+1:
-                    glm_handle.write("                  ")
-                    glm_handle.write("'{0}',\n".format(val[idx]))    
-        glm_handle.write("/")
+        for block in self.glm_config.keys():
+            glm_handle.write("&"+block+"\n")
+            for param in self.glm_config[block].keys():
+                value = self.glm_config[block][param]
+                glm_handle.write(" {0} = {1}\n".format(param, value))
+            glm_handle.write("/")
         glm_handle.close()
-        self.met_path = None
+
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
         if fname == None:

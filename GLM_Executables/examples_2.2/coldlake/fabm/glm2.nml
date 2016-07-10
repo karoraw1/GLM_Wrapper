@@ -1,20 +1,20 @@
 &glm_setup
-   sim_name = 'GLM Simulation'
-   max_layers = 200
-   min_layer_vol = 0.025
-   min_layer_thick = 0.250
-   max_layer_thick = 0.500
-   Kw = 0.5
-   coef_mix_conv = 0.125
-   coef_wind_stir = 0.23
-   coef_mix_shear = 0.20
-   coef_mix_turb = 0.51
-   coef_mix_KH = 0.30
-   coef_mix_hyp = 0.5
-   deep_mixing = .true.
+sim_name='GLM Simulation'
+max_layers=200
+min_layer_vol=0.025
+min_layer_thick=0.250
+max_layer_thick=0.500
+Kw=0.5
+coef_mix_conv=0.125
+coef_wind_stir=0.23
+coef_mix_shear=0.20
+coef_mix_turb=0.51
+coef_mix_KH=0.30
+coef_mix_hyp=0.5
+deep_mixing=.true.
 /
 &morphometry
-   lake_name= 'ColdLake'
+lake_name='ColdLake'
    latitude=56.65
    longitude=-111.2167
    bsn_len=1200

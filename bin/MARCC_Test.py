@@ -37,26 +37,30 @@ for i in trios:
     else:
         nodes = i[3]        
     fn = base_name+str(nodes)+"_nodes_"+str(i[1])+"_calls_"+i[2]+".sh"
-    handle = open(os.path.join(base_path, fn), "w+")
-    replacement_pack['file_handle'].append(handle)
-    replacement_pack['nodes'].append(str(nodes))
-    replacement_pack['partition'].append(str(i[2]))
-    handle.write("#!/bin/bash -l\n\n#SBATCH\n#SBATCH --job-name=")
-    handle.write(str(fn))
-    handle.write("\n#SBATCH --time=03:00:00\n#SBATCH --mail-type=begin,end\n")
-    handle.write("#SBATCH --mail-user=karoraw1@jhu.edu\n""#SBATCH --nodes=")
-    handle.write(str(nodes))
-    handle.write("\n#SBATCH --partition=")
-    handle.write(str(i[2]))
-    handle.write("\n\n")
-    for execs in range(i[1]):
-        for line in range(len(command_steps)):
-            handle.write(command_steps[line]+"\n")
-        handle.write("\n")
-    
-    handle.close()
+    if not os.path.exists(os.path.join(base_path, fn)):
+        handle = open(os.path.join(base_path, fn), "w+")
+        replacement_pack['file_handle'].append(handle)
+        replacement_pack['nodes'].append(str(nodes))
+        replacement_pack['partition'].append(str(i[2]))
+        handle.write("#!/bin/bash -l\n\n#SBATCH\n#SBATCH --job-name=")
+        handle.write(str(fn))
+        handle.write("\n#SBATCH --time=03:00:00\n#SBATCH --mail-type=begin,end\n")
+        handle.write("#SBATCH --mail-user=karoraw1@jhu.edu\n""#SBATCH --nodes=")
+        handle.write(str(nodes))
+        handle.write("\n#SBATCH --partition=")
+        handle.write(str(i[2]))
+        handle.write("\n\n")
+        for execs in range(i[1]):
+            for line in range(len(command_steps)):
+                handle.write(command_steps[line]+"\n")
+            handle.write("\n")
+        
+        handle.close()
     handle2.write("sbatch "+fn+"\n")
+    
 handle2.close()
+
+
 
     
 
