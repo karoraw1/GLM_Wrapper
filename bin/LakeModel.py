@@ -28,15 +28,45 @@ def run_model(meta_model):
     """
     
 
-def import_config():
+def import_config(dl_default=False):
     # the glm contains the following blocks:
-    # &glm_setup: 13 general simulation info and mixing parameters    
-    glm_setup = {'max_layers' :500, 
+    # &glm_setup: 13 general simulation info and mixing parameters
+    if dl_default:
+        default_config = {'others':{}}
+        default_order = {}
+        block_order = []
+        with open('../test_files/sample_glm.nml', 'r') as f:
+            for line in f:
+                print line 
+                key = line[0]
+                line = line.strip()
+                if key == '&':
+                    new_block = line[1:]
+                    orderedList = []
+                    default_config[new_block] = {}
+                elif key == '/':
+                    default_order[new_block] = orderedList
+                    block_order.append(new_block)
+                    print "Section End"
+                elif key != '!':
+                    line_split = line.split('=')
+                    line_ = [l.strip() for l in line_split]
+                    orderedList.append(line_[0])
+                    print line_
+                    if line_[0][0:3] != 'aed':
+                        default_config[new_block][line_[0]] = line_
+                    
+                else:
+                    default_config['others'][line_split[0]] = line_split
+
+    else:
+        default_config, default_order, block_order = None, None, None
+        
+    glm_setup = {'max_layers' :200, 
                  'min_layer_vol' :0.025, 
-                 'min_layer_thick' :0.50, 
-                 'max_layer_thick' :1.500,  
-                 'Kw' : 0.6, 
-                 'coef_inf_entrain' : 0., 
+                 'min_layer_thick' :0.25, 
+                 'max_layer_thick' :0.500,  
+                 'Kw' : 0.5, 
                  'coef_mix_conv' : 0.125, 
                  'coef_wind_stir' : 0.23, 
                  'coef_mix_shear' : 0.20, 
@@ -44,8 +74,11 @@ def import_config():
                  'coef_mix_KH' : 0.30, 
                  'coef_mix_hyp' : 0.5,
                  'deep_mixing':'.true.'}
+                 
+    wq_setup = {}
+    
     # &morphometry: 8 vars
-    morphometry = {"lake_name": "'UpperMysticLake'", 
+    morphometry = {'lake_name': "'UpperMysticLake'", 
                    "latitude": 42.4317,  
                    "longitude": -71.1483,
                    "bsn_len": 1073.637,
@@ -57,14 +90,19 @@ def import_config():
                         397077.50, 460778.04, 524802.66, 560051.22]}
                         
     morphometry['bsn_vals'] = len(morphometry['H'])
-    assert len(morphometry['H']) == len(morphometry['H'])
+    assert len(morphometry['H']) == len(morphometry['A'])
     
     # &time block 5 vars if 'timefmt' is 2
-    time = {"timefmt" : 2, 
+    time = {"timefmt" : 3, 
             "start" : "'2012-01-01 00:00:00'", 
             "stop" : "'2014-01-01 00:00:00'", 
             "dt" : 3600.0,
             "timezone" : 5.0 }
+            
+    start_t = pd.Timestamp(time["start"])
+    end_t = pd.Timestamp(time["stop"])
+    time['num_days'] = (end_t-start_t).days
+    
     # &output 14 vars 
     output = {"out_dir" : "", 
               "out_fn" : "'output_'",
@@ -74,28 +112,33 @@ def import_config():
               "csv_point_fname" : "'WQ_'",
               "csv_point_at" : "17.",
               "csv_point_nvars" : 2,
-              "csv_point_vars" : [ "'temp'", "'salt'"],
+              "csv_point_vars" : [ 'temp', 'salt'],
               "csv_outlet_allinone" : ".false.",
               "csv_outlet_fname" : "'outlet_'",
               "csv_outlet_nvars" : 3,
-              "csv_outlet_vars" : ["'flow'," "'temp'", "'salt',"],
+              "csv_outlet_vars" : ['flow', 'temp', 'salt'],
               "csv_ovrflw_fname" : "\"overflow\"" }
               
     #&init_profiles            
-    init_profiles = {"lake_depth": 22.0, 
-                     "num_depths": 5, 
+    init_profiles = {"lake_depth": 24.384, 
+                     "num_depths": 0, 
                      "the_depths": [1, 5, 9, 13, 17, 21], 
                      "the_temps": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0], 
-                     "the_sals": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
-                     "num_wq_vars": 0, 
-                     "wq_names": [], 
-                     "wq_init_vals": "" }
+                     "the_sals": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+                     }
+    init_profiles['num_depths'] = len(init_profiles["the_depths"])
+    assert len(init_profiles["the_depths"]) == len(init_profiles["the_temps"])
+    assert len(init_profiles["the_depths"]) == len(init_profiles["the_sals"])
+    
+    if wq_setup.keys() != []:        
+        init_profiles["num_wq_vars"] = 0
+        init_profiles["wq_names"] = []
+        init_profiles["wq_init_vals"] = "" 
                      
     #&meteorology                 
     meteorology = {"met_sw" : ".true.",
                    "lw_type" : "'LW_IN'", 
-                   "rain_sw" : ".false.", 
-                   "snow_sw" :  ".true.",
+                   "rain_sw" : ".false.",
                    "atm_stab" : ".false.",
                    "catchrain" : ".false.",
                    "rad_mode": 1,
@@ -131,31 +174,33 @@ def import_config():
               "strmbd_drag": 0.0160, 
               "inflow_factor": 1.0, 
               "inflow_fl": "'inflow.csv'", 
-              "inflow_varnum": 4, 
-              "inflow_vars": ['FLOW', 'TEMP', 'SALT'],
+              "inflow_varnum": 3, 
+              "inflow_vars": ['FLOW','TEMP','SALT'],
               "coef_inf_entrain": 0. }
               
     #&outflow
     outflow = {"num_outlet": 1,
                "flt_off_sw": ".false.",
-               "outl_elvs": -215.5,
+               "outl_elvs": 1.00,
                "bsn_len_outl": 799, 
                "bsn_wid_outl" : 399,
                "outflow_fl" : "'outflow.csv'",
-               "outflow_factor": 0.8 }
+               "outflow_factor": 0.8,
+               "seepage" : ".true.",
+               "seepage_rate" : 0.0 }
                 
     glm_config = { "glm_setup" : glm_setup, 
-                   "wq_setup" : {}, 
-                   "morpho" : morphometry, 
+                   "wq_setup" : wq_setup, 
+                   "morphometry" : morphometry, 
                    "time" : time,
                    "output" : output,
-                   "init" : init_profiles,
-                   "met" : meteorology,
-                   "bird" : bird, 
+                   "init_profiles" : init_profiles,
+                   "meteorology" : meteorology,
+                   "bird_model" : bird, 
                    "outflow" : outflow,
                    "inflow" : inflow }
 
-    return glm_config
+    return glm_config, default_config, default_order, block_order
 
 def error_metrics(Obs, Sim):
     Err = Sim - Obs
@@ -427,23 +472,54 @@ class Lake(object):
         self.name = name
         self.dir_path = dir_path
         make_dir(dir_path)
-        self.glm_path = os.path.join(self.dir_path,"glm2.nml")      
-        self.glm_config = import_config()
+        self.glm_path = os.path.join(self.dir_path,"glm2.nml")
+        self.glm_config, self.default_config, self.default_order, self.block_order = import_config(dl_default=True)
 
-    def write_glm_config(self):
-        self.glm_config['output']['out_dir'] = self.dir_path        
+    def write_glm_config(self, verbose=True):
+        self.glm_config['output']['out_dir'] = "'"+str(self.dir_path)+"'"
         self.glm_config['output']['out_fn'] += self.name
-        safe_dir(self.glm_config['output']['out_dir'])
+        self.glm_config['glm_setup']['sim_name'] = "'"+str(self.name)+"'"
+        
+        if verbose:
+            print "Formatting Check"
+            if self.default_config != None:
+                for key in self.glm_config.keys():
+                    if key in self.default_config.keys():
+                        default = self.default_config[key].keys()
+                        glm = self.glm_config[key].keys()
+                        print key
+                        print "\tonly in default: ", list(set(default)-set(glm))
+                        print "\tonly in glm: ", list(set(glm)-set(default))
+                    else:
+                        print key, " is not in default config"
+
 
         # start writing config file
-        glm_handle = open(self.glm_path, 'w+')
-        for block in self.glm_config.keys():
-            glm_handle.write("&"+block+"\n")
-            for param in self.glm_config[block].keys():
-                value = self.glm_config[block][param]
-                glm_handle.write(" {0} = {1}\n".format(param, value))
-            glm_handle.write("/")
-        glm_handle.close()
+        if os.path.exists(self.glm_path):
+            print "\n\nOverwriting Existing `glm2.nml` Configuration File\n"
+            glm_handle = open(self.glm_path, 'w+')
+            non_empty = []
+            for key in self.block_order:
+                if self.glm_config[key].keys() != []:
+                    non_empty.append(key)
+            self.non_empty = non_empty
+            for block in self.non_empty:
+                glm_handle.write("&"+block+"\n")
+                
+                for param in self.default_order[block]:
+                    print block, param
+                    value = self.glm_config[block][param]
+                    if type(value) == list:
+                        glm_handle.write("   {0} = ".format(param))
+                        for i, v in enumerate(value):
+                            if (i+1) == len(value):
+                                glm_handle.write("%r\n" % v)
+                            else:
+                                glm_handle.write("%r, " % v)
+                    else:
+                        glm_handle.write("   {0} = {1}\n".format(param, value))
+                glm_handle.write("/\n")
+            glm_handle.close()
 
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
@@ -488,7 +564,7 @@ class Lake(object):
         #1997-01-01,128.1119583,273.7329402,15.48908333,76.07847214, 0.950309798, 0,0       
         """
         self.config_dir = os.path.dirname(self.glm_path)
-        met_fn = self.expectations['met'][10][1:-1]
+        met_fn = self.glm_config['meteorology']['meteo_fl'][1:-1]
         self.metcsv_path = os.path.join(self.config_dir, met_fn)
         self.met_df = pd.DataFrame(index= self.date_range, columns= metPack)
         for i in metPack:
@@ -503,8 +579,8 @@ class Lake(object):
         the expected file name from the `expectations` object and writes a 
         csv to that location. 
         """
-        out_fn = self.expectations['outflow'][5][1:-1]
-        in_fn = self.expectations['inflow'][7][1:-1]
+        out_fn = self.glm_config['outflow']['outflow_fl'][1:-1]
+        in_fn = self.glm_config['inflow']['inflow_fl'][1:-1]
         self.incsv_path = os.path.join(self.config_dir, in_fn)
         self.outcsv_path = os.path.join(self.config_dir, out_fn)
         self.out_df = pd.DataFrame(index= self.date_range, columns= OutPack)
@@ -516,9 +592,9 @@ class Lake(object):
             self.out_df[i] = self.aligned_columns[i]
             
         print "\tWriting inflow.csv"
-        self.met_df.to_csv(path_or_buf=self.incsv_path, index_label='time')
+        self.in_df.to_csv(path_or_buf=self.incsv_path, index_label='time')
         print "\tWriting outflow.csv"
-        self.met_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
+        self.out_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
 
 
 class USGS_water_data(object):
@@ -704,7 +780,7 @@ class CERES_nc(object):
                     self.ceres_df[key] = self.ceres_[key].values
             
             self.ceres_zs = z_score(self.ceres_df)
-            self.ceres_d_zs = self.ceres_zs.resample("D", how='mean')
+            self.ceres_d_zs = self.ceres_zs.resample("D").mean()
             self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
             printNaNWarning(self.ceres_df, "CERES data", None)
             self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)

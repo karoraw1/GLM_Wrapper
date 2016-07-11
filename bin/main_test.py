@@ -37,7 +37,7 @@ mainFolder = os.path.dirname(os.getcwd())
 # directory for `glm2.nml`. So we need a directory for each case and a 
 # directory to hold them all which will be:
 
-superDir = '/glm_case_folders'
+superDir = 'glm_case_folders'
 met_fn = "BostonLoganAirportWeather.csv"
 ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
 ceres_fn2 = "CERES_SYN1deg-Day_200508-201406.nc"
@@ -62,8 +62,7 @@ ceres_SYN1 = os.path.join(mainFolder, 'weatherData', ceres_fn2)
 waterDataPaths = {i:os.path.join(mainFolder, 'waterdata', waterDataFiles[i]) 
                   for i in waterDataFiles.keys()}
 
-newDirs = [mainFolder+superDir+"/"+x for x in cases]
-LakeModel.make_dir(mainFolder+superDir)
+newDirs = [os.path.join(mainFolder, superDir, x) for x in cases]
 test = LakeModel.Lake(cases[0], newDirs[0])
 
 test.write_glm_config()
@@ -122,13 +121,13 @@ precipS.name = "Snow"
 
 # Pack up variables for flow csvs 
 Out_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']*0
-Out_Discharge.name = "OutDischarge"
+Out_Discharge.name = "FLOW"
 In_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']
-In_Discharge.name = "InDischarge"
+In_Discharge.name = "FLOW"
 In_Temp = Hobbs_o.df['Temperature, water, degrees Celsius (Mean)'].interpolate()
-In_Temp.name = "InflowTemp"
+In_Temp.name = "TEMP"
 In_Salt = Hobbs_o.df[Hobbs_o.df.columns[6]].interpolate()
-In_Salt.name = "InflowSalt"
+In_Salt.name = "SALT"
 
 data_pack = [shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed, 
              precipR, precipS, Out_Discharge, In_Discharge, In_Temp, In_Salt]
@@ -136,13 +135,10 @@ data_pack = [shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed,
 test.temporal_clipping(data_pack)
 
 metPack = ['ShortWave','LongWave','AirTemp','RelHum','WindSpeed','Rain','Snow']
-inPack = ['InDischarge','InflowTemp','InflowSalt']
-outPack = ['OutDischarge']
+inPack = ['FLOW','TEMP','SALT']
+outPack = ['FLOW']
 test.create_metcsv(metPack)
 test.create_flowcsvs(inPack, outPack)
-
-
-
 
 
 

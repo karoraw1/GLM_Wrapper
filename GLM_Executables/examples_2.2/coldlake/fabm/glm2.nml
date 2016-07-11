@@ -15,18 +15,18 @@ deep_mixing=.true.
 /
 &morphometry
 lake_name='ColdLake'
-   latitude=56.65
-   longitude=-111.2167
-   bsn_len=1200
-   bsn_wid=600
-   bsn_vals=14
-   H = 303.28,  304.80,  306.51,  307.85,  309.37,  310.90,  312.42, 313.94,  315.47,  316.99,  318.52,  320.04,  321.56,  323.09
-   A = 275450., 288110., 301870., 316290., 331730., 347410., 366270., 387520., 405750., 445270., 467040., 487500., 508770., 541520.
+latitude=56.65
+longitude=-111.2167
+bsn_len=1200
+bsn_wid=600
+bsn_vals=14
+H = 303.28,  304.80,  306.51,  307.85,  309.37,  310.90,  312.42, 313.94,  315.47,  316.99,  318.52,  320.04,  321.56,  323.09
+A = 275450., 288110., 301870., 316290., 331730., 347410., 366270., 387520., 405750., 445270., 467040., 487500., 508770., 541520.
 /
 &time
    timefmt = 3
    start = '1998-05-01 00:00:00'
-   !stop = '2007-05-02 00:00:00'
+   stop = '2007-05-02 00:00:00'
    dt = 3600.0
    num_days=3288
    timezone = 7.0
@@ -35,51 +35,24 @@ lake_name='ColdLake'
    out_dir = '.'
    out_fn = 'output'
    nsave = 24
-
    csv_point_nlevs = 0
    csv_point_fname = 'WQ_'
    csv_point_at = 15., 17.
    csv_point_nvars = 16
    csv_point_vars = 'temp', 'salt', 'aed_oxygen_oxy', 'aed_silica_rsi', 'aed_nitrogen_amm', 'aed_nitrogen_nit', 'aed_phosphorus_frp', 'aed_organic_matter_don', 'aed_organic_matter_pon', 'aed_organic_matter_dop', 'aed_organic_matter_pop', 'aed_organic_matter_doc', 'aed_organic_matter_poc', 'aed_phytoplankton_green', 'aed_phytoplankton_crypto', 'aed_phytoplankton_diatom'
    csv_lake_fname = 'lake'
-
    csv_outlet_allinone = .false.
    csv_outlet_fname = 'outlet_'
    csv_outlet_nvars = 17
-   csv_outlet_vars = 'flow',
-                     'temp',
-                     'salt',
-                     'aed_oxygen_oxy',
-                     'aed_silica_rsi',
-                     'aed_nitrogen_amm',
-                     'aed_nitrogen_nit',
-                     'aed_phosphorus_frp',
-                     'aed_organic_matter_don',
-                     'aed_organic_matter_pon',
-                     'aed_organic_matter_dop',
-                     'aed_organic_matter_pop',
-                     'aed_organic_matter_doc',
-                     'aed_organic_matter_poc',
-                     'aed_phytoplankton_green',
-                     'aed_phytoplankton_crypto',
-                     'aed_phytoplankton_diatom'
+   csv_outlet_vars = 'flow', 'temp', 'salt', 'aed_oxygen_oxy', 'aed_silica_rsi', 'aed_nitrogen_amm', 'aed_nitrogen_nit', 'aed_phosphorus_frp', 'aed_organic_matter_don', 'aed_organic_matter_pon', 'aed_organic_matter_dop', 'aed_organic_matter_pop', 'aed_organic_matter_doc', 'aed_organic_matter_poc', 'aed_phytoplankton_green', 'aed_phytoplankton_crypto', 'aed_phytoplankton_diatom'
    csv_ovrflw_fname = "overflow"
 /
 &init_profiles
     lake_depth = 19.81
     num_depths = 3
     the_depths = 0.49,4.26,18.50
-    ! GLM
     the_temps  = 4.00,4.00,4.00
     the_sals   = 0.760,0.760,0.760
-    ! WQ
-    num_wq_vars = 6
-    wq_names =  'aed_organic_matter_don',
-                'aed_organic_matter_pon',
-                'aed_organic_matter_dop',
-                'aed_organic_matter_pop',
-                'aed_organic_matter_doc',
-                'aed_organic_matter_poc'
 /
 &meteorology
    met_sw     = .true.
@@ -90,20 +63,19 @@ lake_name='ColdLake'
    rad_mode    = 1
    albedo_mode = 1
    cloud_mode  = 4
-   !-- BC file details
    meteo_fl   = 'met.csv'
    subdaily = .false.
    wind_factor = 1.0
-!  sw_factor = 1.0
-!  lw_factor = 1.0
-!  at_factor = 1.0
-!  rh_factor = 1.0
-!  rain_factor = 1.0
-   cd         = 0.0013
-   ce         = 0.0013
-   ch         = 0.0013
+   sw_factor = 1.0
+   lw_factor = 1.0
+   at_factor = 1.0
+   rh_factor = 1.0
+   rain_factor = 1.0
+   cd = 0.0013
+   ce = 0.0013
+   ch = 0.0013
    rain_threshold = 0.01
-   runoff_coef    = 0.3
+   runoff_coef = 0.3
 /
 &bird_model
   AP = 973
@@ -123,23 +95,7 @@ lake_name='ColdLake'
    inflow_factor  = 1.0
    inflow_fl      = 'inflow_fabm.csv'
    inflow_varnum  = 17,
-   inflow_vars    = 'FLOW',
-                    'TEMP',
-                    'SALT',
-                    'aed_oxygen_oxy',
-                    'aed_silica_rsi',
-                    'aed_nitrogen_amm',
-                    'aed_nitrogen_nit',
-                    'aed_phosphorus_frp',
-                    'aed_organic_matter_don',
-                    'aed_organic_matter_pon',
-                    'aed_organic_matter_dop',
-                    'aed_organic_matter_pop',
-                    'aed_organic_matter_doc',
-                    'aed_organic_matter_poc',
-                    'aed_phytoplankton_green',
-                    'aed_phytoplankton_crypto',
-                    'aed_phytoplankton_diatom'
+   inflow_vars    = 'FLOW', 'TEMP', 'SALT', 'aed_oxygen_oxy', 'aed_silica_rsi', 'aed_nitrogen_amm', 'aed_nitrogen_nit', 'aed_phosphorus_frp', 'aed_organic_matter_don', 'aed_organic_matter_pon', 'aed_organic_matter_dop', 'aed_organic_matter_pop', 'aed_organic_matter_doc', 'aed_organic_matter_poc', 'aed_phytoplankton_green', 'aed_phytoplankton_crypto', 'aed_phytoplankton_diatom'
    coef_inf_entrain = 0.
 /
 &outflow
