@@ -139,7 +139,9 @@ inPack = ['FLOW','TEMP','SALT']
 outPack = ['FLOW']
 test.create_metcsv(metPack)
 test.create_flowcsvs(inPack, outPack)
+test.run_model(test)
 
+#copyTest = LakeModel.optimize_lake(test, {})
 
 
 

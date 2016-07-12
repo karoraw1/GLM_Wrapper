@@ -22,10 +22,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import JD_converter as jd
-
-def run_model(meta_model):
-    """This function accesses the locations of each glm configuration, creates
-    """
+import subprocess as sp
+import copy
     
 
 def import_config(dl_default=False):
@@ -468,13 +466,14 @@ def safe_dir(s):
 class Lake(object):
     
     def __init__(self, name, dir_path):
-
+        self.stdout, self.stderr, self.ran = None, None, False
         self.name = name
         self.dir_path = dir_path
         make_dir(dir_path)
         self.glm_path = os.path.join(self.dir_path,"glm2.nml")
         self.glm_config, self.default_config, self.default_order, self.block_order = import_config(dl_default=True)
-
+        self.baseline_configured=False
+        
     def write_glm_config(self, verbose=True):
         self.glm_config['output']['out_dir'] = "'"+str(self.dir_path)+"'"
         self.glm_config['output']['out_fn'] += self.name
@@ -520,7 +519,10 @@ class Lake(object):
                         glm_handle.write("   {0} = {1}\n".format(param, value))
                 glm_handle.write("/\n")
             glm_handle.close()
-
+            
+        self.baseline_configured = True
+        self.run_model = run_model
+    
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
         if fname == None:
@@ -827,13 +829,29 @@ class CERES_nc(object):
                                     data = stack.T.copy())
                 
 
-class meta_lake(object):
-    """This object is initialized with a list of lake models 
-    To calculate the posterior, we find the prior and the likelhood for each 
-    value of in the range of each given variable, and for the marginal likelhood, 
-    we replace the integral with the equivalent sum. 
-    
+def run_model(Lake, variant=None, ex_loc = None):
+    """This function accesses the locations of each glm configuration, creates
     """
-    #pool = Pool(processes=procs)
-    #pool.map(maybe_download, samples)
+    if variant != None:
+        pass
+    else:
+        script_loc = os.path.dirname(Lake.glm_path)
+        
+        if ex_loc == None:
+            curr_dir = os.path.dirname(os.getcwd())
+            ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
+            ex_loc = os.path.join(curr_dir, ex_loc)
+            
+        p = sp.Popen(ex_loc, cwd=script_loc, shell=True, stderr=sp.PIPE, stdout=sp.PIPE)
+        p.wait()
+        Lake.stdout, Lake.stderr = p.communicate()
+        Lake.ran = True
+        return Lake.stdout, Lake.stderr, Lake.ran
+        
+def optimize_lake(Lake, block, var, sim_name, grid):
+    """ return a list of deepcopied Lake objects for ever value pair in the dict
+    the value """  
+    return copy.deepcopy(Lake)
+    
+def plot_lake_heatmap(block, var, ):
     
