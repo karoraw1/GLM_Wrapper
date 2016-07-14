@@ -33,11 +33,11 @@
 /
 &output
    out_dir = '/Users/login/Documents/GLM_Wrapper/glm_case_folders/testcase'
-   out_fn = 'output_'testcase
+   out_fn = 'output_testcase'
    nsave = 12
-   csv_point_nlevs = 1
+   csv_point_nlevs = 6
    csv_point_fname = 'WQ_'
-   csv_point_at = 17.
+   csv_point_at = 1, 5, 9, 13, 17, 21
    csv_point_nvars = 2
    csv_point_vars = 'temp', 'salt'
    csv_lake_fname = 'lake'
@@ -101,9 +101,9 @@
 &outflow
    num_outlet = 1
    flt_off_sw = .false.
-   outl_elvs = 1.0
-   bsn_len_outl = 799
-   bsn_wid_outl = 399
+   outl_elvs = 0.0
+   bsn_len_outl = 299
+   bsn_wid_outl = 199
    outflow_fl = 'outflow.csv'
    outflow_factor = 0.8
    seepage = .true.

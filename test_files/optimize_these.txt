@@ -1,0 +1,38 @@
+&glm_setup
+- deep_mixing = [.true., .false.],[bool]
+- Kw = [0.1, 1.0, 0.1],[float]
+- min_layer_vol = [0.010, 0.04, 0.005],[float] 
+- min_layer_thick = [0.1, 1.0, 0.1],[float]
+- max_layer_thick = [0.50, 2.500, 0.1],[float]
+&outflow
+- seepage_rate = [0.0, 1, 0.1],[float]
+- bsn_len_outl = [99, 1099, 100],[int]
+- bsn_wid_outl = [49, 599, 50],[int]
+- outflow_factor = [0.0, 1.0, 0.1],[float]
+&inflow
+- coef_inf_entrain = [0.0, 1, 0.1],[float]
+- strmbd_drag = [0.004, 0.0320, 0.004],[float]
+- strmbd_slope = [0.1, 2.0, 0.1],[float]
+- strm_hf_angle = [5.0, 155.0, 10.0],[float]
+&meteorology
+- atm_stab = [.true., .false.],[bool]
+- catchrain = [.true., .false.],[bool]
+- rad_mode = [1, 5, None],[int]
+- albedo_mode = [1, 3, 1],[int]
+- cloud_mode = [1, 4, 1],[int]
+# rainfall amount (m) required before runoff from exposed banks
+- rain_threshold = [0.005, 0.02, 0.005],[float]
+# conversion of rainfall to runoff in exposed lake banks
+- runoff_coef = [0.0, 0.7, 0.1],[float]
+# Scaling factor that is used to multiply the wind speed data that is read in.
+- wind_factor = [0.5, 1.5, 0.1],[float]
+# Scaling factor that is used to multiply the rainfall data that is read in.
+- rain_factor = [0.5, 1.5, 0.1],[float]
+# Scaling factor that is used to multiply the air temperature data that is read in.
+- at_factor = [0.5, 1.5, 0.1],[float]
+# Scaling factor that is used to multiply the relative humidity data that is read in. 
+- rh_factor = [0.5, 1.5, 0.1],[float]
+# Scaling factor that is used to multiply the shortwave data that is read in. 
+- sw_factor = [0.5, 1.5, 0.1],[float]
+# Scaling factor that is used to multiply the longwave data that is read in.
+- lw_factor = [0.5, 1.5, 0.1],[float]

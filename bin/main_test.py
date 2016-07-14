@@ -20,6 +20,7 @@ import LakeModel
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import copy
 
 plotting = False
 plt.style.use('fivethirtyeight')
@@ -37,7 +38,8 @@ mainFolder = os.path.dirname(os.getcwd())
 # directory for `glm2.nml`. So we need a directory for each case and a 
 # directory to hold them all which will be:
 
-superDir = 'glm_case_folders'
+superDir = os.path.join(mainFolder, 'glm_case_folders')
+LakeModel.make_dir(superDir, verbose=False)
 met_fn = "BostonLoganAirportWeather.csv"
 ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
 ceres_fn2 = "CERES_SYN1deg-Day_200508-201406.nc"
@@ -62,10 +64,11 @@ ceres_SYN1 = os.path.join(mainFolder, 'weatherData', ceres_fn2)
 waterDataPaths = {i:os.path.join(mainFolder, 'waterdata', waterDataFiles[i]) 
                   for i in waterDataFiles.keys()}
 
-newDirs = [os.path.join(mainFolder, superDir, x) for x in cases]
+newDirs = [os.path.join(superDir, x) for x in cases]
+_ = [LakeModel.make_dir(i, verbose=False) for i in newDirs]
 test = LakeModel.Lake(cases[0], newDirs[0])
 
-test.write_glm_config()
+test.write_glm_config(verbose=False)
 
 BOS_weather = LakeModel.GHCN_weather_data(met_path)
 BOS_weather.clean_columns()
@@ -89,8 +92,7 @@ waterOjbects = [Hobbs_o, Hobbs_i1, Hobbs_i2, Hobbs_i3, Hobbs_i4, inflow,
 for h in waterOjbects:
     h.preprocess()
     h.read()
-    h.removeQuals()
-    h.print_metadata()
+    h.removeQuals(verbose=False)
 
 GroundW. df['GroundwaterLevel'] = (GroundW.df[GroundW.df.columns[0]]-96.6)*-1
 
@@ -120,10 +122,10 @@ precipS = BOS_weather.df.snow_fall
 precipS.name = "Snow"
 
 # Pack up variables for flow csvs 
-Out_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']*0
-Out_Discharge.name = "FLOW"
+Out_Discharge = copy.deepcopy(inflow.df['Discharge, cubic feet per second (Mean)'])*0.8
+Out_Discharge.name = "OUTFLOW"
 In_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']
-In_Discharge.name = "FLOW"
+In_Discharge.name = "INFLOW"
 In_Temp = Hobbs_o.df['Temperature, water, degrees Celsius (Mean)'].interpolate()
 In_Temp.name = "TEMP"
 In_Salt = Hobbs_o.df[Hobbs_o.df.columns[6]].interpolate()
@@ -135,14 +137,46 @@ data_pack = [shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed,
 test.temporal_clipping(data_pack)
 
 metPack = ['ShortWave','LongWave','AirTemp','RelHum','WindSpeed','Rain','Snow']
-inPack = ['FLOW','TEMP','SALT']
-outPack = ['FLOW']
+inPack = ['INFLOW','TEMP','SALT']
+outPack = ['OUTFLOW']
 test.create_metcsv(metPack)
 test.create_flowcsvs(inPack, outPack)
-test.run_model(test)
 
-#copyTest = LakeModel.optimize_lake(test, {})
+test.read_variants('../test_files/optimize_these.txt', verbose=False)
+variant_lakes = test.write_variant_configs()
+test.run_model()
+for vL in range(len(variant_lakes)):
+    variant_lakes[vL].temporal_clipping(data_pack)
+    variant_lakes[vL].create_metcsv(metPack)
+    variant_lakes[vL].create_flowcsvs(inPack, outPack)
+    variant_lakes[vL].run_model()
+    variant_lakes[vL].pull_output_nc(verbose=False)
+    variant_lakes[vL].gather_output_csvs(['lake', 'outlet', 'overflow'])
+    
+plot_now = False
+#test.pull_output_nc(verbose=False)
+#test.pull_output_nc(data_var=['salt', 'temp', 'evap', 'precip'], verbose=False,
+#                    plot=plot_now)
+#test.gather_output_csvs(['lake', 'outlet', 'overflow'])
 
-
+if plot_now:
+    plt.figure(1)
+    plt.plot(test.csv_dict['lake']['LakeNumber'], c='g', label="Lake Number", alpha=0.5)
+    plt.legend(loc='best')
+    plt.figure(2)
+    plt.plot(test.csv_dict['lake']['Tot Inflow Vol'], c='r', label="Inflow Vol", alpha=0.5)
+    plt.plot(test.csv_dict['lake']['Tot Outflow Vol'], c='b', label="Outflow Vol", alpha=0.5)
+    plt.legend(loc='best')
+    plt.figure(3)
+    plt.plot(test.csv_dict['lake']['Evaporation'], c='m', label="Evaporation", alpha=0.5)
+    plt.legend(loc='best')
+    plt.figure(4)
+    plt.plot(test.csv_dict['lake']['Max Temp'], label='Max Temp')
+    plt.plot(test.csv_dict['lake']['Min Temp'], label='Min Temp')
+    plt.plot(test.csv_dict['lake']['Surface Temp'], label='Surface Temp')
+    plt.legend()
+    
+    
+    
 
 

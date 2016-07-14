@@ -9,10 +9,6 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 @author: login
 """
 
-from mpl_toolkits.mplot3d import Axes3D
-from functools import partial
-import sys
-import glob
 import scipy.stats as st
 import re
 import mmap
@@ -24,9 +20,23 @@ from netCDF4 import Dataset
 import JD_converter as jd
 import subprocess as sp
 import copy
+import time
+from functools import wraps
+ 
+ 
+def fn_timer(function):
+    @wraps(function)
+    def function_timer(*args, **kwargs):
+        t0 = time.time()
+        result = function(*args, **kwargs)
+        t1 = time.time()
+        print ("Total time running %s: %s seconds" %
+               (function.func_name, str(t1-t0))
+               )
+        return result
+    return function_timer
     
-
-def import_config(dl_default=False):
+def import_config(dl_default=False, verbose=True):
     # the glm contains the following blocks:
     # &glm_setup: 13 general simulation info and mixing parameters
     if dl_default:
@@ -35,7 +45,6 @@ def import_config(dl_default=False):
         block_order = []
         with open('../test_files/sample_glm.nml', 'r') as f:
             for line in f:
-                print line 
                 key = line[0]
                 line = line.strip()
                 if key == '&':
@@ -45,12 +54,14 @@ def import_config(dl_default=False):
                 elif key == '/':
                     default_order[new_block] = orderedList
                     block_order.append(new_block)
-                    print "Section End"
+                    if verbose == True:
+                        print "Section End"
                 elif key != '!':
                     line_split = line.split('=')
                     line_ = [l.strip() for l in line_split]
                     orderedList.append(line_[0])
-                    print line_
+                    if verbose == True:
+                        print line_
                     if line_[0][0:3] != 'aed':
                         default_config[new_block][line_[0]] = line_
                     
@@ -106,9 +117,9 @@ def import_config(dl_default=False):
               "out_fn" : "'output_'",
               "nsave" : 12, 
               "csv_lake_fname" : "'lake'",
-              "csv_point_nlevs" : 1,
+              "csv_point_nlevs" : 0,
               "csv_point_fname" : "'WQ_'",
-              "csv_point_at" : "17.",
+              "csv_point_at" : [1, 5, 9, 13, 17, 21],
               "csv_point_nvars" : 2,
               "csv_point_vars" : [ 'temp', 'salt'],
               "csv_outlet_allinone" : ".false.",
@@ -117,6 +128,8 @@ def import_config(dl_default=False):
               "csv_outlet_vars" : ['flow', 'temp', 'salt'],
               "csv_ovrflw_fname" : "\"overflow\"" }
               
+    output["csv_point_nlevs"] = len(output["csv_point_at"])
+    
     #&init_profiles            
     init_profiles = {"lake_depth": 24.384, 
                      "num_depths": 0, 
@@ -179,9 +192,9 @@ def import_config(dl_default=False):
     #&outflow
     outflow = {"num_outlet": 1,
                "flt_off_sw": ".false.",
-               "outl_elvs": 1.00,
-               "bsn_len_outl": 799, 
-               "bsn_wid_outl" : 399,
+               "outl_elvs": 0.00,
+               "bsn_len_outl": 299, 
+               "bsn_wid_outl" : 199,
                "outflow_fl" : "'outflow.csv'",
                "outflow_factor": 0.8,
                "seepage" : ".true.",
@@ -229,10 +242,10 @@ def addtodict(vals, vars, dict):
     for var, val in zip(vars, vals):
         dict[var] = val
     
-def make_dir(s):
+def make_dir(s, verbose=True):
     if os.path.exists(s):
-        #sys.exit("I cannot build a house atop another house")
-        print "%s exists\n" % os.path.basename(s)
+        if verbose==True:
+            print "%s exists\n" % os.path.basename(s)
     else:
         os.mkdir( s, 0760)
 
@@ -442,41 +455,25 @@ def ncdump(nc_fid, verb=True):
                 print_ncattr(var)
     return nc_attrs, nc_dims, nc_vars
 
-
-def safe_dir(s):
-    counter = 1
-    # check if dir exists
-    if os.path.exists(s):
-        # check to see if it is empty
-        if os.listdir(s):
-            # if it is, add integers until a fresh name is found
-            while os.path.exists(s) and counter < 1000:
-                s = s + str(counter)
-                counter +=1
-            os.mkdir(s, 0760)
-            print "\nNew folder name found & folder made"
-        else:
-            # if empty, skip ahead
-            print "\nEmpty folder already exists, skipping creation"
-    else:
-        #if it doesn't exist, make it
-        os.mkdir(s, 0760)
-        print "\n made dir %s" % os.path.basename(s)
             
 class Lake(object):
     
     def __init__(self, name, dir_path):
         self.stdout, self.stderr, self.ran = None, None, False
+        
         self.name = name
         self.dir_path = dir_path
-        make_dir(dir_path)
+        make_dir(dir_path, verbose=False)
         self.glm_path = os.path.join(self.dir_path,"glm2.nml")
-        self.glm_config, self.default_config, self.default_order, self.block_order = import_config(dl_default=True)
-        self.baseline_configured=False
         
+        config_pack = import_config(dl_default=True, verbose=False)
+        self.glm_config, self.default_config = config_pack[0], config_pack[1]
+        self.default_order, self.block_order = config_pack[2], config_pack[3]
+        self.baseline_configured=False
+       
     def write_glm_config(self, verbose=True):
         self.glm_config['output']['out_dir'] = "'"+str(self.dir_path)+"'"
-        self.glm_config['output']['out_fn'] += self.name
+        self.glm_config['output']['out_fn'] = self.glm_config['output']['out_fn'][0:-1] + self.name+"'"
         self.glm_config['glm_setup']['sim_name'] = "'"+str(self.name)+"'"
         
         if verbose:
@@ -486,43 +483,75 @@ class Lake(object):
                     if key in self.default_config.keys():
                         default = self.default_config[key].keys()
                         glm = self.glm_config[key].keys()
-                        print key
-                        print "\tonly in default: ", list(set(default)-set(glm))
-                        print "\tonly in glm: ", list(set(glm)-set(default))
+                        if verbose == True:
+                            print key
+                            print "\tonly in default: ", list(set(default)-set(glm))
+                            print "\tonly in glm: ", list(set(glm)-set(default))
                     else:
                         print key, " is not in default config"
 
 
         # start writing config file
         if os.path.exists(self.glm_path):
-            print "\n\nOverwriting Existing `glm2.nml` Configuration File\n"
-            glm_handle = open(self.glm_path, 'w+')
-            non_empty = []
-            for key in self.block_order:
-                if self.glm_config[key].keys() != []:
-                    non_empty.append(key)
-            self.non_empty = non_empty
-            for block in self.non_empty:
-                glm_handle.write("&"+block+"\n")
-                
-                for param in self.default_order[block]:
-                    print block, param
-                    value = self.glm_config[block][param]
-                    if type(value) == list:
-                        glm_handle.write("   {0} = ".format(param))
-                        for i, v in enumerate(value):
-                            if (i+1) == len(value):
-                                glm_handle.write("%r\n" % v)
-                            else:
-                                glm_handle.write("%r, " % v)
-                    else:
-                        glm_handle.write("   {0} = {1}\n".format(param, value))
-                glm_handle.write("/\n")
-            glm_handle.close()
+            if verbose==True:
+                print "\n\nOverwriting Existing `glm2.nml` Configuration File\n"
+        glm_handle = open(self.glm_path, 'w+')
+        non_empty = []
+        for key in self.block_order:
+            if self.glm_config[key].keys() != []:
+                non_empty.append(key)
+        self.non_empty = non_empty
+        for block in self.non_empty:
+            glm_handle.write("&"+block+"\n")
             
+            for param in self.default_order[block]:
+                if verbose == True:
+                    print block, param
+                value = self.glm_config[block][param]
+                if type(value) == list:
+                    glm_handle.write("   {0} = ".format(param))
+                    for i, v in enumerate(value):
+                        if (i+1) == len(value):
+                            glm_handle.write("%r\n" % v)
+                        else:
+                            glm_handle.write("%r, " % v)
+                else:
+                    glm_handle.write("   {0} = {1}\n".format(param, value))
+            glm_handle.write("/\n")
+        glm_handle.close()
+        
         self.baseline_configured = True
-        self.run_model = run_model
     
+    def gather_output_csvs(self, type_list):
+        outl_f = self.glm_config['output']['csv_outlet_fname'][1:-1]+'00'
+        lake_f = self.glm_config['output']['csv_lake_fname'][1:-1]
+        ovrf_f = self.glm_config['output']['csv_ovrflw_fname'][1:-1]
+#        wq_f = self.glm_config['output']['csv_point_fname']
+        fns = [outl_f, lake_f, ovrf_f]
+        hdls = [os.path.join(os.path.dirname(self.glm_path), i+".csv") for i in fns]
+        csv_dict = {}
+        for i in type_list:
+#            if i == 'wq':
+#                csv_dict[i] = pd.read_csv(hdls[3])
+            if i == 'lake':
+                csv_dict[i] = pd.read_csv(hdls[1])
+            if i == 'outlet':
+                csv_dict[i] = pd.read_csv(hdls[0])
+            if i == 'overflow':
+                csv_dict[i] = pd.read_csv(hdls[2])
+        for csv_file in csv_dict.keys():
+            t_steps, lake_vs = csv_dict[csv_file].shape
+            csv_dict[csv_file]['date'] = csv_dict[csv_file].time.copy()
+            csv_dict[csv_file].time = csv_dict[csv_file].time.apply(lambda x: x[-8:])
+            csv_dict[csv_file].date = csv_dict[csv_file].date.apply(lambda x: x[:10])
+            time_bool = csv_dict[csv_file].loc[:, 'time'] == '24:00:00'
+            csv_dict[csv_file][time_bool]  = '23:59:59'
+            csv_dict[csv_file].datetime = csv_dict[csv_file].date + " "+ csv_dict[csv_file].time
+            csv_dict[csv_file].index = pd.to_datetime(csv_dict[csv_file].datetime)        
+            csv_dict[csv_file].index = csv_dict[csv_file].index
+            
+        self.csv_dict = csv_dict
+        
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
         if fname == None:
@@ -556,7 +585,7 @@ class Lake(object):
             self.aligned_columns[k.name] = k[i & j].copy()
 
         self.date_range = pd.date_range(start=self.firstDay, end=self.lastDay)
-        
+    
     def create_metcsv(self, metPack):
         """
         This creates the meteorological variable CSV. It pulls the 
@@ -593,11 +622,171 @@ class Lake(object):
         for i in OutPack:
             self.out_df[i] = self.aligned_columns[i]
             
+        self.out_df.rename(columns = {'OUTFLOW':'FLOW'}, inplace = True)
+        self.in_df.rename(columns = {'INFLOW':'FLOW'}, inplace = True)
+        
         print "\tWriting inflow.csv"
         self.in_df.to_csv(path_or_buf=self.incsv_path, index_label='time')
         print "\tWriting outflow.csv"
         self.out_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
+        
+    def run_model(self, variants=False, ex_loc = None):
+        """This function accesses the locations of each glm configuration, 
+        provided in Lake.glm_path, and runs the model using the executable
+        specefied in `ex_loc`
+        """
+        script_loc = os.path.dirname(self.glm_path)
+        
+        if ex_loc == None:
+            curr_dir = os.path.dirname(os.getcwd())
+            ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
+            ex_loc = os.path.join(curr_dir, ex_loc)
+            
+        p = sp.Popen(ex_loc, cwd=script_loc, shell=True, stderr=sp.PIPE, 
+                     stdout=sp.PIPE)
+        p.wait()
+        self.stdout, self.stderr = p.communicate()
+        self.ran = True
+    
+    def pull_output_nc(self, data_var=[], verbose=True, plot=True):
+        if self.ran == True:
+            
+            o_fn = self.glm_config['output']["out_fn"][1:-1] + '.nc'
+            o_path = self.glm_config['output']["out_dir"][1:-1]
+            self.output_nc_path = os.path.join(o_path, o_fn)
+            output = Dataset(self.output_nc_path, "r")
+            interval = pd.date_range(start=self.glm_config['time']['start'], 
+                                     end=self.glm_config['time']['stop'], 
+                                     freq="12H")
+            self.nc_interval = interval[:-1]
+            
+            if verbose == True:
+                for k in output.variables.keys():
+                    print k
+                    
+                    if k != 'NS':
+                        print "\t{}".format(output[k].units)
+                        print "\t{}".format(output[k].shape)
+                        
+            if data_var !=[] and plot==True:
+                for i, _var in enumerate(data_var):
+                    plt.figure()                    
+                    if len(output[_var].shape) == 4:
+                        temp = output[_var][:,:,0,0].data
+                        temp[temp == output[_var]._FillValue] = -1
+                        plt.imshow(np.flipud(temp.T))
+                        plt.colorbar()
+                    elif len(output[_var].shape) == 3:
+                        temp = output[_var][:,0,0].astype(float)
+                        temp[temp == output[_var]._FillValue] = np.nan
+                        plt.plot(self.nc_interval, temp)
+                    
+                    plt.title(_var)                        
+                    plt.show()
+            
+                    # the default value assigned to masked elements > 1e36, 
+                    # here we reassign them -1 for plotting purpose
+                
+                    #np.flipud puts the lake bottom at the plot bottom 
+                    
+                        
+        else:
+            print "Can't plot before running model"
+        
+        self.output_nc = output
+        
+    def read_variants(self, path, verbose=True):
+        meta_config = self.glm_config
+        block_key_option = []
+        
+        with open(path, 'r') as f:
+            for line in f:
+                if line[0] == '#':
+                    pass
+                elif line[0] == '&':
+                    new_block = line[1:].strip()
+                    assert new_block in meta_config.keys()
+                    if verbose == True:
+                        print "\n", new_block
+                elif line[0] == '-':
+                    splitted = line[2:].split('=')
+                    spit_cleaned = [i.strip() for i in splitted]
+                    sub_block = spit_cleaned[0]
+                    if verbose == True:
+                        print "\t%r" % sub_block
+                        
+                    [val_space, dType] = spit_cleaned[1].split("],[")
+                    val_space, dType = val_space[1:], dType[:-1]
+                    val_split = [l.strip() for l in val_space.split(",")]
+                    
+                    if val_split[-1] == 'None':
+                        val_split.pop()
+                        
+                    if dType == 'float':
+                        val_split = [float(l) for l in val_split]
+                    elif dType == 'int':
+                        val_split = [int(l) for l in val_split]
+                            
+                    if dType == 'bool':
+                        for idx, i in enumerate(val_split):
+                            if verbose == True:
+                                print "\t\t%r" % i
+                            sim_name = sub_block+"_"+str(idx+1)
+                            block_key_option.append((new_block, sub_block, i, 
+                                                     sim_name))
+                    elif len(val_split) != 3 and dType != 'bool':
+                        for idx, i in enumerate(val_split):
+                            sim_name = sub_block+"_"+str(idx+1)
+                            block_key_option.append((new_block, sub_block, i, 
+                                                     sim_name))
+                            if verbose == True:
+                                print "\t\t%r" % i
+                            
+                    elif len(val_split) == 3:
+                        arange = np.arange(val_split[0], val_split[1]+val_split[2],
+                                           val_split[2])
+                        for idx, i in enumerate(arange):
+                            j = int(np.floor(i*1000))
+                            j = j/1000.
+                            
+                            if verbose==True:
+                                print "\t\t%r" % j
 
+                            sim_name = sub_block+"_"+str(idx+1)
+                            block_key_option.append((new_block, sub_block, j, 
+                                                     sim_name))
+                    else:
+                        print "\n\nunparsed option\n\n"
+                    
+                            
+                else:
+                    print "Unparsable line"
+                    print line
+                    
+        print "\t%i variant cases specified" % len(block_key_option)
+        
+        self.variant_cases = block_key_option
+
+    def write_variant_configs(self, verbose=False):
+        if self.glm_config and self.variant_cases:
+            variant_lakes = []
+            for i in self.variant_cases:
+                variant_lake = copy.deepcopy(self)
+                key1, key2, val, simname = i[0],i[1],i[2],i[3]
+                variant_lake.glm_config[key1][key2] = val
+                variant_lake.name = simname
+                
+                variant_lake.dir_path = os.path.join(self.dir_path, simname)
+                
+                make_dir(variant_lake.dir_path, verbose=False)
+                variant_lake.glm_path = os.path.join(variant_lake.dir_path,
+                                                     "glm2.nml")
+                
+                variant_lake.write_glm_config(verbose)                
+                variant_lakes.append(variant_lake)
+        return variant_lakes
+    
+            
 
 class USGS_water_data(object):
 
@@ -685,14 +874,15 @@ class USGS_water_data(object):
                print "\t%r" % qual_col.value_counts().values
         print ""
         
-    def removeQuals(self):
+    def removeQuals(self, verbose=True):
         for column in self.df.columns:
             if '_cd' in column:
                 self.df.drop(column, axis=1, inplace=True)
             elif 'site_' in column:
                 self.df.drop(column, axis=1, inplace=True)
             else:
-                print "{0} is a valid column".format(column)
+                if verbose==True:
+                    print "{0} is a valid column".format(column)
                 
 class GHCN_weather_data(object):
     
@@ -735,7 +925,7 @@ class GHCN_weather_data(object):
             self.df.iloc[:, idx] = self.clean_cols[idx].values
         
         self.gchn_zs = z_score(self.df)
-        printNaNWarning(self.df, "GCHN data", None)
+        #printNaNWarning(self.df, "GCHN data", None)
 
                                            
 class CERES_nc(object):
@@ -784,7 +974,7 @@ class CERES_nc(object):
             self.ceres_zs = z_score(self.ceres_df)
             self.ceres_d_zs = self.ceres_zs.resample("D").mean()
             self.ceres_d_zs = self.ceres_d_zs.ix[:-1]        
-            printNaNWarning(self.ceres_df, "CERES data", None)
+            #printNaNWarning(self.ceres_df, "CERES data", None)
             self.ceres_reindex_zs, self.i_names = TimeIdx(self.ceres_d_zs)
             self.ceres_mean_aggs = makeAggregations(self.ceres_reindex_zs, 
                                                     self.i_names, np.mean)
@@ -793,7 +983,7 @@ class CERES_nc(object):
                                                        "humidity")
             self.cloud_scales = show_agg_resolution(self.ceres_mean_aggs, 
                                                        "cloud_frac")
-            printAutocorr(self.ceres_mean_aggs)
+            #printAutocorr(self.ceres_mean_aggs)
             #pass dataframe to insert new index columns
             rootgrp.close()
         elif type == "4":
@@ -828,30 +1018,3 @@ class CERES_nc(object):
             self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
                                     data = stack.T.copy())
                 
-
-def run_model(Lake, variant=None, ex_loc = None):
-    """This function accesses the locations of each glm configuration, creates
-    """
-    if variant != None:
-        pass
-    else:
-        script_loc = os.path.dirname(Lake.glm_path)
-        
-        if ex_loc == None:
-            curr_dir = os.path.dirname(os.getcwd())
-            ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
-            ex_loc = os.path.join(curr_dir, ex_loc)
-            
-        p = sp.Popen(ex_loc, cwd=script_loc, shell=True, stderr=sp.PIPE, stdout=sp.PIPE)
-        p.wait()
-        Lake.stdout, Lake.stderr = p.communicate()
-        Lake.ran = True
-        return Lake.stdout, Lake.stderr, Lake.ran
-        
-def optimize_lake(Lake, block, var, sim_name, grid):
-    """ return a list of deepcopied Lake objects for ever value pair in the dict
-    the value """  
-    return copy.deepcopy(Lake)
-    
-def plot_lake_heatmap(block, var, ):
-    
