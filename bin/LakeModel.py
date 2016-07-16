@@ -15,6 +15,7 @@ import mmap
 import os
 import numpy as np
 import pandas as pd
+from pandas.tseries.offsets import DateOffset
 import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import JD_converter as jd
@@ -22,9 +23,13 @@ import subprocess as sp
 import copy
 import time
 from functools import wraps
+import shutil
  
  
 def fn_timer(function):
+    """
+    This decorator can be used to print the time it takes a fxn to execute
+    """
     @wraps(function)
     def function_timer(*args, **kwargs):
         t0 = time.time()
@@ -520,38 +525,7 @@ class Lake(object):
             glm_handle.write("/\n")
         glm_handle.close()
         
-        self.baseline_configured = True
-    
-    def gather_output_csvs(self, type_list):
-        outl_f = self.glm_config['output']['csv_outlet_fname'][1:-1]+'00'
-        lake_f = self.glm_config['output']['csv_lake_fname'][1:-1]
-        ovrf_f = self.glm_config['output']['csv_ovrflw_fname'][1:-1]
-#        wq_f = self.glm_config['output']['csv_point_fname']
-        fns = [outl_f, lake_f, ovrf_f]
-        hdls = [os.path.join(os.path.dirname(self.glm_path), i+".csv") for i in fns]
-        csv_dict = {}
-        for i in type_list:
-#            if i == 'wq':
-#                csv_dict[i] = pd.read_csv(hdls[3])
-            if i == 'lake':
-                csv_dict[i] = pd.read_csv(hdls[1])
-            if i == 'outlet':
-                csv_dict[i] = pd.read_csv(hdls[0])
-            if i == 'overflow':
-                csv_dict[i] = pd.read_csv(hdls[2])
-        for csv_file in csv_dict.keys():
-            t_steps, lake_vs = csv_dict[csv_file].shape
-            csv_dict[csv_file]['date'] = csv_dict[csv_file].time.copy()
-            csv_dict[csv_file].time = csv_dict[csv_file].time.apply(lambda x: x[-8:])
-            csv_dict[csv_file].date = csv_dict[csv_file].date.apply(lambda x: x[:10])
-            time_bool = csv_dict[csv_file].loc[:, 'time'] == '24:00:00'
-            csv_dict[csv_file][time_bool]  = '23:59:59'
-            csv_dict[csv_file].datetime = csv_dict[csv_file].date + " "+ csv_dict[csv_file].time
-            csv_dict[csv_file].index = pd.to_datetime(csv_dict[csv_file].datetime)        
-            csv_dict[csv_file].index = csv_dict[csv_file].index
-            
-        self.csv_dict = csv_dict
-        
+        self.baseline_configured = True    
         
     def read_GEODISC_cloud_data(self, fname=None, data_dir=None):
         if fname == None:
@@ -630,36 +604,91 @@ class Lake(object):
         print "\tWriting outflow.csv"
         self.out_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
         
-    def run_model(self, variants=False, ex_loc = None):
-        """This function accesses the locations of each glm configuration, 
-        provided in Lake.glm_path, and runs the model using the executable
-        specefied in `ex_loc`
-        """
-        script_loc = os.path.dirname(self.glm_path)
-        
-        if ex_loc == None:
-            curr_dir = os.path.dirname(os.getcwd())
-            ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
-            ex_loc = os.path.join(curr_dir, ex_loc)
-            
-        p = sp.Popen(ex_loc, cwd=script_loc, shell=True, stderr=sp.PIPE, 
-                     stdout=sp.PIPE)
-        p.wait()
-        self.stdout, self.stderr = p.communicate()
-        self.ran = True
-    
-    def pull_output_nc(self, data_var=[], verbose=True, plot=True):
+    def pull_output_nc(self, plot_var=[], verbose=True, plot=True):
         if self.ran == True:
             
             o_fn = self.glm_config['output']["out_fn"][1:-1] + '.nc'
             o_path = self.glm_config['output']["out_dir"][1:-1]
-            self.output_nc_path = os.path.join(o_path, o_fn)
-            output = Dataset(self.output_nc_path, "r")
+            
+            o_mult = self.glm_config['output']['nsave']
+            o_interval = self.glm_config['time']['dt']
+            freq_S = str(int(o_mult*o_interval))+"S"
+            if verbose == True:
+                print "The time steps in the output netCDF are %s" % freq_S
+            
             interval = pd.date_range(start=self.glm_config['time']['start'], 
                                      end=self.glm_config['time']['stop'], 
-                                     freq="12H")
-            self.nc_interval = interval[:-1]
+                                     freq=freq_S)
+            self.nc_interval = interval[1:]                         
+            self.output_nc_path = os.path.join(o_path, o_fn)
+            output = Dataset(self.output_nc_path, "r")
+            nc_vars = output.variables.keys()
             
+            if 'time' in nc_vars:
+                t_vector = output['time'][:]
+                start_t = pd.to_datetime(output['time'].units[12:])
+                d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
+            
+            assert len(d_vector) == len(self.nc_interval)
+            if verbose == True:
+                print "THe netCDF time vector is the expected size"
+            
+            lake_cols, lake_vecs, depth_dfs = [], {}, {}
+            
+            for ncv in nc_vars:
+                dimens = len(output[ncv].shape)
+                if dimens == 3:
+                    lake_cols.append(ncv)
+                    lake_vecs[ncv] = output[ncv][:,0,0]
+                if dimens == 4:
+                    data_buff = output[ncv][:,:,0,0]
+                    data_mat = data_buff.data
+                    fill_val = data_buff.fill_value
+                    data_mat[data_mat == fill_val] = np.nan
+                    col_n = range(data_mat.shape[1])
+                    this_df = pd.DataFrame(columns = col_n, index = d_vector, 
+                                           data = data_mat)
+                    assert data_buff.mask.sum() == this_df.isnull().sum().sum()
+                    depth_dfs[ncv] = this_df
+
+            self.depth_dfs = depth_dfs
+            self.lake_df = pd.DataFrame(columns=lake_cols,
+                                        index=d_vector,
+                                        data=lake_vecs)
+            if verbose == True:
+                print "%r columns added to the lake_df from the netCDF" % lake_cols
+            
+            loc_files = [i for i in os.listdir(self.dir_path) if '.csv' in i]
+            good_files = []
+            for file_ in loc_files:
+                if self.glm_config['output']['csv_ovrflw_fname'][1:-1] in file_:
+                    good_files.append(file_)
+                if self.glm_config['output']['csv_lake_fname'][1:-1] in file_:
+                    good_files.append(file_)
+                if self.glm_config['output']['csv_outlet_fname'][1:-1] in file_:
+                    good_files.append(file_)
+            #TODO: add WQ_ files here when ready
+            if verbose == True:
+                print "%r loaded from the configuration folder" % good_files
+            
+            hdls = [os.path.join(self.dir_path, i) for i in good_files]
+            csv_dict = {}
+            for p, f in zip(hdls, good_files):
+                csv_dict[f] = pd.read_csv(p)
+
+            for f in good_files:
+                t_steps, lake_vs = csv_dict[f].shape
+                csv_dict[f]['date'] = csv_dict[f].time.copy()
+                csv_dict[f].time = csv_dict[f].time.apply(lambda x: x[-8:])
+                csv_dict[f].date = csv_dict[f].date.apply(lambda x: x[:10])
+                time_bool = csv_dict[f].loc[:, 'time'] == '24:00:00'
+                csv_dict[f].loc[time_bool, 'time']  = '23:59:59'
+                csv_dict[f].datetime = csv_dict[f].date + " "+ csv_dict[f].time
+                csv_dict[f].index = pd.to_datetime(csv_dict[f].datetime)                
+                csv_dict[f].drop(['date', 'time'], axis=1, inplace=True)
+
+            self.csv_dict = csv_dict
+
             if verbose == True:
                 for k in output.variables.keys():
                     print k
@@ -668,8 +697,8 @@ class Lake(object):
                         print "\t{}".format(output[k].units)
                         print "\t{}".format(output[k].shape)
                         
-            if data_var !=[] and plot==True:
-                for i, _var in enumerate(data_var):
+            if plot_var !=[] and plot==True:
+                for i, _var in enumerate(plot_var):
                     plt.figure()                    
                     if len(output[_var].shape) == 4:
                         temp = output[_var][:,:,0,0].data
@@ -686,7 +715,6 @@ class Lake(object):
             
                     # the default value assigned to masked elements > 1e36, 
                     # here we reassign them -1 for plotting purpose
-                
                     #np.flipud puts the lake bottom at the plot bottom 
                     
                         
@@ -767,7 +795,8 @@ class Lake(object):
         
         self.variant_cases = block_key_option
 
-    def write_variant_configs(self, verbose=False):
+    def write_variant_configs(self, copycsvs=False, verbose=True):
+        
         if self.glm_config and self.variant_cases:
             variant_lakes = []
             for i in self.variant_cases:
@@ -777,12 +806,21 @@ class Lake(object):
                 variant_lake.name = simname
                 
                 variant_lake.dir_path = os.path.join(self.dir_path, simname)
-                
-                make_dir(variant_lake.dir_path, verbose=False)
+                make_dir(variant_lake.dir_path, verbose)
                 variant_lake.glm_path = os.path.join(variant_lake.dir_path,
                                                      "glm2.nml")
+                variant_lake.write_glm_config(verbose)
                 
-                variant_lake.write_glm_config(verbose)                
+                if copycsvs==True:
+                    if verbose==True:
+                        print "Copying original data csvs to variant folders"
+                    shutil.copy(self.metcsv_path, variant_lake.dir_path)
+                    shutil.copy(self.outcsv_path, variant_lake.dir_path)
+                    shutil.copy(self.incsv_path, variant_lake.dir_path)
+                else:
+                    if verbose==True:
+                        print "Original data csvs not moved into variant folders"
+                    
                 variant_lakes.append(variant_lake)
         return variant_lakes
     
@@ -1018,3 +1056,26 @@ class CERES_nc(object):
             self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
                                     data = stack.T.copy())
                 
+def run_model(Lake, variants=False, ex_loc = None, verbose=True):
+    """This function accesses the locations of each glm configuration, 
+    provided in Lake.glm_path, and runs the model using the executable
+    specefied in `ex_loc`
+    """
+    script_loc = os.path.dirname(Lake.glm_path)
+    
+    if ex_loc == None:
+        curr_dir = os.path.dirname(os.getcwd())
+        ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
+        ex_loc = os.path.join(curr_dir, ex_loc)
+        
+    p = sp.Popen(ex_loc, cwd=script_loc, shell=True, stderr=sp.PIPE, 
+                 stdout=sp.PIPE)
+    p.wait()
+    Lake.stdout, Lake.stderr = p.communicate()
+    Lake.ran = True
+    check1 = 'Simulation begins..' in Lake.stdout
+    check2 = '100.00% of days complete' in Lake.stdout
+    if check1 and check2 and verbose:
+        print "{} model run completed".format(Lake.name)
+    
+    return Lake

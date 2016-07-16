@@ -143,22 +143,19 @@ test.create_metcsv(metPack)
 test.create_flowcsvs(inPack, outPack)
 
 test.read_variants('../test_files/optimize_these.txt', verbose=False)
-variant_lakes = test.write_variant_configs()
-test.run_model()
-for vL in range(len(variant_lakes)):
-    variant_lakes[vL].temporal_clipping(data_pack)
-    variant_lakes[vL].create_metcsv(metPack)
-    variant_lakes[vL].create_flowcsvs(inPack, outPack)
-    variant_lakes[vL].run_model()
-    variant_lakes[vL].pull_output_nc(verbose=False)
-    variant_lakes[vL].gather_output_csvs(['lake', 'outlet', 'overflow'])
-    
-plot_now = False
-#test.pull_output_nc(verbose=False)
-#test.pull_output_nc(data_var=['salt', 'temp', 'evap', 'precip'], verbose=False,
-#                    plot=plot_now)
-#test.gather_output_csvs(['lake', 'outlet', 'overflow'])
+variant_lakes = test.write_variant_configs(copycsvs=True, verbose=False)
 
+test = LakeModel.run_model(test)
+variant_lakes_ran = map(LakeModel.run_model, variant_lakes)
+
+for vL in range(len(variant_lakes)):
+    variant_lakes[vL].pull_output_nc(verbose=False)
+
+
+test.pull_output_nc(verbose=False)
+
+
+"""
 if plot_now:
     plt.figure(1)
     plt.plot(test.csv_dict['lake']['LakeNumber'], c='g', label="Lake Number", alpha=0.5)
@@ -176,7 +173,30 @@ if plot_now:
     plt.plot(test.csv_dict['lake']['Surface Temp'], label='Surface Temp')
     plt.legend()
     
-    
-    
+
+base_temp = test.output_nc['temp'][:,:,0,0].data
+variant_temps = [vLr.output_nc['temp'][:,:,0,0].data for vLr in variant_lakes_ran]
+base_temp[base_temp > 1000] = 0
+for vLr in variant_temps:
+    vLr[vLr > 1000] = 0
+
+error = [((vt - base_temp)**2).sum() for vt in variant_temps]
+variant_names = [n.name for n in variant_lakes_ran]
+error_df = pd.DataFrame(index = variant_names, columns = ['error'],
+                        data = error)
+error_df.sort_values('error', ascending=False, inplace=True)
+
+1. atm_stab
+2. max_layer_thick (2-21)
+3. strm_hf_angle (10-16) (not in order)
+4. min_layer_thick
+5. strmbd_slope
+6. lw_factor
+7. wind_factor
+8. rain_factor
+9. seepage_rate
+10. rh_factor
+
+"""
 
 
