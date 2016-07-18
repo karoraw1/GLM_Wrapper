@@ -144,16 +144,11 @@ test.create_flowcsvs(inPack, outPack)
 
 test.read_variants('../test_files/optimize_these.txt', verbose=False)
 variant_lakes = test.write_variant_configs(copycsvs=True, verbose=False)
-
-test = LakeModel.run_model(test)
+test = LakeModel.run_model(test, verbose=False)
+test = LakeModel.pull_output_nc(test)
 variant_lakes_ran = map(LakeModel.run_model, variant_lakes)
-
-for vL in range(len(variant_lakes)):
-    variant_lakes[vL].pull_output_nc(verbose=False)
-
-
-test.pull_output_nc(verbose=False)
-
+variant_lakes_w_data = map(LakeModel.pull_output_nc, variant_lakes_ran)
+test.score_variants(Lake_temps, 'temp', variant_lakes_w_data, lik_fxn='NSE')
 
 """
 if plot_now:

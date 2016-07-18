@@ -218,17 +218,31 @@ def import_config(dl_default=False, verbose=True):
 
     return glm_config, default_config, default_order, block_order
 
+def log_likelihood(err, t_obs):
+    std=100    #EDIT THIS VALUE
+    log_lik=0
+    #mutiply prob. of observation at each time t
+    for t in np.arange(t_obs):
+        lik_this = st.norm.pdf(err[t].mean(), 0, std)
+        log_lik += np.log(lik_this)
+    return np.exp(log_lik)
+    
 def error_metrics(Obs, Sim):
+    """ returns MSE, rMSE, NSE, Pearson r, and others if given two 
+    numpy ndarrays"""
+    t_obs, _ = Sim.shape
+    Sim_f, Obs_f = Sim.flatten(), Obs.flatten()
     Err = Sim - Obs
     MSE = np.mean(Err**2)
     rMSE = np.sqrt(MSE)
-    NSE = 1 - (MSE/np.var(Obs))
-    r = st.pearsonr(Obs, Sim)
+    NSE = 1. - (Err.var()/np.var(Obs))
+    r = st.pearsonr(Sim_f, Obs_f)        
     a = np.std(Sim) / np.std(Obs)
     b = np.mean(Sim) / np.mean(Obs)
     # Kling-Gupta Efficiency
     KGE = 1- np.sqrt((r[0]-1)**2 + (a-1)**2 + (b-1)**2)
-    return {'MSE':MSE, 'rMSE':rMSE, 'NSE':NSE, 'r':r, 'a':a, 'b':b, 'KGE':KGE}
+    return {'MSE':MSE, 'rMSE':rMSE, 'NSE':NSE, 'r':r, 'a':a, 'b':b, 'KGE':KGE,
+            'LOG': log_likelihood(Err, t_obs) }
 
 def subsectbydate_2(df1, df2):
     lowEnd = np.max([df1.index[0],df2.index[0]])
@@ -465,6 +479,7 @@ class Lake(object):
     
     def __init__(self, name, dir_path):
         self.stdout, self.stderr, self.ran = None, None, False
+        self.variant_var, self.variant_val = "baseline", "baseline"
         
         self.name = name
         self.dir_path = dir_path
@@ -603,129 +618,16 @@ class Lake(object):
         self.in_df.to_csv(path_or_buf=self.incsv_path, index_label='time')
         print "\tWriting outflow.csv"
         self.out_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
-        
-    def pull_output_nc(self, plot_var=[], verbose=True, plot=True):
-        if self.ran == True:
-            
-            o_fn = self.glm_config['output']["out_fn"][1:-1] + '.nc'
-            o_path = self.glm_config['output']["out_dir"][1:-1]
-            
-            o_mult = self.glm_config['output']['nsave']
-            o_interval = self.glm_config['time']['dt']
-            freq_S = str(int(o_mult*o_interval))+"S"
-            if verbose == True:
-                print "The time steps in the output netCDF are %s" % freq_S
-            
-            interval = pd.date_range(start=self.glm_config['time']['start'], 
-                                     end=self.glm_config['time']['stop'], 
-                                     freq=freq_S)
-            self.nc_interval = interval[1:]                         
-            self.output_nc_path = os.path.join(o_path, o_fn)
-            output = Dataset(self.output_nc_path, "r")
-            nc_vars = output.variables.keys()
-            
-            if 'time' in nc_vars:
-                t_vector = output['time'][:]
-                start_t = pd.to_datetime(output['time'].units[12:])
-                d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
-            
-            assert len(d_vector) == len(self.nc_interval)
-            if verbose == True:
-                print "THe netCDF time vector is the expected size"
-            
-            lake_cols, lake_vecs, depth_dfs = [], {}, {}
-            
-            for ncv in nc_vars:
-                dimens = len(output[ncv].shape)
-                if dimens == 3:
-                    lake_cols.append(ncv)
-                    lake_vecs[ncv] = output[ncv][:,0,0]
-                if dimens == 4:
-                    data_buff = output[ncv][:,:,0,0]
-                    data_mat = data_buff.data
-                    fill_val = data_buff.fill_value
-                    data_mat[data_mat == fill_val] = np.nan
-                    col_n = range(data_mat.shape[1])
-                    this_df = pd.DataFrame(columns = col_n, index = d_vector, 
-                                           data = data_mat)
-                    assert data_buff.mask.sum() == this_df.isnull().sum().sum()
-                    depth_dfs[ncv] = this_df
 
-            self.depth_dfs = depth_dfs
-            self.lake_df = pd.DataFrame(columns=lake_cols,
-                                        index=d_vector,
-                                        data=lake_vecs)
-            if verbose == True:
-                print "%r columns added to the lake_df from the netCDF" % lake_cols
-            
-            loc_files = [i for i in os.listdir(self.dir_path) if '.csv' in i]
-            good_files = []
-            for file_ in loc_files:
-                if self.glm_config['output']['csv_ovrflw_fname'][1:-1] in file_:
-                    good_files.append(file_)
-                if self.glm_config['output']['csv_lake_fname'][1:-1] in file_:
-                    good_files.append(file_)
-                if self.glm_config['output']['csv_outlet_fname'][1:-1] in file_:
-                    good_files.append(file_)
-            #TODO: add WQ_ files here when ready
-            if verbose == True:
-                print "%r loaded from the configuration folder" % good_files
-            
-            hdls = [os.path.join(self.dir_path, i) for i in good_files]
-            csv_dict = {}
-            for p, f in zip(hdls, good_files):
-                csv_dict[f] = pd.read_csv(p)
-
-            for f in good_files:
-                t_steps, lake_vs = csv_dict[f].shape
-                csv_dict[f]['date'] = csv_dict[f].time.copy()
-                csv_dict[f].time = csv_dict[f].time.apply(lambda x: x[-8:])
-                csv_dict[f].date = csv_dict[f].date.apply(lambda x: x[:10])
-                time_bool = csv_dict[f].loc[:, 'time'] == '24:00:00'
-                csv_dict[f].loc[time_bool, 'time']  = '23:59:59'
-                csv_dict[f].datetime = csv_dict[f].date + " "+ csv_dict[f].time
-                csv_dict[f].index = pd.to_datetime(csv_dict[f].datetime)                
-                csv_dict[f].drop(['date', 'time'], axis=1, inplace=True)
-
-            self.csv_dict = csv_dict
-
-            if verbose == True:
-                for k in output.variables.keys():
-                    print k
-                    
-                    if k != 'NS':
-                        print "\t{}".format(output[k].units)
-                        print "\t{}".format(output[k].shape)
-                        
-            if plot_var !=[] and plot==True:
-                for i, _var in enumerate(plot_var):
-                    plt.figure()                    
-                    if len(output[_var].shape) == 4:
-                        temp = output[_var][:,:,0,0].data
-                        temp[temp == output[_var]._FillValue] = -1
-                        plt.imshow(np.flipud(temp.T))
-                        plt.colorbar()
-                    elif len(output[_var].shape) == 3:
-                        temp = output[_var][:,0,0].astype(float)
-                        temp[temp == output[_var]._FillValue] = np.nan
-                        plt.plot(self.nc_interval, temp)
-                    
-                    plt.title(_var)                        
-                    plt.show()
-            
-                    # the default value assigned to masked elements > 1e36, 
-                    # here we reassign them -1 for plotting purpose
-                    #np.flipud puts the lake bottom at the plot bottom 
-                    
-                        
-        else:
-            print "Can't plot before running model"
-        
-        self.output_nc = output
         
     def read_variants(self, path, verbose=True):
         meta_config = self.glm_config
         block_key_option = []
+        variants = {'grid': {},
+                    'prior': {},
+                    'likelihood': {},
+                    'posterior': {} }
+        
         
         with open(path, 'r') as f:
             for line in f:
@@ -740,6 +642,7 @@ class Lake(object):
                     splitted = line[2:].split('=')
                     spit_cleaned = [i.strip() for i in splitted]
                     sub_block = spit_cleaned[0]
+                    variants['grid'][sub_block] = []
                     if verbose == True:
                         print "\t%r" % sub_block
                         
@@ -762,6 +665,8 @@ class Lake(object):
                             sim_name = sub_block+"_"+str(idx+1)
                             block_key_option.append((new_block, sub_block, i, 
                                                      sim_name))
+                            variants['grid'][sub_block].append(i)
+                                                     
                     elif len(val_split) != 3 and dType != 'bool':
                         for idx, i in enumerate(val_split):
                             sim_name = sub_block+"_"+str(idx+1)
@@ -769,6 +674,7 @@ class Lake(object):
                                                      sim_name))
                             if verbose == True:
                                 print "\t\t%r" % i
+                            variants['grid'][sub_block].append(i)
                             
                     elif len(val_split) == 3:
                         arange = np.arange(val_split[0], val_split[1]+val_split[2],
@@ -783,10 +689,10 @@ class Lake(object):
                             sim_name = sub_block+"_"+str(idx+1)
                             block_key_option.append((new_block, sub_block, j, 
                                                      sim_name))
+                            variants['grid'][sub_block].append(j)
                     else:
                         print "\n\nunparsed option\n\n"
-                    
-                            
+                                                
                 else:
                     print "Unparsable line"
                     print line
@@ -794,6 +700,15 @@ class Lake(object):
         print "\t%i variant cases specified" % len(block_key_option)
         
         self.variant_cases = block_key_option
+        
+        for k in variants['grid'].keys():
+            len_ = len(variants['grid'][k])
+            variants['grid'][k] = np.array(variants['grid'][k])
+            variants['prior'][k] = np.ones(len_)
+            variants['likelihood'][k] = np.zeros(len_)
+            variants['posterior'][k] = np.zeros(len_)
+            
+        self.variants = variants
 
     def write_variant_configs(self, copycsvs=False, verbose=True):
         
@@ -804,6 +719,10 @@ class Lake(object):
                 key1, key2, val, simname = i[0],i[1],i[2],i[3]
                 variant_lake.glm_config[key1][key2] = val
                 variant_lake.name = simname
+                variant_lake.variant_var = key2
+                variant_lake.variant_val = val
+                
+                variant_lake.ran = False
                 
                 variant_lake.dir_path = os.path.join(self.dir_path, simname)
                 make_dir(variant_lake.dir_path, verbose)
@@ -824,8 +743,61 @@ class Lake(object):
                 variant_lakes.append(variant_lake)
         return variant_lakes
     
-            
+    
 
+    def score_variants(self, observations, obs_type, variant_list, lik_fxn='NSE'):
+        
+        assert self.ran == True
+        
+        for v_l in variant_list:
+            # ensure input object is a Lake model that was run and has had its 
+            # data collected. 
+
+            assert type(v_l) == Lake
+            assert v_l.ran == True
+            assert v_l.csv_dict
+
+            #is top bottom orientation correct??
+        if obs_type in self.depth_dfs.keys():
+            baseline = self.depth_dfs[obs_type].resample('D').mean()
+            self.observed_dm = time_depth_df_filter(baseline, observations)
+            self.error = error_metrics(observations.values, self.observed_dm)
+            
+            for variant in variant_list:
+                # Step 2: estimate the liklihood 
+                sub_block_ = variant.variant_var
+                curr_val = variant.variant_val
+                all_idxs = np.where(self.variants['grid'][sub_block_] == curr_val)
+                idx = all_idxs[0]
+                
+                modelled = variant.depth_dfs[obs_type].resample('D').mean()
+                variant.observed_dm = time_depth_df_filter(modelled, 
+                                                           observations)
+                
+                err = error_metrics(observations.values, variant.observed_dm)
+                self.variants['likelihood'][sub_block_][idx] = err[lik_fxn]
+                
+            for sb2 in self.variants['likelihood'].keys():
+                if len(self.variants['grid'][sb2]) > 4:
+                    raw_post=self.variants['prior'][sb2]*self.variants['likelihood'][sb2]
+                    evidence=np.trapz(raw_post, self.variants['grid'][sb2])
+                    self.variants['posterior'][sub_block_]=raw_post/evidence
+                
+            
+def time_depth_df_filter(baseline, observations):
+    #extract proper baseline here based on real world observations
+    time_matched = baseline[baseline.index.isin(observations.index)]
+    observed_dm = np.zeros(observations.shape)
+    obs_days, depths = observations.shape
+    for row in range(obs_days):
+        this_row = time_matched.iloc[row, :].dropna()
+        this_len = len(this_row)-1
+        binsize = int(np.round(this_len/float(depths)))
+        for depth, elem in zip(range(depths),range(0,this_len, binsize)):
+            observed_dm[row, depth] = this_row[elem:elem+binsize].mean()
+    return observed_dm
+
+    
 class USGS_water_data(object):
 
     def __init__(self, fn):
@@ -1056,26 +1028,203 @@ class CERES_nc(object):
             self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
                                     data = stack.T.copy())
                 
-def run_model(Lake, variants=False, ex_loc = None, verbose=True):
+def run_model(Lake, ex_loc = None, verbose=True):
     """This function accesses the locations of each glm configuration, 
     provided in Lake.glm_path, and runs the model using the executable
     specefied in `ex_loc`
     """
-    script_loc = os.path.dirname(Lake.glm_path)
+    report_path = os.path.join(Lake.dir_path, "Run_report.txt")
+    unique_divider = "\n*\n"
     
-    if ex_loc == None:
-        curr_dir = os.path.dirname(os.getcwd())
-        ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
-        ex_loc = os.path.join(curr_dir, ex_loc)
+    if os.path.exists(report_path):
+        if verbose:
+            print "Prior run of {} model detected".format(Lake.name)        
+        report_h = open(report_path, 'r')
+        report_ = report_h.read().split(unique_divider)
+        report_.pop()
+        check3 = report_[-2] == Lake.variant_var
+        check4 = report_[-1] == str(Lake.variant_val)
         
-    p = sp.Popen(ex_loc, cwd=script_loc, shell=True, stderr=sp.PIPE, 
-                 stdout=sp.PIPE)
-    p.wait()
-    Lake.stdout, Lake.stderr = p.communicate()
-    Lake.ran = True
-    check1 = 'Simulation begins..' in Lake.stdout
-    check2 = '100.00% of days complete' in Lake.stdout
-    if check1 and check2 and verbose:
-        print "{} model run completed".format(Lake.name)
+        if check3 and check4:
+            Lake.ran, Lake.stderr, Lake.stdout = True, report_[-3], report_[-4]
+            if verbose:
+                print "Prior run of {} model accepted\n".format(Lake.name)
+        else:
+            report_h.close()
+            if verbose:
+                print "Prior run rejected. Re-running\n"
+                print "Expected: %r, %r" % (Lake.variant_var, str(Lake.variant_val))
+                print "Recieved: %r, %r" % (report_[-2], report_[-1])
+
+            os.remove(report_path)
+            Lake = run_model(Lake)  
+    else: 
+        if verbose:
+            print "No prior run of model detected @ {}".format(report_path)
+            
+            
+        if ex_loc == None:
+            curr_dir = os.path.dirname(os.getcwd())
+            ex_loc = 'GLM_Executables/glm.app/Contents/MacOS/glm'
+            ex_loc = os.path.join(curr_dir, ex_loc)
+            
+        p = sp.Popen(ex_loc, cwd=Lake.dir_path, shell=True, stderr=sp.PIPE, 
+                     stdout=sp.PIPE)
+        p.wait()
+        Lake.stdout, Lake.stderr = p.communicate()
+        Lake.ran = True
+        
+        check1 = 'Simulation begins..' in Lake.stdout
+        check2 = '100.00% of days complete' in Lake.stdout
+        if check1 and check2:
+            report_h = open(report_path, 'w')
+            report_h.writelines("Run Report"+unique_divider)
+            
+            report_h.writelines(Lake.stdout+unique_divider)
+            
+            report_h.writelines(Lake.stderr+unique_divider)
+            
+            report_h.writelines(Lake.variant_var+unique_divider)
+            
+            report_h.writelines(str(Lake.variant_val)+unique_divider)
+            
+            if verbose:
+                print "{} model run completed\n".format(Lake.name)
     
+    return Lake
+
+@fn_timer
+def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True):
+    if Lake.ran == True:
+        
+        o_fn = Lake.glm_config['output']["out_fn"][1:-1] + '.nc'
+        o_path = Lake.glm_config['output']["out_dir"][1:-1]
+        
+        o_mult = Lake.glm_config['output']['nsave']
+        o_interval = Lake.glm_config['time']['dt']
+        freq_S = str(int(o_mult*o_interval))+"S"
+        if verbose == True:
+            print "The time steps in the output netCDF are %s" % freq_S
+        
+        interval = pd.date_range(start=Lake.glm_config['time']['start'], 
+                                 end=Lake.glm_config['time']['stop'], 
+                                 freq=freq_S)
+        Lake.nc_interval = interval[1:]                         
+        Lake.output_nc_path = os.path.join(o_path, o_fn)
+        output = Dataset(Lake.output_nc_path, "r")
+        nc_vars = output.variables.keys()
+        
+        if 'time' in nc_vars:
+            t_vector = output['time'][:]
+            start_t = pd.to_datetime(output['time'].units[12:])
+            d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
+        
+        assert len(d_vector) == len(Lake.nc_interval)
+        if verbose == True:
+            print "THe netCDF time vector is the expected size"
+        
+        lake_cols, lake_vecs, depth_dfs = [], {}, {}
+        
+        for ncv in nc_vars:
+            dimens = len(output[ncv].shape)
+            if dimens == 3:
+                lake_cols.append(ncv)
+                lake_vecs[ncv] = output[ncv][:,0,0]
+            if dimens == 4:
+                data_buff = output[ncv][:,:,0,0]
+                data_mat = data_buff.data
+                fill_val = data_buff.fill_value
+                data_mat[data_mat == fill_val] = np.nan
+                col_n = range(data_mat.shape[1])
+                this_df = pd.DataFrame(columns = col_n, index = d_vector, 
+                                       data = data_mat)
+                assert data_buff.mask.sum() == this_df.isnull().sum().sum()
+                depth_dfs[ncv] = this_df
+
+        Lake.depth_dfs = depth_dfs
+        Lake.lake_df = pd.DataFrame(columns=lake_cols,
+                                    index=d_vector,
+                                    data=lake_vecs)
+        if verbose == True:
+            print "%r columns added to the lake_df from the netCDF" % lake_cols
+        
+        loc_files = [i for i in os.listdir(Lake.dir_path) if '.csv' in i]
+        overfl_fname = Lake.glm_config['output']['csv_ovrflw_fname'][1:-1]
+        lake_fname = Lake.glm_config['output']['csv_lake_fname'][1:-1]
+        outlet_fname = Lake.glm_config['output']['csv_outlet_fname'][1:-1]
+        
+        good_files = []
+        for file_ in loc_files:
+            if overfl_fname in file_:
+                good_files.append(file_)
+            if lake_fname in file_:
+                good_files.append(file_)
+            if outlet_fname in file_:
+                good_files.append(file_)
+        #TODO: add WQ_ files here when ready
+        if verbose == True:
+            print "%r loaded from the configuration folder" % good_files
+        
+        hdls = [os.path.join(Lake.dir_path, i) for i in good_files]
+        csv_dict = {}
+        for p, f in zip(hdls, good_files):
+            csv_dict[f] = pd.read_csv(p)
+
+        for f in good_files:
+            t_steps, lake_vs = csv_dict[f].shape
+            csv_dict[f]['date'] = csv_dict[f].time.copy()
+            csv_dict[f].time = csv_dict[f].time.apply(lambda x: x[-8:])
+            csv_dict[f].date = csv_dict[f].date.apply(lambda x: x[:10])
+            time_bool = csv_dict[f].loc[:, 'time'] == '24:00:00'
+            csv_dict[f].loc[time_bool, 'time']  = '23:59:59'
+            csv_dict[f].datetime = csv_dict[f].date + " "+ csv_dict[f].time
+            csv_dict[f].index = pd.to_datetime(csv_dict[f].datetime)                
+            csv_dict[f].drop(['date', 'time'], axis=1, inplace=True)
+
+        for k in csv_dict.keys():
+            old_cols = list(csv_dict[k].columns)
+            if overfl_fname in k:
+                new_cols = ["overflow_"+i for i in old_cols]
+            elif outlet_fname in k:
+                new_cols = ["outflow_"+i for i in old_cols]
+            else:
+                new_cols = old_cols
+            csv_dict[k].columns = new_cols
+
+
+        Lake.csv_dict = csv_dict
+
+        if verbose == True:
+            for k in output.variables.keys():
+                print k
+                
+                if k != 'NS':
+                    print "\t{}".format(output[k].units)
+                    print "\t{}".format(output[k].shape)
+                    
+        if plot_var !=[] and plot==True:
+            for i, _var in enumerate(plot_var):
+                plt.figure()                    
+                if len(output[_var].shape) == 4:
+                    temp = output[_var][:,:,0,0].data
+                    temp[temp == output[_var]._FillValue] = -1
+                    plt.imshow(np.flipud(temp.T))
+                    plt.colorbar()
+                elif len(output[_var].shape) == 3:
+                    temp = output[_var][:,0,0].astype(float)
+                    temp[temp == output[_var]._FillValue] = np.nan
+                    plt.plot(Lake.nc_interval, temp)
+                
+                plt.title(_var)                        
+                plt.show()
+        
+                # the default value assigned to masked elements > 1e36, 
+                # here we reassign them -1 for plotting purpose
+                #np.flipud puts the lake bottom at the plot bottom 
+                
+                    
+    else:
+        print "Can't plot before running model"
+    
+    Lake.output_nc = output
     return Lake
