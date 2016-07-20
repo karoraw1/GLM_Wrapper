@@ -10,9 +10,7 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 """
 
 import scipy.stats as st
-import re
-import mmap
-import os
+import re, mmap, cPickle, os, copy, time, shutil
 import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
@@ -20,11 +18,7 @@ import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import JD_converter as jd
 import subprocess as sp
-import copy
-import time
-from functools import wraps
-import shutil
- 
+from functools import wraps 
  
 def fn_timer(function):
     """
@@ -1093,138 +1087,153 @@ def run_model(Lake, ex_loc = None, verbose=True):
     
     return Lake
 
-@fn_timer
-def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True):
+def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True, pickle=True):
     if Lake.ran == True:
         
-        o_fn = Lake.glm_config['output']["out_fn"][1:-1] + '.nc'
-        o_path = Lake.glm_config['output']["out_dir"][1:-1]
-        
+        # This section calculates the expected time interval for saved time
+        # steps in the netCDF archive
         o_mult = Lake.glm_config['output']['nsave']
         o_interval = Lake.glm_config['time']['dt']
-        freq_S = str(int(o_mult*o_interval))+"S"
-        if verbose == True:
-            print "The time steps in the output netCDF are %s" % freq_S
-        
+        freq_S = str(int(o_mult*o_interval))+"S"        
         interval = pd.date_range(start=Lake.glm_config['time']['start'], 
                                  end=Lake.glm_config['time']['stop'], 
                                  freq=freq_S)
-        Lake.nc_interval = interval[1:]                         
+        Lake.nc_interval = interval[1:]
+        if verbose == True:
+            print "The time steps in the output netCDF are %s" % freq_S
+        
+        ## This section pulls out the expected path for the archive and also
+        # checks to see if a pickled version is stored first
+        
+        o_fn = Lake.glm_config['output']["out_fn"][1:-1] + '.nc'
+        o_path = Lake.glm_config['output']["out_dir"][1:-1]
         Lake.output_nc_path = os.path.join(o_path, o_fn)
-        output = Dataset(Lake.output_nc_path, "r")
-        nc_vars = output.variables.keys()
+        expected_pickle = Lake.output_nc_path[:-3]+".pickle"
         
-        if 'time' in nc_vars:
-            t_vector = output['time'][:]
-            start_t = pd.to_datetime(output['time'].units[12:])
-            d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
+        if os.path.exists(expected_pickle):
+            
+            f = open(expected_pickle, 'rb')
+            unpickled = cPickle.load(f)       
+            f.close()
+            Lake.depth_dfs, Lake.csv_dict = unpickled[0], unpickled[2]
+            Lake.lake_df = unpickled[1]
+            Lake.output_nc = None
+        else:
+            output = Dataset(Lake.output_nc_path, "r")
+            nc_vars = output.variables.keys()             
+            if 'time' in nc_vars:
+                t_vector = output['time'][:]
+                start_t = pd.to_datetime(output['time'].units[12:])
+                d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
+            
+            assert len(d_vector) == len(Lake.nc_interval)
+            if verbose == True:
+                print "THe netCDF time vector is the expected size"
+            
+            lake_cols, lake_vecs, depth_dfs = [], {}, {}
+            
+            for ncv in nc_vars:
+                dimens = len(output[ncv].shape)
+                if dimens == 3:
+                    lake_cols.append(ncv)
+                    lake_vecs[ncv] = output[ncv][:,0,0]
+                if dimens == 4:
+                    data_buff = output[ncv][:,:,0,0]
+                    data_mat = data_buff.data
+                    fill_val = data_buff.fill_value
+                    data_mat[data_mat == fill_val] = np.nan
+                    col_n = range(data_mat.shape[1])
+                    this_df = pd.DataFrame(columns = col_n, index = d_vector, 
+                                           data = data_mat)
+                    assert data_buff.mask.sum() == this_df.isnull().sum().sum()
+                    depth_dfs[ncv] = this_df
+    
+            Lake.depth_dfs = depth_dfs
+            lake_df = pd.DataFrame(columns=lake_cols, index=d_vector, 
+                                   data=lake_vecs)
+            Lake.lake_df = lake_df
+            
+            if verbose == True:
+                print "%r columns added to the lake_df from the netCDF" % lake_cols
+            
+            loc_files = [i for i in os.listdir(Lake.dir_path) if '.csv' in i]
+            overfl_fname = Lake.glm_config['output']['csv_ovrflw_fname'][1:-1]
+            lake_fname = Lake.glm_config['output']['csv_lake_fname'][1:-1]
+            outlet_fname = Lake.glm_config['output']['csv_outlet_fname'][1:-1]
+            
+            good_files = []
+            for file_ in loc_files:
+                if overfl_fname in file_:
+                    good_files.append(file_)
+                if lake_fname in file_:
+                    good_files.append(file_)
+                if outlet_fname in file_:
+                    good_files.append(file_)
+            #TODO: add WQ_ files here when ready
+            if verbose == True:
+                print "%r loaded from the configuration folder" % good_files
+            
+            hdls = [os.path.join(Lake.dir_path, i) for i in good_files]
+            csv_dict = {}
+            for p, f in zip(hdls, good_files):
+                csv_dict[f] = pd.read_csv(p)
+    
+            for f in good_files:
+                t_steps, lake_vs = csv_dict[f].shape
+                csv_dict[f]['date'] = csv_dict[f].time.copy()
+                csv_dict[f].time = csv_dict[f].time.apply(lambda x: x[-8:])
+                csv_dict[f].date = csv_dict[f].date.apply(lambda x: x[:10])
+                time_bool = csv_dict[f].loc[:, 'time'] == '24:00:00'
+                csv_dict[f].loc[time_bool, 'time']  = '23:59:59'
+                csv_dict[f].datetime = csv_dict[f].date + " "+ csv_dict[f].time
+                csv_dict[f].index = pd.to_datetime(csv_dict[f].datetime)                
+                csv_dict[f].drop(['date', 'time'], axis=1, inplace=True)
+    
+            for k in csv_dict.keys():
+                old_cols = list(csv_dict[k].columns)
+                if overfl_fname in k:
+                    new_cols = ["overflow_"+i for i in old_cols]
+                elif outlet_fname in k:
+                    new_cols = ["outflow_"+i for i in old_cols]
+                else:
+                    new_cols = old_cols
+                csv_dict[k].columns = new_cols
+    
+    
+            Lake.csv_dict = csv_dict
+            
+            if pickle == True:
+                to_be_pickled = [depth_dfs, lake_df, csv_dict]
+                Lake.output_pickle = expected_pickle
+                f = open(Lake.output_pickle, 'wb')   # 'wb' instead 'w' for binary file
+                cPickle.dump(to_be_pickled, f, -1)       # -1 specifies highest binary protocol
+                f.close()
         
-        assert len(d_vector) == len(Lake.nc_interval)
-        if verbose == True:
-            print "THe netCDF time vector is the expected size"
-        
-        lake_cols, lake_vecs, depth_dfs = [], {}, {}
-        
-        for ncv in nc_vars:
-            dimens = len(output[ncv].shape)
-            if dimens == 3:
-                lake_cols.append(ncv)
-                lake_vecs[ncv] = output[ncv][:,0,0]
-            if dimens == 4:
-                data_buff = output[ncv][:,:,0,0]
-                data_mat = data_buff.data
-                fill_val = data_buff.fill_value
-                data_mat[data_mat == fill_val] = np.nan
-                col_n = range(data_mat.shape[1])
-                this_df = pd.DataFrame(columns = col_n, index = d_vector, 
-                                       data = data_mat)
-                assert data_buff.mask.sum() == this_df.isnull().sum().sum()
-                depth_dfs[ncv] = this_df
-
-        Lake.depth_dfs = depth_dfs
-        Lake.lake_df = pd.DataFrame(columns=lake_cols,
-                                    index=d_vector,
-                                    data=lake_vecs)
-        if verbose == True:
-            print "%r columns added to the lake_df from the netCDF" % lake_cols
-        
-        loc_files = [i for i in os.listdir(Lake.dir_path) if '.csv' in i]
-        overfl_fname = Lake.glm_config['output']['csv_ovrflw_fname'][1:-1]
-        lake_fname = Lake.glm_config['output']['csv_lake_fname'][1:-1]
-        outlet_fname = Lake.glm_config['output']['csv_outlet_fname'][1:-1]
-        
-        good_files = []
-        for file_ in loc_files:
-            if overfl_fname in file_:
-                good_files.append(file_)
-            if lake_fname in file_:
-                good_files.append(file_)
-            if outlet_fname in file_:
-                good_files.append(file_)
-        #TODO: add WQ_ files here when ready
-        if verbose == True:
-            print "%r loaded from the configuration folder" % good_files
-        
-        hdls = [os.path.join(Lake.dir_path, i) for i in good_files]
-        csv_dict = {}
-        for p, f in zip(hdls, good_files):
-            csv_dict[f] = pd.read_csv(p)
-
-        for f in good_files:
-            t_steps, lake_vs = csv_dict[f].shape
-            csv_dict[f]['date'] = csv_dict[f].time.copy()
-            csv_dict[f].time = csv_dict[f].time.apply(lambda x: x[-8:])
-            csv_dict[f].date = csv_dict[f].date.apply(lambda x: x[:10])
-            time_bool = csv_dict[f].loc[:, 'time'] == '24:00:00'
-            csv_dict[f].loc[time_bool, 'time']  = '23:59:59'
-            csv_dict[f].datetime = csv_dict[f].date + " "+ csv_dict[f].time
-            csv_dict[f].index = pd.to_datetime(csv_dict[f].datetime)                
-            csv_dict[f].drop(['date', 'time'], axis=1, inplace=True)
-
-        for k in csv_dict.keys():
-            old_cols = list(csv_dict[k].columns)
-            if overfl_fname in k:
-                new_cols = ["overflow_"+i for i in old_cols]
-            elif outlet_fname in k:
-                new_cols = ["outflow_"+i for i in old_cols]
-            else:
-                new_cols = old_cols
-            csv_dict[k].columns = new_cols
-
-
-        Lake.csv_dict = csv_dict
-
-        if verbose == True:
-            for k in output.variables.keys():
-                print k
-                
-                if k != 'NS':
-                    print "\t{}".format(output[k].units)
-                    print "\t{}".format(output[k].shape)
+            if verbose == True:
+                for k in output.variables.keys():
+                    print k
                     
-        if plot_var !=[] and plot==True:
-            for i, _var in enumerate(plot_var):
-                plt.figure()                    
-                if len(output[_var].shape) == 4:
-                    temp = output[_var][:,:,0,0].data
-                    temp[temp == output[_var]._FillValue] = -1
-                    plt.imshow(np.flipud(temp.T))
-                    plt.colorbar()
-                elif len(output[_var].shape) == 3:
-                    temp = output[_var][:,0,0].astype(float)
-                    temp[temp == output[_var]._FillValue] = np.nan
-                    plt.plot(Lake.nc_interval, temp)
-                
-                plt.title(_var)                        
-                plt.show()
-        
-                # the default value assigned to masked elements > 1e36, 
-                # here we reassign them -1 for plotting purpose
-                #np.flipud puts the lake bottom at the plot bottom 
-                
+                    if k != 'NS':
+                        print "\t{}".format(output[k].units)
+                        print "\t{}".format(output[k].shape)
+                        
+            if plot_var !=[] and plot==True:
+                for i, _var in enumerate(plot_var):
+                    plt.figure()                    
+                    if len(output[_var].shape) == 4:
+                        temp = output[_var][:,:,0,0].data
+                        temp[temp == output[_var]._FillValue] = -1
+                        plt.imshow(np.flipud(temp.T))
+                        plt.colorbar()
+                    elif len(output[_var].shape) == 3:
+                        temp = output[_var][:,0,0].astype(float)
+                        temp[temp == output[_var]._FillValue] = np.nan
+                        plt.plot(Lake.nc_interval, temp)
                     
+                    plt.title(_var)                        
+                    plt.show()
+            Lake.output_nc = output
+            output.close()
     else:
         print "Can't plot before running model"
-    
-    Lake.output_nc = output
     return Lake
