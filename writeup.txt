@@ -1,0 +1,54 @@
+
+The baseline values were essentially copied from the examples to observe the formatting as parsed by Python. Four such files were provided
+and all values that were identical between them were used when possible. The baseline condition, upon which further optiization was performed
+was set using a GLUE-like technique. 
+
+A grid-based optimization was used to initally calibrate the parameter set. This was implemented as a text parser. The example file in the 
+`root/test_files` directory shows the acceptable format in action. It is excerpted below:
+
+```
+&meteorology
+- catchrain = [.true., .false.],[bool]
+- rad_mode = [1, 5, None],[int]
+- albedo_mode = [1, 3, 1],[int]
+- cloud_mode = [1, 4, 1],[int]
+# rainfall amount (m) required before runoff from exposed banks
+- rain_threshold = [0.005, 0.02, 0.005],[float]
+```
+
+The parameter block is specified first and signified by a "&", which is consistent with the original GLM configuration file. Each variable
+within that block is then listed below it on a line started with "-". The information about values is specefied in the first set of brackets
+and the datatype in the second. If it is a boolean, true and false strings are specified without quotes in the same format as in the original
+configuration file. Integers and floats are specified using the syntax `[start, stop, step]`. If step is `None`, only the start and the
+stop values are tried. Lines that start with hash marks are ignored. 
+
+
+
+Each parameter is varied by 5% between 50% and 150% of the original value. These variations represent a model space, from which a value 
+for each parameter set is chosen at random. As the model space is explored through consecutive runs, the Nash Sutcliffe Efficiency is 
+calculated and each run is classified as behavioural or non-behavioural based on whether the Nash Sutcliffe Efficiency is above the
+baseline condition. The values of each parameter used in a run are sorted into behavioural and non-behavioural categories. The sensitivity
+of the model to each parameter was then assessed using the Kolmogorov-Smirnoff 2 sample test on the cumulative distribution of values in
+the behavioural and non-behavioural sets. The CDF is calculated like so starting with a pair of lists corresponding to the parameter
+values in the behavioural & non-behavioural sets. 
+
+```
+from scipy import stats
+import statsmodels.api as sm
+
+full_set = behavioural_set.extend(non_behavioural_set)
+x = np.linspace(min(full_set), max(full_set))
+ecdf_b = sm.distributions.ECDF(behavioural_set)
+ecdf_nb = sm.distributions.ECDF(non_behavioural_set)
+cum_dist_b = ecdf_b(x)
+cum_dist_nb = ecdf_nb(x)
+ks_stat, ks_pval = stats.ks_2samp(cumdist_b, cumdist_nb)
+
+```
+
+
+
+For each sample we have matched axis of deviation and differing outcomes for the relative change in error. These can all be compared to the  uniform distribution using the 
+Anderson-Darling test, which is used to test if a sample is drawn from a particular distribution. If the error measured in reponse to a varying
+parameter value is relatively unchanged, the Anderson-Darling test statistic is more likely to be insignificant. This can be applied 
+to either the   

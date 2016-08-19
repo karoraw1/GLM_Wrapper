@@ -9,8 +9,9 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 @author: login
 """
 
+
 import scipy.stats as st
-import re, mmap, cPickle, os, copy, time, shutil
+import re, mmap, cPickle, os, copy, time, shutil, sys
 import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
@@ -20,6 +21,10 @@ import JD_converter as jd
 import subprocess as sp
 from functools import wraps 
  
+ 
+def hard_round(x):
+    return int(x*1000.0)/1000.0
+    
 def fn_timer(function):
     """
     This decorator can be used to print the time it takes a fxn to execute
@@ -70,33 +75,32 @@ def import_config(dl_default=False, verbose=True):
     else:
         default_config, default_order, block_order = None, None, None
         
-    glm_setup = {'max_layers' :200, 
-                 'min_layer_vol' :0.025, 
+    glm_setup = {'max_layers' :300, 
+                 'min_layer_vol' :0.018, 
                  'min_layer_thick' :0.25, 
-                 'max_layer_thick' :0.500,  
-                 'Kw' : 0.5, 
-                 'coef_mix_conv' : 0.125, 
-                 'coef_wind_stir' : 0.23, 
-                 'coef_mix_shear' : 0.20, 
-                 'coef_mix_turb' : 0.51, 
+                 'max_layer_thick' :0.455,  
+                 'Kw' : 0.75, 
+                 'coef_mix_conv' : 0.1125, 
+                 'coef_wind_stir' : 0.1724, 
+                 'coef_mix_shear' : 0.09, 
+                 'coef_mix_turb' : 0.714, 
                  'coef_mix_KH' : 0.30, 
-                 'coef_mix_hyp' : 0.5,
-                 'deep_mixing':'.true.'}
+                 'coef_mix_hyp' : 0.6,
+                 'deep_mixing':'.false.'}
                  
     wq_setup = {}
     
     # &morphometry: 8 vars
     morphometry = {'lake_name': "'UpperMysticLake'", 
-                   "latitude": 42.4317,  
-                   "longitude": -71.1483,
-                   "bsn_len": 1073.637,
-                   "bsn_wid": 632.60, 
+                   "latitude": 42,  
+                   "longitude": -71,
+                   "bsn_len": 1100.0,
+                   "bsn_wid": 600.0, 
                    "bsn_vals": None,
-                   "H": [-23.384, -20.336, -17.288, -14.24, -11.192, -8.144, 
-                         -5.096, -2.048, 1.00],
-                   "A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69, 
-                        397077.50, 460778.04, 524802.66, 560051.22]}
-                        
+                   "A":[77372.999, 148474.999, 202471.999, 257818.999, 
+                        338552.999, 397077.999, 460777.999, 524803, 560051]}
+    morphometry['H'] = [0.12, 3.687, 7.375, 11.063, 14.752, 18.44, 22.127, 
+                        25.815, 29.504]
     morphometry['bsn_vals'] = len(morphometry['H'])
     assert len(morphometry['H']) == len(morphometry['A'])
     
@@ -131,11 +135,12 @@ def import_config(dl_default=False, verbose=True):
     
     #&init_profiles            
     init_profiles = {"lake_depth": 24.384, 
-                     "num_depths": 0, 
+                     "num_depths": 6, 
                      "the_depths": [1, 5, 9, 13, 17, 21], 
-                     "the_temps": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0], 
-                     "the_sals": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+                     "the_temps": [3.6, 3.6, 3.6, 3.6, 3.6, 3.6], 
                      }
+#    the_sals = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]                 
+    init_profiles["the_sals"] = [222.0, 444.0, 666.0, 888.0, 1110.0, 1332.0]
     init_profiles['num_depths'] = len(init_profiles["the_depths"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_temps"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_sals"])
@@ -149,24 +154,24 @@ def import_config(dl_default=False, verbose=True):
     meteorology = {"met_sw" : ".true.",
                    "lw_type" : "'LW_IN'", 
                    "rain_sw" : ".false.",
-                   "atm_stab" : ".false.",
+                   "atm_stab" : ".false.", 
                    "catchrain" : ".false.",
                    "rad_mode": 1,
                    "albedo_mode": 3, 
                    "cloud_mode": 3, 
                    "subdaily": '.false.', 
                    "meteo_fl": "'met_daily.csv'",
-                   "wind_factor": 1.0,
-                   "sw_factor":  1.0,
-                   "lw_factor": 1.0, 
-                   "at_factor": 1.0,
-                   "rh_factor": 1.0,
-                   "rain_factor": 1.0,
-                   "ce":  0.0013, 
-                   "ch": 0.0013, 
-                   "cd": 0.0013, 
+                   "wind_factor": -1.1,
+                   "sw_factor":  0.6,
+                   "lw_factor": -0.75, 
+                   "at_factor": 1.5,
+                   "rh_factor": -1.2,
+                   "rain_factor": -0.2,
+                   "ce":  0.0011, 
+                   "ch": 0.0017, 
+                   "cd": 0.0017, 
                    "rain_threshold": 0.01, 
-                   "runoff_coef":  0.3}
+                   "runoff_coef":  0.65}
     #&bird_model            
     bird = {"AP" : 973, 
             "Oz" : 0.279, 
@@ -179,23 +184,23 @@ def import_config(dl_default=False, verbose=True):
     inflow = {"num_inflows": 1,
               "names_of_strms": "'Aberjona'", 
               "subm_flag": ".false.", 
-              "strm_hf_angle": 65.0, 
-              "strmbd_slope": 2.0, 
+              "strm_hf_angle": 0.35, 
+              "strmbd_slope": 3.5, 
               "strmbd_drag": 0.0160, 
-              "inflow_factor": 1.0, 
+              "inflow_factor": 0.8, 
               "inflow_fl": "'inflow.csv'", 
               "inflow_varnum": 3, 
               "inflow_vars": ['FLOW','TEMP','SALT'],
-              "coef_inf_entrain": 0. }
+              "coef_inf_entrain": 0.1 }
               
     #&outflow
     outflow = {"num_outlet": 1,
                "flt_off_sw": ".false.",
-               "outl_elvs": 0.00,
-               "bsn_len_outl": 299, 
-               "bsn_wid_outl" : 199,
+               "outl_elvs": 21.1,
+               "bsn_len_outl": 299.0, 
+               "bsn_wid_outl" : 1020.0,
                "outflow_fl" : "'outflow.csv'",
-               "outflow_factor": 0.8,
+               "outflow_factor": 0.3,
                "seepage" : ".true.",
                "seepage_rate" : 0.0 }
                 
@@ -474,7 +479,7 @@ class Lake(object):
     def __init__(self, name, dir_path):
         self.stdout, self.stderr, self.ran = None, None, False
         self.variant_var, self.variant_val = "baseline", "baseline"
-        
+        self.liklihood = None
         self.name = name
         self.dir_path = dir_path
         make_dir(dir_path, verbose=False)
@@ -487,7 +492,7 @@ class Lake(object):
        
     def write_glm_config(self, verbose=True):
         self.glm_config['output']['out_dir'] = "'"+str(self.dir_path)+"'"
-        self.glm_config['output']['out_fn'] = self.glm_config['output']['out_fn'][0:-1] + self.name+"'"
+        self.glm_config['output']['out_fn'] = self.glm_config['output']['out_fn'][0:-1] +"'"
         self.glm_config['glm_setup']['sim_name'] = "'"+str(self.name)+"'"
         
         if verbose:
@@ -636,6 +641,8 @@ class Lake(object):
                     splitted = line[2:].split('=')
                     spit_cleaned = [i.strip() for i in splitted]
                     sub_block = spit_cleaned[0]
+
+                    
                     variants['grid'][sub_block] = []
                     if verbose == True:
                         print "\t%r" % sub_block
@@ -643,11 +650,16 @@ class Lake(object):
                     [val_space, dType] = spit_cleaned[1].split("],[")
                     val_space, dType = val_space[1:], dType[:-1]
                     val_split = [l.strip() for l in val_space.split(",")]
+                    print sub_block
+                    print val_space
+                    print dType
                     
                     if val_split[-1] == 'None':
                         val_split.pop()
                         
                     if dType == 'float':
+                        val_split = [float(l) for l in val_split]
+                    elif dType == 'list':
                         val_split = [float(l) for l in val_split]
                     elif dType == 'int':
                         val_split = [int(l) for l in val_split]
@@ -669,13 +681,24 @@ class Lake(object):
                             if verbose == True:
                                 print "\t\t%r" % i
                             variants['grid'][sub_block].append(i)
-                            
+                    elif len(val_split) == 3 and dType == 'list':
+                        old_val = self.glm_config[new_block][sub_block]
+                        arange = np.arange(val_split[0], val_split[1]+val_split[2],
+                                           val_split[2])
+                        for idx, i in enumerate(arange):
+                            new_val = np.array(old_val)*i
+                            new_val = [int(np.floor(j*10000))/10000. for j in new_val]
+                            sim_name = sub_block+"_"+str(idx+1)
+                            block_key_option.append((new_block, sub_block, 
+                                                     new_val, sim_name))
+                            variants['grid'][sub_block].append(i)
+
                     elif len(val_split) == 3:
                         arange = np.arange(val_split[0], val_split[1]+val_split[2],
                                            val_split[2])
                         for idx, i in enumerate(arange):
-                            j = int(np.floor(i*1000))
-                            j = j/1000.
+                            j = int(np.floor(i*10000))
+                            j = j/10000.
                             
                             if verbose==True:
                                 print "\t\t%r" % j
@@ -694,16 +717,73 @@ class Lake(object):
         print "\t%i variant cases specified" % len(block_key_option)
         
         self.variant_cases = block_key_option
-        
+        combination_max = 1
         for k in variants['grid'].keys():
             len_ = len(variants['grid'][k])
+            combination_max *= len_
             variants['grid'][k] = np.array(variants['grid'][k])
             variants['prior'][k] = np.ones(len_)
             variants['likelihood'][k] = np.zeros(len_)
             variants['posterior'][k] = np.zeros(len_)
+
+        print "\t%2.f possible models in this parameter space" % combination_max
             
         self.variants = variants
 
+    def randomize(self, verbose=True):
+        random_lake = copy.deepcopy(self)
+        random_lake.ran = False
+        random_lake.name = "randomized_2"
+        random_lake.dir_path = os.path.join(os.path.dirname(self.dir_path), "randomize_2")
+        if not os.path.exists(random_lake.dir_path):
+            os.mkdir(random_lake.dir_path)
+        random_lake.glm_path = os.path.join(random_lake.dir_path, "glm2.nml")
+        old_csvs = [self.metcsv_path, self.outcsv_path, self.incsv_path]
+        new_csvs = [random_lake.metcsv_path, random_lake.outcsv_path, 
+                    random_lake.incsv_path]
+        for csv_old, csv_new in zip(old_csvs, new_csvs):
+            csv_bn = os.path.basename(csv_old)
+            csv_new = os.path.join(random_lake.dir_path, csv_bn)
+            if not os.path.exists(csv_new):
+                os.symlink(csv_old, csv_new)
+                
+        p_count = 0
+        p_found = 0
+        if self.variants:
+            for param, vals in self.variants['grid'].items():
+                p_count+=1
+                p_flag = False
+                randIdx = np.random.randint(len(vals))
+                for block, sub_blocks in random_lake.glm_config.items():
+                    if param in sub_blocks.keys():
+                        p_found+=1
+                        p_flag = True
+                        if type(sub_blocks[param]) == list:
+                            new_vals = [hard_round(i*vals[randIdx]) for i in sub_blocks[param]]
+                        else:
+                            new_vals = vals[randIdx]
+                        print param, "changed from", sub_blocks[param], "to", new_vals
+                        sub_blocks[param] = new_vals
+                                                
+            if p_flag == False:
+                print param, "not found"
+            print p_count, "external parameter spaces defined"
+            print p_found, "of them matched to internal declarations"
+            out_el = random_lake.glm_config['outflow']['outl_elvs']
+            lake_base = random_lake.glm_config['morphometry']['H'][0]
+            lake_crest = random_lake.glm_config['morphometry']['H'][-1]            
+            if out_el < lake_base:
+                random_lake.glm_config['outflow']['outl_elvs'] = lake_base
+            elif out_el > lake_crest:
+                random_lake.glm_config['outflow']['outl_elvs'] = lake_crest
+                    
+            random_lake.write_glm_config(False)
+        else:
+            sys.exit("No variants detected")
+
+            
+        return random_lake
+        
     def write_variant_configs(self, copycsvs=False, verbose=True):
         
         if self.glm_config and self.variant_cases:
@@ -711,11 +791,33 @@ class Lake(object):
             for i in self.variant_cases:
                 variant_lake = copy.deepcopy(self)
                 key1, key2, val, simname = i[0],i[1],i[2],i[3]
+                listVars = ['the_temps', 'the_sals', 'A', 'H' ]
+                    
+                if key2 == "H":
+                    old_elevs = self.glm_config['morphometry']['H'][1]
+                    multiplier = val[1]/old_elevs
+                    old_depths = self.glm_config['init_profiles']['the_depths']
+                    new_depths = [i*multiplier for i in old_depths]
+                    # change the lake depth to the new deepest elevation
+                    variant_lake.glm_config['init_profiles']['the_depths'] = new_depths
+                    variant_lake.glm_config['init_profiles']['lake_depth'] = np.array(val).max()
+                    variant_lake.glm_config['outflow']['outl_elvs'] = np.array(val).max()
+                    
+                if key2 == "A":
+                    old_areas = self.glm_config['morphometry']['A'][1]
+                    multiplier = val[1]/old_areas                    
+                    old_minV = self.glm_config['glm_setup']['min_layer_vol']
+                    variant_lake.glm_config['glm_setup']['min_layer_vol'] = old_minV*multiplier
+                
                 variant_lake.glm_config[key1][key2] = val
                 variant_lake.name = simname
                 variant_lake.variant_var = key2
-                variant_lake.variant_val = val
-                
+                if key2 in listVars:
+                    old_list = self.glm_config[key1][key2][1]
+                    variant_lake.variant_val = val[1]/old_list
+                else:
+                    variant_lake.variant_val = val
+                    
                 variant_lake.ran = False
                 
                 variant_lake.dir_path = os.path.join(self.dir_path, simname)
@@ -727,9 +829,9 @@ class Lake(object):
                 if copycsvs==True:
                     if verbose==True:
                         print "Copying original data csvs to variant folders"
-                    shutil.copy(self.metcsv_path, variant_lake.dir_path)
-                    shutil.copy(self.outcsv_path, variant_lake.dir_path)
-                    shutil.copy(self.incsv_path, variant_lake.dir_path)
+                    os.symlink(self.metcsv_path, variant_lake.dir_path)
+                    os.symlink(self.outcsv_path, variant_lake.dir_path)
+                    os.symlink(self.incsv_path, variant_lake.dir_path)
                 else:
                     if verbose==True:
                         print "Original data csvs not moved into variant folders"
@@ -739,56 +841,96 @@ class Lake(object):
     
     
 
-    def score_variants(self, observations, obs_type, variant_list, lik_fxn='NSE'):
-        
-        assert self.ran == True
-        
-        for v_l in variant_list:
-            # ensure input object is a Lake model that was run and has had its 
-            # data collected. 
-
-            assert type(v_l) == Lake
-            assert v_l.ran == True
-            assert v_l.csv_dict
-
-            #is top bottom orientation correct??
-        if obs_type in self.depth_dfs.keys():
-            baseline = self.depth_dfs[obs_type].resample('D').mean()
-            self.observed_dm = time_depth_df_filter(baseline, observations)
-            self.error = error_metrics(observations.values, self.observed_dm)
+    def score_variant(self, observations, base, obs_type, lik_fxn='NSE'):
+        # ensure input object is a Lake model that was run and has had its 
+        # data collected. 
+        if self.ran == False:
+            print "Scoring attempt on Bad Run Skipped"
+            return np.nan
             
-            for variant in variant_list:
-                # Step 2: estimate the liklihood 
-                sub_block_ = variant.variant_var
-                curr_val = variant.variant_val
-                all_idxs = np.where(self.variants['grid'][sub_block_] == curr_val)
+        assert type(self) == Lake
+        assert self.csv_dict
+
+        #is top bottom orientation correct??
+        # Depth DFs is a dict of all the depth & time indexed measurements
+        # This is developed for 'temp' but can be expanded to check other 
+        # locations for outputs to score
+        if obs_type in self.depth_dfs.keys():
+            # baseline here is our best guess for parameter sets. we resample
+            # because the example configuration decided to save a tune step 
+            # every 12 hours
+            # observations is a Dataframe containing real world data, but is
+            # restricted to just a few time points and layers are not matched 
+            # to actual depths so the model output needs to be resectioned
+            # Use the error function written previously to calculate the error
+            # Currently only NSE is a supported likelihood function
+            
+            # Now repeat the last 3 steps for all variant runs in variant_list
+            # Pull out each tweaked parameter and the corresponding value
+            sub_block_ = self.variant_var
+            curr_val = self.variant_val
+            # Pull out the value's position in the vector of all tested values
+            modelled = self.depth_dfs[obs_type].resample('D').mean()
+            self.z_index = self.depth_dfs['z'].resample('D').mean()
+            self.observed_dm = time_depth_df_filter(modelled, observations,
+                                                    self.z_index)
+            err = error_metrics(observations.values, self.observed_dm)
+            print err[lik_fxn]
+            self.liklihood = err[lik_fxn]
+                
+            if sub_block_ != 'baseline':
+                all_idxs = np.where(base.variants['grid'][sub_block_] == curr_val)
                 idx = all_idxs[0]
                 
-                modelled = variant.depth_dfs[obs_type].resample('D').mean()
-                variant.observed_dm = time_depth_df_filter(modelled, 
-                                                           observations)
-                
-                err = error_metrics(observations.values, variant.observed_dm)
-                self.variants['likelihood'][sub_block_][idx] = err[lik_fxn]
-                
-            for sb2 in self.variants['likelihood'].keys():
-                if len(self.variants['grid'][sb2]) > 4:
-                    raw_post=self.variants['prior'][sb2]*self.variants['likelihood'][sb2]
-                    evidence=np.trapz(raw_post, self.variants['grid'][sb2])
-                    self.variants['posterior'][sub_block_]=raw_post/evidence
+                # Steps repeated as above, with the specefied error parameter
+                # pulled out of the dictionary returned from `error_metrics`
+                # and assigned the the original LakeModel Lake within the
+                # variant dictionary in the 'likelihood' section at the same 
+                # position as the input was in the 'grid' section
+                base.variants['likelihood'][sub_block_][idx] = err[lik_fxn]
+            
+
+                # We then go back into the new vectors containing likelihood values
+                for sb2 in base.variants['likelihood'].keys():
+                    # We exclude parameters that are booleans or categorical
+                    if len(base.variants['grid'][sb2]) > 4:
+                        # Multiply the posterior by 1 because we assume a uniform
+                        # distribution for the prior
+                        raw_post=base.variants['prior'][sb2]*base.variants['likelihood'][sb2]
+                    
+                        # We integrate the raw posterior distribution along the 
+                        # input grid of parameter values and divide the raw
+                        # posterior by that value to get the real posterior
+                        evidence=np.trapz(raw_post, base.variants['grid'][sb2])
+                        base.variants['posterior'][sb2]=raw_post/evidence
+        return err[lik_fxn]
+    
+
                 
             
-def time_depth_df_filter(baseline, observations):
-    #extract proper baseline here based on real world observations
-    time_matched = baseline[baseline.index.isin(observations.index)]
+def time_depth_df_filter(baseline, observations, depths):
+    #only extract the rows where we have corresponding dates
+    time_matched_vals = baseline[baseline.index.isin(observations.index)]
+    time_matched_depth = depths[depths.index.isin(observations.index)]
+    
     observed_dm = np.zeros(observations.shape)
-    obs_days, depths = observations.shape
+    obs_days, e_cols = observations.shape
+    
     for row in range(obs_days):
-        this_row = time_matched.iloc[row, :].dropna()
-        this_len = len(this_row)-1
-        binsize = int(np.round(this_len/float(depths)))
-        for depth, elem in zip(range(depths),range(0,this_len, binsize)):
-            observed_dm[row, depth] = this_row[elem:elem+binsize].mean()
+        this_row = time_matched_vals.iloc[row, :].dropna()
+        this_z = time_matched_depth.iloc[row, :].dropna()        
+        
+        elevations = range(e_cols)
+        elevations.reverse()
+        elevations = np.array(elevations) + 1
+        
+        for m,e in zip(range(e_cols), elevations):
+            if m != range(e_cols)[0]:
+                
+                observed_dm[row, m] = this_row[(this_z > e-1) & (this_z < e)].mean()
+            else:
+                observed_dm[row, m] = this_row[(this_z > e)].mean()
+                
     return observed_dm
 
     
@@ -1022,7 +1164,7 @@ class CERES_nc(object):
             self.df2 = pd.DataFrame(index=self.time_n, columns=vars[3:], 
                                     data = stack.T.copy())
                 
-def run_model(Lake, ex_loc = None, verbose=True):
+def run_model(Lake, ex_loc=None, verbose=True, forceRerun=False):
     """This function accesses the locations of each glm configuration, 
     provided in Lake.glm_path, and runs the model using the executable
     specefied in `ex_loc`
@@ -1030,7 +1172,7 @@ def run_model(Lake, ex_loc = None, verbose=True):
     report_path = os.path.join(Lake.dir_path, "Run_report.txt")
     unique_divider = "\n*\n"
     
-    if os.path.exists(report_path):
+    if os.path.exists(report_path) and forceRerun == False:
         if verbose:
             print "Prior run of {} model detected".format(Lake.name)        
         report_h = open(report_path, 'r')
@@ -1053,8 +1195,10 @@ def run_model(Lake, ex_loc = None, verbose=True):
             os.remove(report_path)
             Lake = run_model(Lake)  
     else: 
-        if verbose:
+        if verbose and forceRerun == False:
             print "No prior run of model detected @ {}".format(report_path)
+        else:
+            print "Prior Run detected @ {}, and overwritten".format(report_path)
             
             
         if ex_loc == None:
@@ -1064,13 +1208,16 @@ def run_model(Lake, ex_loc = None, verbose=True):
             
         p = sp.Popen(ex_loc, cwd=Lake.dir_path, shell=True, stderr=sp.PIPE, 
                      stdout=sp.PIPE)
-        p.wait()
+        #Lake.ret_code = p.wait()
         Lake.stdout, Lake.stderr = p.communicate()
-        Lake.ran = True
+        
+
         
         check1 = 'Simulation begins..' in Lake.stdout
         check2 = '100.00% of days complete' in Lake.stdout
+        
         if check1 and check2:
+            Lake.ran = True
             report_h = open(report_path, 'w')
             report_h.writelines("Run Report"+unique_divider)
             
@@ -1081,13 +1228,21 @@ def run_model(Lake, ex_loc = None, verbose=True):
             report_h.writelines(Lake.variant_var+unique_divider)
             
             report_h.writelines(str(Lake.variant_val)+unique_divider)
-            
+        
             if verbose:
                 print "{} model run completed\n".format(Lake.name)
+        else:
+            print Lake.stdout
+            print Lake.stderr
+            print "Model Run Terminated Prematurely"
+            Lake.ran = False
+        
+        return Lake
     
-    return Lake
 
-def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True, pickle=True):
+
+def pull_output_nc(Lake, force, verbose=False, plot=True, plot_var=[],
+                   pickle=True):
     if Lake.ran == True:
         
         # This section calculates the expected time interval for saved time
@@ -1110,8 +1265,9 @@ def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True, pickle=True):
         Lake.output_nc_path = os.path.join(o_path, o_fn)
         expected_pickle = Lake.output_nc_path[:-3]+".pickle"
         
-        if os.path.exists(expected_pickle):
-            
+        if os.path.exists(expected_pickle) and force == False:
+            print "\tNC Pickle detected"
+            print "\t\t", expected_pickle
             f = open(expected_pickle, 'rb')
             unpickled = cPickle.load(f)       
             f.close()
@@ -1125,7 +1281,7 @@ def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True, pickle=True):
                 t_vector = output['time'][:]
                 start_t = pd.to_datetime(output['time'].units[12:])
                 d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
-            
+
             assert len(d_vector) == len(Lake.nc_interval)
             if verbose == True:
                 print "THe netCDF time vector is the expected size"
@@ -1134,6 +1290,7 @@ def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True, pickle=True):
             
             for ncv in nc_vars:
                 dimens = len(output[ncv].shape)
+                
                 if dimens == 3:
                     lake_cols.append(ncv)
                     lake_vecs[ncv] = output[ncv][:,0,0]
@@ -1235,5 +1392,5 @@ def pull_output_nc(Lake, plot_var=[], verbose=False, plot=True, pickle=True):
             Lake.output_nc = output
             output.close()
     else:
-        print "Can't plot before running model"
+        print "Model not executed"
     return Lake

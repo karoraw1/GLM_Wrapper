@@ -1,27 +1,27 @@
 &glm_setup
    sim_name = 'testcase'
-   max_layers = 200
-   min_layer_vol = 0.025
+   max_layers = 300
+   min_layer_vol = 0.018
    min_layer_thick = 0.25
-   max_layer_thick = 0.5
-   Kw = 0.5
-   coef_mix_conv = 0.125
-   coef_wind_stir = 0.23
-   coef_mix_shear = 0.2
-   coef_mix_turb = 0.51
+   max_layer_thick = 0.455
+   Kw = 0.75
+   coef_mix_conv = 0.1125
+   coef_wind_stir = 0.1724
+   coef_mix_shear = 0.09
+   coef_mix_turb = 0.714
    coef_mix_KH = 0.3
-   coef_mix_hyp = 0.5
-   deep_mixing = .true.
+   coef_mix_hyp = 0.6
+   deep_mixing = .false.
 /
 &morphometry
    lake_name = 'UpperMysticLake'
-   latitude = 42.4317
-   longitude = -71.1483
-   bsn_len = 1073.637
-   bsn_wid = 632.6
+   latitude = 42
+   longitude = -71
+   bsn_len = 1100.0
+   bsn_wid = 600.0
    bsn_vals = 9
-   H = -23.384, -20.336, -17.288, -14.24, -11.192, -8.144, -5.096, -2.048, 1.0
-   A = 77373.8, 148475.73, 202472.97, 257818.95, 338552.69, 397077.5, 460778.04, 524802.66, 560051.22
+   H = 0.12, 3.687, 7.375, 11.063, 14.752, 18.44, 22.127, 25.815, 29.504
+   A = 77372.999, 148474.999, 202471.999, 257818.999, 338552.999, 397077.999, 460777.999, 524803, 560051
 /
 &time
    timefmt = 3
@@ -33,7 +33,7 @@
 /
 &output
    out_dir = '/Users/login/Documents/GLM_Wrapper/glm_case_folders/testcase'
-   out_fn = 'output_testcase'
+   out_fn = 'output_'
    nsave = 12
    csv_point_nlevs = 6
    csv_point_fname = 'WQ_'
@@ -51,8 +51,8 @@
    lake_depth = 24.384
    num_depths = 6
    the_depths = 1, 5, 9, 13, 17, 21
-   the_temps = 4.0, 4.0, 4.0, 4.0, 4.0, 4.0
-   the_sals = 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+   the_temps = 3.6, 3.6, 3.6, 3.6, 3.6, 3.6
+   the_sals = 222.0, 444.0, 666.0, 888.0, 1110.0, 1332.0
 /
 &meteorology
    met_sw = .true.
@@ -65,17 +65,17 @@
    cloud_mode = 3
    meteo_fl = 'met_daily.csv'
    subdaily = .false.
-   wind_factor = 1.0
-   sw_factor = 1.0
-   lw_factor = 1.0
-   at_factor = 1.0
-   rh_factor = 1.0
-   rain_factor = 1.0
-   cd = 0.0013
-   ce = 0.0013
-   ch = 0.0013
+   wind_factor = -1.1
+   sw_factor = 0.6
+   lw_factor = -0.75
+   at_factor = 1.5
+   rh_factor = -1.2
+   rain_factor = -0.2
+   cd = 0.0017
+   ce = 0.0011
+   ch = 0.0017
    rain_threshold = 0.01
-   runoff_coef = 0.3
+   runoff_coef = 0.65
 /
 &bird_model
    AP = 973
@@ -89,23 +89,23 @@
    num_inflows = 1
    names_of_strms = 'Aberjona'
    subm_flag = .false.
-   strm_hf_angle = 65.0
-   strmbd_slope = 2.0
+   strm_hf_angle = 0.35
+   strmbd_slope = 3.5
    strmbd_drag = 0.016
-   inflow_factor = 1.0
+   inflow_factor = 0.8
    inflow_fl = 'inflow.csv'
    inflow_varnum = 3
    inflow_vars = 'FLOW', 'TEMP', 'SALT'
-   coef_inf_entrain = 0.0
+   coef_inf_entrain = 0.1
 /
 &outflow
    num_outlet = 1
    flt_off_sw = .false.
-   outl_elvs = 0.0
-   bsn_len_outl = 299
-   bsn_wid_outl = 199
+   outl_elvs = 21.1
+   bsn_len_outl = 299.0
+   bsn_wid_outl = 1020.0
    outflow_fl = 'outflow.csv'
-   outflow_factor = 0.8
+   outflow_factor = 0.3
    seepage = .true.
    seepage_rate = 0.0
 /
