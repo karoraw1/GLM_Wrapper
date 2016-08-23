@@ -25,7 +25,7 @@
 - seepage_rate = [0.0, 0.2, 0.05],[float]
 - bsn_len_outl = [99, 1099, 50],[int]
 - bsn_wid_outl = [24, 599, 25],[int]
-#- outflow_factor = [-0.5, 1.0, 0.1],[float]
+#- outflow_factor = [0.8, 1.0, 0.05],[float]
 &inflow
 - coef_inf_entrain = [0.0, 1, 0.1],[float]
 - strmbd_drag = [0.004, 0.0320, 0.004],[float]

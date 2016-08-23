@@ -14,6 +14,7 @@ and later use the command when terminal starts:
 @author: Keith Arora-Williams
 """
 from __future__ import division
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
 import os
 import cPickle
@@ -112,13 +113,15 @@ SSF_Filled = SSF_D.interpolate()
 filledagain = SSF_Filled.fillna(method='bfill')
 
 #Pack up met.csv variables
+cloudFrac = CERES_data.df1['cldarea_total_daily']
+cloudFrac.name = "Clouds"
 longWaveIn = CERES_data.df1['sfc_comp_lw-down_all_daily']
 longWaveIn.name = "LongWave"
 shortWaveNet = CERES_data.df1['sfc_comp_sw-down_all_daily'] - CERES_data.df1['sfc_comp_sw-up_all_daily']
 shortWaveNet.name = "ShortWave"
 airTemp = (BOS_weather.df.t_max + BOS_weather.df.t_min) / 2.0
 airTemp.name = "AirTemp"
-relHumidity = SSF_Filled.humidity
+relHumidity = filledagain.humidity
 relHumidity.name = "RelHum"
 windSpeed = BOS_weather.df.wind_speed
 windSpeed.name = "WindSpeed"
@@ -128,10 +131,14 @@ precipS = BOS_weather.df.snow_fall
 precipS.name = "Snow"
 
 # Pack up variables for flow csvs 
-In_Discharge = inflow.df['Discharge, cubic feet per second (Mean)']
+
+def CubicftPerS_to_MegalitersPerDay(df):
+    return df*2.44658
+    
+In_Discharge = CubicftPerS_to_MegalitersPerDay(inflow.df['Discharge, cubic feet per second (Mean)'])
 In_Discharge.name = "INFLOW"
 
-Out_Discharge = copy.deepcopy(inflow.df['Discharge, cubic feet per second (Mean)'])*0.8
+Out_Discharge = copy.deepcopy(In_Discharge)*0.8
 Out_Discharge.name = "OUTFLOW"
 
 In_Temp = Hobbs_o.df['Temperature, water, degrees Celsius (Mean)'].interpolate()
@@ -140,11 +147,13 @@ In_Salt = Hobbs_o.df[Hobbs_o.df.columns[6]].interpolate()
 In_Salt.name = "SALT"
 
 data_pack = [shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed, 
-             precipR, precipS, Out_Discharge, In_Discharge, In_Temp, In_Salt]
+             precipR, precipS, cloudFrac, Out_Discharge, In_Discharge, 
+             In_Temp, In_Salt]
              
 test.temporal_clipping(data_pack)
 
-metPack = ['ShortWave','LongWave','AirTemp','RelHum','WindSpeed','Rain','Snow']
+metPack = ['ShortWave','LongWave','AirTemp','RelHum','WindSpeed','Rain','Snow',
+           'Clouds']
 inPack = ['INFLOW','TEMP','SALT']
 outPack = ['OUTFLOW']
 test.create_metcsv(metPack)
@@ -155,11 +164,10 @@ test = LakeModel.run_model(test, verbose=True, forceRerun=True)
 test = LakeModel.pull_output_nc(test, force=True)
 test.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
 
+
 def plotLakeandError(scored_Lake):
     modelled_dm = scored_Lake.observed_dm
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
-    
-    plt.figure(figsize=(16,10))
+    plt.figure(figsize=(16,8))
     titles = ["Observed temps", scored_Lake.name+" modelled Temps", "Error"]
     ylabs_ = [str(i.date()) for i in Lake_temps.index]
     for i, v in enumerate([Lake_temps, modelled_dm, abs(Lake_temps-modelled_dm)]):
@@ -179,6 +187,33 @@ def plotLakeandError(scored_Lake):
     denom = (Lake_temps.shape[0]*Lake_temps.shape[1])
     print error/denom, "average error per voxel"
 
+def plotLakeProfiles(scored_lake):
+    fig = plt.figure(1, figsize=(18,9))
+    ax = fig.add_subplot(3,1,1)
+    ax.set_title("Elevation", fontsize=18)
+    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['z'].iloc[:, :150].T))
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(cax, cax=cax1)
+    
+    ax = fig.add_subplot(3,1,2)
+    ax.set_title("Temperature", fontsize=18)
+    ax.set_ylabel("Layer Number", fontsize=16)
+    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['temp'].iloc[:, :150].T))
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(cax, cax=cax1)
+    
+    ax = fig.add_subplot(3,1,3)
+    ax.set_title("Salinity", fontsize=18)
+    ax.set_xlabel("Time Steps (12 hour)", fontsize=16)
+    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['salt'].iloc[:, :150].T))
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(cax, cax=cax1)
+    
+plotLakeandError(test)
+sys.exit()
 #This is the potential model space 
 test.read_variants('../test_files/optimize_these.txt', verbose=False)
 

@@ -76,16 +76,16 @@ def import_config(dl_default=False, verbose=True):
         default_config, default_order, block_order = None, None, None
         
     glm_setup = {'max_layers' :300, 
-                 'min_layer_vol' :0.018, 
-                 'min_layer_thick' :0.25, 
-                 'max_layer_thick' :0.455,  
-                 'Kw' : 0.75, 
+                 'min_layer_vol' :0.02, 
+                 'min_layer_thick' :0.32, 
+                 'max_layer_thick' :0.41,  
+                 'Kw' : 0.6, 
                  'coef_mix_conv' : 0.1125, 
-                 'coef_wind_stir' : 0.1724, 
-                 'coef_mix_shear' : 0.09, 
-                 'coef_mix_turb' : 0.714, 
-                 'coef_mix_KH' : 0.30, 
-                 'coef_mix_hyp' : 0.6,
+                 'coef_wind_stir' : 0.1625, 
+                 'coef_mix_shear' : 0.21, 
+                 'coef_mix_turb' : 0.6375, 
+                 'coef_mix_KH' : 0.315, 
+                 'coef_mix_hyp' : 0.675,
                  'deep_mixing':'.false.'}
                  
     wq_setup = {}
@@ -94,13 +94,14 @@ def import_config(dl_default=False, verbose=True):
     morphometry = {'lake_name': "'UpperMysticLake'", 
                    "latitude": 42,  
                    "longitude": -71,
-                   "bsn_len": 1100.0,
-                   "bsn_wid": 600.0, 
+                   "bsn_len": 1430.0,
+                   "bsn_wid": 990.0, 
                    "bsn_vals": None,
-                   "A":[77372.999, 148474.999, 202471.999, 257818.999, 
-                        338552.999, 397077.999, 460777.999, 524803, 560051]}
-    morphometry['H'] = [0.12, 3.687, 7.375, 11.063, 14.752, 18.44, 22.127, 
-                        25.815, 29.504]
+                   "A":[85110.3, 163322.5, 222719.2, 283600.9, 372408.3, 
+                        436785.8, 506855.8, 577283.3, 616056.1]}
+    morphometry['H'] = [0.132, 4.055, 8.112, 12.169, 16.227, 20.284, 24.339, 
+                        28.396, 32.454]
+                        
     morphometry['bsn_vals'] = len(morphometry['H'])
     assert len(morphometry['H']) == len(morphometry['A'])
     
@@ -137,10 +138,10 @@ def import_config(dl_default=False, verbose=True):
     init_profiles = {"lake_depth": 24.384, 
                      "num_depths": 6, 
                      "the_depths": [1, 5, 9, 13, 17, 21], 
-                     "the_temps": [3.6, 3.6, 3.6, 3.6, 3.6, 3.6], 
+                     "the_temps": [5.04, 5.04, 5.04, 5.04, 5.04, 5.04], 
                      }
 #    the_sals = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]                 
-    init_profiles["the_sals"] = [222.0, 444.0, 666.0, 888.0, 1110.0, 1332.0]
+    init_profiles["the_sals"] = [197.6, 395.16, 592.74, 790.32, 988., 1185.48]
     init_profiles['num_depths'] = len(init_profiles["the_depths"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_temps"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_sals"])
@@ -161,17 +162,17 @@ def import_config(dl_default=False, verbose=True):
                    "cloud_mode": 3, 
                    "subdaily": '.false.', 
                    "meteo_fl": "'met_daily.csv'",
-                   "wind_factor": -1.1,
-                   "sw_factor":  0.6,
-                   "lw_factor": -0.75, 
-                   "at_factor": 1.5,
-                   "rh_factor": -1.2,
-                   "rain_factor": -0.2,
-                   "ce":  0.0011, 
-                   "ch": 0.0017, 
-                   "cd": 0.0017, 
-                   "rain_threshold": 0.01, 
-                   "runoff_coef":  0.65}
+                   "wind_factor": -1.4,
+                   "sw_factor":  -0.4,
+                   "lw_factor": 0.4, 
+                   "at_factor": -1.05,
+                   "rh_factor": 1.4,
+                   "rain_factor": -1.25,
+                   "ce":  0.001, 
+                   "ch": 0.0011, 
+                   "cd": 0.0015, 
+                   "rain_threshold": 0.03, 
+                   "runoff_coef":  0.1}
     #&bird_model            
     bird = {"AP" : 973, 
             "Oz" : 0.279, 
@@ -184,21 +185,21 @@ def import_config(dl_default=False, verbose=True):
     inflow = {"num_inflows": 1,
               "names_of_strms": "'Aberjona'", 
               "subm_flag": ".false.", 
-              "strm_hf_angle": 0.35, 
-              "strmbd_slope": 3.5, 
-              "strmbd_drag": 0.0160, 
+              "strm_hf_angle": 1.1, 
+              "strmbd_slope": 3.35, 
+              "strmbd_drag": 0.008, 
               "inflow_factor": 0.8, 
               "inflow_fl": "'inflow.csv'", 
               "inflow_varnum": 3, 
               "inflow_vars": ['FLOW','TEMP','SALT'],
-              "coef_inf_entrain": 0.1 }
+              "coef_inf_entrain": 0.7 }
               
     #&outflow
     outflow = {"num_outlet": 1,
                "flt_off_sw": ".false.",
                "outl_elvs": 21.1,
-               "bsn_len_outl": 299.0, 
-               "bsn_wid_outl" : 1020.0,
+               "bsn_len_outl": 1049.0, 
+               "bsn_wid_outl" : 274.0,
                "outflow_fl" : "'outflow.csv'",
                "outflow_factor": 0.3,
                "seepage" : ".true.",

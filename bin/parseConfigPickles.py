@@ -59,7 +59,16 @@ def parseConfigPickles(dir_list, prefix_list, verbose=True):
     return compiled_runs, all_bad_lakes
         
 
-
+optimized = [ "Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
+             "coef_mix_conv", "coef_wind_stir", "coef_mix_shear", 
+             "coef_mix_turb", "coef_mix_KH", "coef_mix_hyp", "longitude", 
+             "latitude", "bsn_len", "bsn_wid", "A", "H", "the_temps", 
+             "the_sals", "seepage_rate", "bsn_len_outl", "bsn_wid_outl", 
+             "coef_inf_entrain", "strmbd_drag", "strmbd_slope", 
+             "strm_hf_angle", "rain_threshold", "runoff_coef", "wind_factor", 
+             "rain_factor", "at_factor", "rh_factor", "sw_factor", "lw_factor",
+             "cd", "ce", "ch"]
+             
 dir_list = ['randomize', 'randomize_2']
 prefix_list = ['results', 'Results', 'run2_results']
 result, bad_lakes = parseConfigPickles(dir_list, prefix_list)
@@ -97,7 +106,11 @@ listVals = [bl_temps, bl_sals, bl_A, bl_H]
 baselineLists = {t:u for t, u in zip(listVars, listVals)}
 sig_params = ['A', 'max_layer_thick', 'the_sals', 'H']
                      
-for config, error in zip(configList, errorList):
+run_id = range(len(errorList))
+x = np.zeros((17503, 36))
+y = np.zeros((17503,))
+ 
+for config, error, row_l in zip(configList, errorList, run_id):
     #load config & error
     for r in config.keys():
         param_block = config[r]
@@ -108,7 +121,6 @@ for config, error in zip(configList, errorList):
             else:
                 this_val = value
             
-            
             if error > 0.7945:
                 hsy_parsed[param]['behavioural'].append(this_val)
                 if param in sig_params:
@@ -116,6 +128,34 @@ for config, error in zip(configList, errorList):
                     error_value_rels[param]['value'].append(this_val)
             elif error <= 0.7945:
                 hsy_parsed[param]['non-behavioural'].append(this_val)
+        
+    for idx, param2 in enumerate(optimized):
+        
+        for r in config.keys():
+            param_block = config[r]    
+            if param2 in param_block.keys():
+                new_val = param_block[param2]
+                if param2 in listVars:
+                    multArray = (np.array(new_val)/baselineLists[param2]).round(decimals=1)
+                    this_val = round(np.median(multArray),1)
+                else:
+                    this_val = new_val
+                
+                x[row_l, idx] = this_val
+                y[row_l] = error
+            else:
+                pass
+            
+
+from sklearn import preprocessing
+from sklearn import linear_model
+x_scaled = preprocessing.scale(x)
+clf = linear_model.Ridge()
+clf.fit(x_scaled, y*100)
+coeffs = pd.DataFrame(index = optimized, data = clf.coef_)
+coeffs.sort_values(0, inplace=True, ascending=False)
+
+
 
 for bL in bad_lakes:
     for r in bL.keys():
@@ -131,15 +171,7 @@ for bL in bad_lakes:
 
 
 
-optimized = [ "Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
-             "coef_mix_conv", "coef_wind_stir", "coef_mix_shear", 
-             "coef_mix_turb", "coef_mix_KH", "coef_mix_hyp", "longitude", 
-             "latitude", "bsn_len", "bsn_wid", "A", "H", "the_temps", 
-             "the_sals", "seepage_rate", "bsn_len_outl", "bsn_wid_outl", 
-             "coef_inf_entrain", "strmbd_drag", "strmbd_slope", 
-             "strm_hf_angle", "rain_threshold", "runoff_coef", "wind_factor", 
-             "rain_factor", "at_factor", "rh_factor", "sw_factor", "lw_factor",
-             "cd", "ce", "ch"]
+
 
 
 def HSY_Sensitivity(group1, group2):
@@ -163,7 +195,7 @@ for param in hsy_parsed.keys():
         non_behavioural = hsy_parsed[param]['non-behavioural']
         breakers = hsy_parsed[param]['breakers']
         p_vals[param] = HSY_Sensitivity(behavioural, non_behavioural)
-        breaker_ps[param]= HSY_Sensitivity(non_behavioural, breakers)
+        breaker_ps[param]= HSY_Sensitivity(non_behavioural+non_behavioural, breakers)
         
         if p_vals[param][3] < 0.05:
             sig_distributions[param] = (p_vals[param][3],
@@ -177,6 +209,9 @@ for param in hsy_parsed.keys():
                                     breaker_ps[param][1],
                                     breaker_ps[param][2])
         
+
+
+"""
 plt.figure(2)
 plt.ylabel("Probability")
 ax1 = plt.subplot(211)
@@ -193,9 +228,10 @@ plt.title("Salinitiy Profile Scalar")
 plt.plot(sig_distributions['the_sals'][1], sig_distributions['the_sals'][2])
 plt.plot(sig_distributions['the_sals'][1], sig_distributions['the_sals'][3])
 plt.show()
-
+"""
+sys.exit()
 plt.figure(3, figsize=(9,9))
-ax1 = plt.subplot(311)
+ax1 = plt.subplot(211)
 plt.plot(breakers_sigs['max_layer_thick'][1], breakers_sigs['max_layer_thick'][2],
          label="Invalid")
 plt.plot(breakers_sigs['max_layer_thick'][1], breakers_sigs['max_layer_thick'][3],
@@ -203,12 +239,13 @@ plt.plot(breakers_sigs['max_layer_thick'][1], breakers_sigs['max_layer_thick'][3
 plt.legend(loc='upper left')
 plt.title("Maximum Layer Thickness")
 # share x and y
-ax2 = plt.subplot(312)
+ax2 = plt.subplot(212)
 plt.plot(breakers_sigs['A'][1], breakers_sigs['A'][2])
 plt.plot(breakers_sigs['A'][1], breakers_sigs['A'][3])
 plt.xlim([0.5, 1.6])
 plt.ylabel("Probability")
 plt.title("Area Profile Scalar")
+"""
 ax3 = plt.subplot(313)
 plt.plot(breakers_sigs['H'][1], breakers_sigs['H'][2])
 plt.plot(breakers_sigs['H'][1], breakers_sigs['H'][3])
@@ -234,3 +271,4 @@ plt.title("Depth Profile Scalar")
 plt.ylim(hline)
 plt.xlabel("Nash-Sutcliffe Efficiency")
 plt.ylabel("Parameter Value")
+"""
