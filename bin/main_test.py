@@ -31,7 +31,7 @@ print time.ctime(time.time())
 print ""
 
 # these are code names for each trial
-cases = ["testcase_2"]
+cases = ["testcase_3"]
 
 # this is the directory you want to work in
 mainFolder = os.path.dirname(os.getcwd())
@@ -212,22 +212,50 @@ def plotLakeProfiles(scored_lake):
     cax1 = divider.append_axes("right", size="5%", pad="3%")
     plt.colorbar(cax, cax=cax1)
     
-plotLakeandError(test)
-sys.exit()
+#plotLakeandError(test)
 #This is the potential model space 
 test.read_variants('../test_files/optimize_these.txt', verbose=False)
-
 #Here we want to create a new lake at a random starting point
-                 
+
+variant_lakes = test.write_variant_configs(copycsvs=True, verbose=False)
+
+#Run them all & score them all
+variant_lakes_w_data = []
+for i, l in enumerate(variant_lakes):
+    statvfs = os.statvfs(os.getcwd())
+    bytes_avail = statvfs.f_frsize * statvfs.f_bavail
+    if bytes_avail < 104857600/2:
+        sys.exit("Disk space less than 100 Mb, aborting")
+    print "~{} Mb of disk space remaining".format(bytes_avail/1024/1024)    
+    print "Running #", i+1, "out of", len(variant_lakes)
+    print "%r = %r" % (l.variant_var, l.variant_val)
+    ran_lake = LakeModel.run_model(l, verbose=True, forceRerun=True)
+    data_lake = LakeModel.pull_output_nc(ran_lake, force=True)
+    if data_lake.ran == True:
+        variant_lakes_w_data.append(data_lake)
+        try: 
+            data_lake.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
+        except ValueError:
+            sys.exit()
+        data_lake.cleanup(verbose=True)
+    else:
+        print "Variant %s failed and was removed" % data_lake.glm_config['glm_setup']['sim_name']
+
+# Find the best improvement 
+vars_lik = {i.liklihood: (i.variant_var, i.variant_val) for i in variant_lakes_w_data if ~np.isnan(i.liklihood)}
+max_lik = np.array(vars_lik.keys()).max()
+print vars_lik[max_lik], max_lik
+sys.exit()
+
 start_time = time.time()
 
-for mults in range(30):
+for mults in range(50):
     bad_lakes = []
     single_run = time.time()
     errors = np.zeros(500)
     bootstraps = np.arange(500)
     this_err = np.nan
-    random_lake = test.randomize()
+    random_lake = test.randomize("randomize_3", True)
     bstps_results = {'config':{},
                      'error':{}}
     
@@ -241,18 +269,18 @@ for mults in range(30):
                 if len(bad_lakes) < 10000:
                     bad_lakes.append(copy.deepcopy(random_lake.glm_config))
                 del random_lake
-                random_lake = test.randomize(verbose=False)
+                random_lake = test.randomize("randomize_3", True)
                 
         # Save the config and the error
         bstps_results['config'][rep] = copy.deepcopy(random_lake.glm_config)
         bstps_results['error'][rep] = this_err
         del random_lake
-        random_lake = test.randomize(verbose=False)
+        random_lake = test.randomize("randomize_3", True)
     
     
     print("--- %s, %s seconds ---" % ((time.time() - start_time),
                                       (time.time() - single_run)))
-    pickleName = "run2_results{}.pickle".format(mults+1)
+    pickleName = "run3_results_{}.pickle".format(mults+1)
     to_be_pickled = [bstps_results, bad_lakes]
     results_pickle = os.path.join(random_lake.dir_path, pickleName)
     f = open(results_pickle, 'wb')   # 'wb' instead 'w' for binary file
@@ -261,29 +289,6 @@ for mults in range(30):
 sys.exit()
 
 
-
-variant_lakes = test.write_variant_configs(copycsvs=True, verbose=False)
-
-#Run them all & score them all
-variant_lakes_w_data = []
-for i, l in enumerate(variant_lakes):
-    print "Running #", i+1, "out of", len(variant_lakes)
-    print "%r = %r" % (l.variant_var, l.variant_val)
-    ran_lake = LakeModel.run_model(l, verbose=True, forceRerun=True)
-    data_lake = LakeModel.pull_output_nc(ran_lake, force=True)
-    if data_lake.ran == True:
-        variant_lakes_w_data.append(data_lake)
-        try: 
-            data_lake.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
-        except ValueError:
-            sys.exit()
-    else:
-        print "Variant %s failed and was removed" % data_lake.glm_config['glm_setup']['sim_name']
-
-# Find the best improvement 
-vars_lik = {i.liklihood: (i.variant_var, i.variant_val) for i in variant_lakes_w_data if ~np.isnan(i.liklihood)}
-max_lik = np.array(vars_lik.keys()).max()
-print vars_lik[max_lik], max_lik
 
 
 # the lake with best likelihood is singled out 

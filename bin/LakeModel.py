@@ -11,7 +11,7 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 
 
 import scipy.stats as st
-import re, mmap, cPickle, os, copy, time, shutil, sys
+import re, mmap, cPickle, os, copy, time, sys, shutil
 import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
@@ -78,7 +78,7 @@ def import_config(dl_default=False, verbose=True):
     glm_setup = {'max_layers' :300, 
                  'min_layer_vol' :0.02, 
                  'min_layer_thick' :0.32, 
-                 'max_layer_thick' :0.41,  
+                 'max_layer_thick' :1.0,  
                  'Kw' : 0.6, 
                  'coef_mix_conv' : 0.1125, 
                  'coef_wind_stir' : 0.1625, 
@@ -94,13 +94,13 @@ def import_config(dl_default=False, verbose=True):
     morphometry = {'lake_name': "'UpperMysticLake'", 
                    "latitude": 42,  
                    "longitude": -71,
-                   "bsn_len": 1430.0,
-                   "bsn_wid": 990.0, 
+                   "bsn_len": 1012.0,
+                   "bsn_wid": 536.0, 
                    "bsn_vals": None,
-                   "A":[85110.3, 163322.5, 222719.2, 283600.9, 372408.3, 
-                        436785.8, 506855.8, 577283.3, 616056.1]}
-    morphometry['H'] = [0.132, 4.055, 8.112, 12.169, 16.227, 20.284, 24.339, 
-                        28.396, 32.454]
+                   "A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69,
+                        397077.50, 460778.04, 524802.66, 560051.22]}
+    morphometry['H'] = [  0., 3.048, 6.096, 9.144, 12.192, 15.24, 18.288,
+                        21.336,  24.384]
                         
     morphometry['bsn_vals'] = len(morphometry['H'])
     assert len(morphometry['H']) == len(morphometry['A'])
@@ -138,10 +138,10 @@ def import_config(dl_default=False, verbose=True):
     init_profiles = {"lake_depth": 24.384, 
                      "num_depths": 6, 
                      "the_depths": [1, 5, 9, 13, 17, 21], 
-                     "the_temps": [5.04, 5.04, 5.04, 5.04, 5.04, 5.04], 
+                     "the_temps": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0], 
                      }
-#    the_sals = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]                 
-    init_profiles["the_sals"] = [197.6, 395.16, 592.74, 790.32, 988., 1185.48]
+    the_sals = [200., 400., 600., 800., 1000., 1200.]                 
+    init_profiles["the_sals"] = [i*2 for i in the_sals]
     init_profiles['num_depths'] = len(init_profiles["the_depths"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_temps"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_sals"])
@@ -157,17 +157,17 @@ def import_config(dl_default=False, verbose=True):
                    "rain_sw" : ".false.",
                    "atm_stab" : ".false.", 
                    "catchrain" : ".false.",
-                   "rad_mode": 1,
+                   "rad_mode": 0,
                    "albedo_mode": 3, 
                    "cloud_mode": 3, 
                    "subdaily": '.false.', 
                    "meteo_fl": "'met_daily.csv'",
-                   "wind_factor": -1.4,
-                   "sw_factor":  -0.4,
-                   "lw_factor": 0.4, 
-                   "at_factor": -1.05,
-                   "rh_factor": 1.4,
-                   "rain_factor": -1.25,
+                   "wind_factor": 1.0,
+                   "sw_factor":  1.0,
+                   "lw_factor": 1.0, 
+                   "at_factor": 1.0,
+                   "rh_factor": 1.0,
+                   "rain_factor": 1.00,
                    "ce":  0.001, 
                    "ch": 0.0011, 
                    "cd": 0.0015, 
@@ -197,12 +197,12 @@ def import_config(dl_default=False, verbose=True):
     #&outflow
     outflow = {"num_outlet": 1,
                "flt_off_sw": ".false.",
-               "outl_elvs": 21.1,
-               "bsn_len_outl": 1049.0, 
+               "outl_elvs": 24.,
+               "bsn_len_outl": 100.0, 
                "bsn_wid_outl" : 274.0,
                "outflow_fl" : "'outflow.csv'",
-               "outflow_factor": 0.3,
-               "seepage" : ".true.",
+               "outflow_factor": 0.5,
+               "seepage" : ".false.",
                "seepage_rate" : 0.0 }
                 
     glm_config = { "glm_setup" : glm_setup, 
@@ -341,8 +341,6 @@ def show_agg_resolution(aggs, col_name):
     return day_frame
 
 
-# TODO: def plotAggregations():
-# TODO: redo this to apply to aggregations 
 
 def printAutocorr(aggs, threshold=None):
     print "Autocorrelation peaks"    
@@ -372,8 +370,6 @@ def printAutocorr(aggs, threshold=None):
             
     return None
 
-
-# TODO: def plotfrequencydomain():
 
 def TimeIdx(df, dates=None, insertAt=0):
     """this inserts day of the year, month of the year, and season of the year
@@ -491,6 +487,9 @@ class Lake(object):
         self.default_order, self.block_order = config_pack[2], config_pack[3]
         self.baseline_configured=False
        
+    def cleanup(self, verbose=True):
+        shutil.rmtree(self.dir_path)
+        
     def write_glm_config(self, verbose=True):
         self.glm_config['output']['out_dir'] = "'"+str(self.dir_path)+"'"
         self.glm_config['output']['out_fn'] = self.glm_config['output']['out_fn'][0:-1] +"'"
@@ -731,10 +730,10 @@ class Lake(object):
             
         self.variants = variants
 
-    def randomize(self, verbose=True):
+    def randomize(self, path, verbose=True):
         random_lake = copy.deepcopy(self)
         random_lake.ran = False
-        random_lake.name = "randomized_2"
+        random_lake.name = path
         random_lake.dir_path = os.path.join(os.path.dirname(self.dir_path), "randomize_2")
         if not os.path.exists(random_lake.dir_path):
             os.mkdir(random_lake.dir_path)
@@ -830,9 +829,23 @@ class Lake(object):
                 if copycsvs==True:
                     if verbose==True:
                         print "Copying original data csvs to variant folders"
-                    os.symlink(self.metcsv_path, variant_lake.dir_path)
-                    os.symlink(self.outcsv_path, variant_lake.dir_path)
-                    os.symlink(self.incsv_path, variant_lake.dir_path)
+                    csv_files = [self.metcsv_path, self.outcsv_path,
+                                 self.incsv_path]
+                    obj_names = [os.path.basename(i) for i in csv_files]
+                    obj_paths = [os.path.join(variant_lake.dir_path, i) 
+                                                            for i in obj_names]
+                    
+                    for csV, objN in zip(csv_files, obj_paths):
+                        if not os.path.exists(objN):
+                            os.symlink(csV, objN)
+                        else:
+                            pass
+                        
+                    variant_lake.metcsv_path = obj_paths[0]
+                    variant_lake.outcsv_path = obj_paths[1]
+                    variant_lake.incsv_path = obj_paths[2]
+                        
+
                 else:
                     if verbose==True:
                         print "Original data csvs not moved into variant folders"

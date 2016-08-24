@@ -59,18 +59,29 @@ def parseConfigPickles(dir_list, prefix_list, verbose=True):
     return compiled_runs, all_bad_lakes
         
 
-optimized = [ "Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
+#optimized = [ "Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
+#             "coef_mix_conv", "coef_wind_stir", "coef_mix_shear", 
+#             "coef_mix_turb", "coef_mix_KH", "coef_mix_hyp", "longitude", 
+#             "latitude", "bsn_len", "bsn_wid", "A", "H", "the_temps", 
+#             "the_sals", "seepage_rate", "bsn_len_outl", "bsn_wid_outl", 
+#             "coef_inf_entrain", "strmbd_drag", "strmbd_slope", 
+#             "strm_hf_angle", "rain_threshold", "runoff_coef", "wind_factor", 
+#             "rain_factor", "at_factor", "rh_factor", "sw_factor", "lw_factor",
+#             "cd", "ce", "ch"]             
+#dir_list = ['randomize', 'randomize_2']
+#prefix_list = ['results', 'Results', 'run2_results']
+
+optimized = ["Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
              "coef_mix_conv", "coef_wind_stir", "coef_mix_shear", 
-             "coef_mix_turb", "coef_mix_KH", "coef_mix_hyp", "longitude", 
-             "latitude", "bsn_len", "bsn_wid", "A", "H", "the_temps", 
-             "the_sals", "seepage_rate", "bsn_len_outl", "bsn_wid_outl", 
-             "coef_inf_entrain", "strmbd_drag", "strmbd_slope", 
-             "strm_hf_angle", "rain_threshold", "runoff_coef", "wind_factor", 
-             "rain_factor", "at_factor", "rh_factor", "sw_factor", "lw_factor",
-             "cd", "ce", "ch"]
-             
-dir_list = ['randomize', 'randomize_2']
-prefix_list = ['results', 'Results', 'run2_results']
+             "coef_mix_turb", "coef_mix_KH", "coef_mix_hyp", "bsn_len", 
+             "bsn_wid", "H", "the_sals", "bsn_len_outl", "bsn_wid_outl", 
+             "outflow_factor", "coef_inf_entrain", "strmbd_drag", 
+             "strmbd_slope", "strm_hf_angle", "rain_threshold", "runoff_coef",
+             "wind_factor", "rain_factor", "at_factor",  "rh_factor", 
+             "sw_factor", "lw_factor", "cd", "ce", "ch"]
+
+prefix_list = ['run3_results']
+dir_list = ['randomize_2']
 result, bad_lakes = parseConfigPickles(dir_list, prefix_list)
 errorList = np.array([n[1] for n in result.values()])
 print "{} individual simulations detected".format(len(errorList))
@@ -80,12 +91,17 @@ plt.xlabel("Nash Sutcliffe Efficiency")
 plt.ylabel('No. simulations (n)')
 plt.hist(errorList, bins=80, color='g')
 
-for i in [.7945, .824]:
+sortedErr = sorted(errorList)
+pct_denom = len(sortedErr)
+idx_cutoffs = [int(pct_denom*0.95), int(pct_denom*0.99)]
+err_cutoffs = [sortedErr[i] for i in idx_cutoffs]
+
+for i in err_cutoffs:
     denom = len(errorList)
     numer = float((errorList > i).sum())
     frac_above = (int((numer/denom)*1000.)/1000.)*100. 
     print "{}% of runs had NSE above {}".format(frac_above, i)
-    
+
 error_value_rels = {}
 hsy_parsed = {}
 for _, p in configList[0].items():
@@ -93,12 +109,12 @@ for _, p in configList[0].items():
         hsy_parsed[q] = {'behavioural':[], 'non-behavioural':[], 'breakers':[]}
         error_value_rels[q] = {'value':[], 'error':[]}
 
-bl_A = np.array([77372.999, 148474.999, 202471.999, 257818.999, 
-                 338552.999, 397077.999, 460777.999, 524803, 560051])
-bl_H = np.array([0.12, 3.687, 7.375, 11.063, 14.752, 18.44, 22.127, 
-                 25.815, 29.504])
-bl_temps = np.array([222.0, 444.0, 666.0, 888.0, 1110.0, 1332.0])
-bl_sals = np.array([3.6, 3.6, 3.6, 3.6, 3.6, 3.6])
+bl_A = np.array([85110.3, 163322.5, 222719.2, 283600.9, 372408.3, 
+                        436785.8, 506855.8, 577283.3, 616056.1])
+bl_H = np.array([0.132, 4.055, 8.112, 12.169, 16.227, 20.284, 24.339, 
+                 28.396, 32.454])
+bl_sals = np.array([197.6, 395.16, 592.74, 790.32, 988., 1185.48])
+bl_temps = np.array([5.04, 5.04, 5.04, 5.04, 5.04, 5.04])
 
 listVars = ['the_temps', 'the_sals', 'A', 'H' ]
 listVals = [bl_temps, bl_sals, bl_A, bl_H]
@@ -107,8 +123,8 @@ baselineLists = {t:u for t, u in zip(listVars, listVals)}
 sig_params = ['A', 'max_layer_thick', 'the_sals', 'H']
                      
 run_id = range(len(errorList))
-x = np.zeros((17503, 36))
-y = np.zeros((17503,))
+x = np.zeros((len(errorList), len(optimized)))
+y = np.zeros((len(errorList),))
  
 for config, error, row_l in zip(configList, errorList, run_id):
     #load config & error
@@ -121,12 +137,12 @@ for config, error, row_l in zip(configList, errorList, run_id):
             else:
                 this_val = value
             
-            if error > 0.7945:
+            if error > err_cutoffs[0]:
                 hsy_parsed[param]['behavioural'].append(this_val)
                 if param in sig_params:
                     error_value_rels[param]['error'].append(error)
                     error_value_rels[param]['value'].append(this_val)
-            elif error <= 0.7945:
+            elif error <= err_cutoffs[0]:
                 hsy_parsed[param]['non-behavioural'].append(this_val)
         
     for idx, param2 in enumerate(optimized):
@@ -155,8 +171,6 @@ clf.fit(x_scaled, y*100)
 coeffs = pd.DataFrame(index = optimized, data = clf.coef_)
 coeffs.sort_values(0, inplace=True, ascending=False)
 
-
-
 for bL in bad_lakes:
     for r in bL.keys():
         param_block = bL[r]
@@ -168,11 +182,6 @@ for bL in bad_lakes:
                 this_val = value
 
             hsy_parsed[param]['breakers'].append(this_val)
-
-
-
-
-
 
 def HSY_Sensitivity(group1, group2):
     full_set = group1 + group2
@@ -228,7 +237,6 @@ plt.title("Salinitiy Profile Scalar")
 plt.plot(sig_distributions['the_sals'][1], sig_distributions['the_sals'][2])
 plt.plot(sig_distributions['the_sals'][1], sig_distributions['the_sals'][3])
 plt.show()
-"""
 sys.exit()
 plt.figure(3, figsize=(9,9))
 ax1 = plt.subplot(211)
@@ -245,7 +253,6 @@ plt.plot(breakers_sigs['A'][1], breakers_sigs['A'][3])
 plt.xlim([0.5, 1.6])
 plt.ylabel("Probability")
 plt.title("Area Profile Scalar")
-"""
 ax3 = plt.subplot(313)
 plt.plot(breakers_sigs['H'][1], breakers_sigs['H'][2])
 plt.plot(breakers_sigs['H'][1], breakers_sigs['H'][3])
