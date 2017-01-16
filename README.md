@@ -10,7 +10,6 @@ The following is a manifest containing explanations of the file structure above.
   * Queue times for each partition are highly variable depending on other users demands, but usually one is free enough to run immediately
   * Parallel automatically assigns 24 CPUS per node, while others assign 1
   * GLM runs >1000x faster on Mac OS compared to Linux
-
 4. **OTU_Time_Series/** : contains OTU data for modelled year, see README within that folder for more info
 5. **bin/** : contains scripts for rapid execution of multiple cases of GLM for calibration purposes, each script should/will contain explanations within.
 6. **donePlots/** : contains many plots used for GLM writeup and other generated during testing
