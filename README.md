@@ -4,9 +4,9 @@ This is a pipeline from various data sources into the General Lake Model among m
 
 The following is a manifest containing explanations of the file structure above. 
 
-1.**GLM_Executables/** : Contains all binaries & source code for GLM as well as **example configurations**
-2.**GLM_documentation/** : Contains two official GLM informational documents, the writup and presentation I did for the class, and useful papers
-3.**MARCCTEST/** : Contains scripts for performance testing on MARCC with diff. combos of nodes, GLM function calls, and partitions. Lessons learned include:
+1. **GLM_Executables/** : Contains all binaries & source code for GLM as well as **example configurations**
+2. **GLM_documentation/** : Contains two official GLM informational documents, the writup and presentation I did for the class, and useful papers
+3. **MARCCTEST/** : Contains scripts for performance testing on MARCC with diff. combos of nodes, GLM function calls, and partitions. Lessons learned include:
   * Queue times for each partition are highly variable depending on other users demands, but usually one is free enough to run immediately
   * Parallel automatically assigns 24 CPUS per node, while others assign 1
   * GLM runs >1000x faster on Mac OS compared to Linux
