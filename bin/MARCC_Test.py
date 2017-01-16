@@ -60,11 +60,3 @@ for i in trios:
     
 handle2.close()
 
-
-
-    
-
-#
-#
-#
-#open('bash_', 'w+')
