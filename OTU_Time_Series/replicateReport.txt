@@ -1,0 +1,564 @@
+
+Reading in OTU Table
+90 groups of replicates detected
+
+Adding quadrant metadata
+
+Numerically encoding metadata
+Changing 6 metadata columns
+
+primers
+
+Quadrants
+
+replicates
+
+kit
+
+depth
+
+date
+
+Calculating Alpha Diversity
+REPLICATE REPORT
+SB011413TAWMD06VV4TMR
+Mean Count Total: 300.5
+CV: 0.228250774626
+Total Taxa Discovered in 2 reps: 428
+59.579% among 1 replicates
+40.421% among 2 replicates
+SB011413TAWMD20VV4TMR
+Mean Count Total: 2233.0
+CV: nan
+Total Taxa Discovered in 1 reps: 2233
+100.000% among 1 replicates
+SB032713TAWMD00VV4TMR
+Mean Count Total: 178.0
+CV: 1.15202790193
+Total Taxa Discovered in 2 reps: 331
+92.447% among 1 replicates
+7.553% among 2 replicates
+SB032713TAWMD03VV4TMR
+Mean Count Total: 82.0
+CV: nan
+Total Taxa Discovered in 1 reps: 82
+100.000% among 1 replicates
+SB032713TAWMD04VV4TMR
+Mean Count Total: 197.0
+CV: 0.244077467618
+Total Taxa Discovered in 2 reps: 298
+67.785% among 1 replicates
+32.215% among 2 replicates
+SB032713TAWMD05VV4TMR
+Mean Count Total: 121.5
+CV: 0.715836494535
+Total Taxa Discovered in 2 reps: 199
+77.889% among 1 replicates
+22.111% among 2 replicates
+SB032713TAWMD06VV4TMR
+Mean Count Total: 158.0
+CV: 0.537043124952
+Total Taxa Discovered in 2 reps: 250
+73.600% among 1 replicates
+26.400% among 2 replicates
+SB032713TAWMD08VV4TMR
+Mean Count Total: 136.0
+CV: 0.634316377241
+Total Taxa Discovered in 2 reps: 213
+72.300% among 1 replicates
+27.700% among 2 replicates
+SB032713TAWMD10VV4TMR
+Mean Count Total: 1434.0
+CV: nan
+Total Taxa Discovered in 1 reps: 1434
+100.000% among 1 replicates
+SB032713TAWMD13VV4TMR
+Mean Count Total: 2606.5
+CV: 0.496181969227
+Total Taxa Discovered in 2 reps: 4135
+73.930% among 1 replicates
+26.070% among 2 replicates
+SB032713TAWMD15VV4TMR
+Mean Count Total: 15.0
+CV: 0.377123616633
+Total Taxa Discovered in 2 reps: 25
+80.000% among 1 replicates
+20.000% among 2 replicates
+SB032713TAWMD16VV4TMR
+Mean Count Total: 1201.0
+CV: 1.03622642372
+Total Taxa Discovered in 2 reps: 2144
+87.966% among 1 replicates
+12.034% among 2 replicates
+SB032713TAWMD17VV4TMR
+Mean Count Total: 2340.0
+CV: 0.194001091249
+Total Taxa Discovered in 2 reps: 3528
+67.347% among 1 replicates
+32.653% among 2 replicates
+SB032713TAWMD18VV4TMR
+Mean Count Total: 2554.5
+CV: 0.40995308003
+Total Taxa Discovered in 2 reps: 3725
+62.846% among 1 replicates
+37.154% among 2 replicates
+SB032713TAWMD19VV4TMR
+Mean Count Total: 1940.0
+CV: nan
+Total Taxa Discovered in 1 reps: 1940
+100.000% among 1 replicates
+SB051013TAWMD04VV4TMR
+Mean Count Total: 570.0
+CV: 0.332464240979
+Total Taxa Discovered in 2 reps: 852
+66.197% among 1 replicates
+33.803% among 2 replicates
+SB051013TAWMD13VV4TMR
+Mean Count Total: 113.5
+CV: 0.317730800357
+Total Taxa Discovered in 2 reps: 168
+64.881% among 1 replicates
+35.119% among 2 replicates
+SB051013TAWMD14VV4TMR
+Mean Count Total: 208.75
+CV: 0.430629551922
+Total Taxa Discovered in 4 reps: 458
+56.114% among 1 replicates
+17.904% among 2 replicates
+13.537% among 3 replicates
+12.445% among 4 replicates
+SB051013TAWMD16VV4TMR
+Mean Count Total: 697.5
+CV: 0.161189932916
+Total Taxa Discovered in 2 reps: 1021
+63.369% among 1 replicates
+36.631% among 2 replicates
+SB051013TAWMD18VV4TMR
+Mean Count Total: 34.0
+CV: nan
+Total Taxa Discovered in 1 reps: 34
+100.000% among 1 replicates
+SB051013TAWMD22VV4TMR
+Mean Count Total: 1817.33333333
+CV: 0.540627316072
+Total Taxa Discovered in 3 reps: 3405
+58.385% among 1 replicates
+23.113% among 2 replicates
+18.502% among 3 replicates
+SB061713TAWMD01VV4TMR
+Mean Count Total: 139.5
+CV: 0.795811932948
+Total Taxa Discovered in 2 reps: 237
+82.278% among 1 replicates
+17.722% among 2 replicates
+SB061713TAWMD03VV4TMR
+Mean Count Total: 1180.0
+CV: 0.454226220457
+Total Taxa Discovered in 2 reps: 1810
+69.613% among 1 replicates
+30.387% among 2 replicates
+SB061713TAWMD05VV4TMR
+Mean Count Total: 1642.0
+CV: 0.072347100633
+Total Taxa Discovered in 2 reps: 2401
+63.224% among 1 replicates
+36.776% among 2 replicates
+SB061713TAWMD07VV4TMR
+Mean Count Total: 1818.0
+CV: 0.223255936414
+Total Taxa Discovered in 2 reps: 2710
+65.830% among 1 replicates
+34.170% among 2 replicates
+SB061713TAWMD09VV4TMR
+Mean Count Total: 209.5
+CV: 0.327395502506
+Total Taxa Discovered in 2 reps: 312
+65.705% among 1 replicates
+34.295% among 2 replicates
+SB061713TAWMD13VV4TMR
+Mean Count Total: 1975.5
+CV: 0.3303768965
+Total Taxa Discovered in 2 reps: 3014
+68.912% among 1 replicates
+31.088% among 2 replicates
+SB061713TAWMD15VV4TMR
+Mean Count Total: 140.0
+CV: 0.404061017821
+Total Taxa Discovered in 2 reps: 207
+64.734% among 1 replicates
+35.266% among 2 replicates
+SB061713TAWMD17VV4TMR
+Mean Count Total: 2223.0
+CV: 0.402061615573
+Total Taxa Discovered in 2 reps: 3320
+66.084% among 1 replicates
+33.916% among 2 replicates
+SB061713TAWMD19VV4TMR
+Mean Count Total: 409.5
+CV: 0.0777040418886
+Total Taxa Discovered in 2 reps: 607
+65.074% among 1 replicates
+34.926% among 2 replicates
+SB061713TAWMD21VV4TMR
+Mean Count Total: 1471.5
+CV: 0.471404520791
+Total Taxa Discovered in 2 reps: 2187
+65.432% among 1 replicates
+34.568% among 2 replicates
+SB071713TAWMD01VV4TMR
+Mean Count Total: 874.0
+CV: 0.553387915711
+Total Taxa Discovered in 2 reps: 1340
+69.552% among 1 replicates
+30.448% among 2 replicates
+SB071713TAWMD03VV4TMR
+Mean Count Total: 486.5
+CV: 0.239820388275
+Total Taxa Discovered in 2 reps: 678
+56.490% among 1 replicates
+43.510% among 2 replicates
+SB071713TAWMD07VV4TMR
+Mean Count Total: 771.0
+CV: 0.418211014554
+Total Taxa Discovered in 2 reps: 1181
+69.433% among 1 replicates
+30.567% among 2 replicates
+SB071713TAWMD11VV4TMR
+Mean Count Total: 2558.5
+CV: 0.0245974217415
+Total Taxa Discovered in 2 reps: 3767
+64.162% among 1 replicates
+35.838% among 2 replicates
+SB071713TAWMD14VV4TMR
+Mean Count Total: 2222.5
+CV: 0.376381247309
+Total Taxa Discovered in 2 reps: 3269
+64.026% among 1 replicates
+35.974% among 2 replicates
+SB071713TAWMD16VV4TMR
+Mean Count Total: 2223.0
+CV: 1.04332444548
+Total Taxa Discovered in 2 reps: 3953
+87.528% among 1 replicates
+12.472% among 2 replicates
+SB071713TAWMD18VV4TMR
+Mean Count Total: 2428.0
+CV: 0.202696177803
+Total Taxa Discovered in 2 reps: 3302
+52.938% among 1 replicates
+47.062% among 2 replicates
+SB071713TAWMD20VV4TMR
+Mean Count Total: 2605.5
+CV: 0.656492536438
+Total Taxa Discovered in 2 reps: 4087
+72.498% among 1 replicates
+27.502% among 2 replicates
+SB071713TAWMD22VV4TMR
+Mean Count Total: 2241.0
+CV: 0.0359706260845
+Total Taxa Discovered in 2 reps: 3141
+57.307% among 1 replicates
+42.693% among 2 replicates
+SB080812TAWMD08VV4TMR
+Mean Count Total: 1418.5
+CV: 0.469078238348
+Total Taxa Discovered in 2 reps: 2120
+66.179% among 1 replicates
+33.821% among 2 replicates
+SB080812TAWMD22VV4TMR
+Mean Count Total: 2082.0
+CV: 0.144002533729
+Total Taxa Discovered in 2 reps: 2883
+55.567% among 1 replicates
+44.433% among 2 replicates
+SB081213TAWMD02VV4TMR
+Mean Count Total: 2211.5
+CV: 0.484407313361
+Total Taxa Discovered in 2 reps: 3164
+60.209% among 1 replicates
+39.791% among 2 replicates
+SB081213TAWMD05VV4TMR
+Mean Count Total: 48.0
+CV: 0.53033008589
+Total Taxa Discovered in 2 reps: 87
+89.655% among 1 replicates
+10.345% among 2 replicates
+SB081213TAWMD06VV4TMR
+Mean Count Total: 804.0
+CV: 0.269122730153
+Total Taxa Discovered in 2 reps: 1189
+64.760% among 1 replicates
+35.240% among 2 replicates
+SB081213TAWMD07VV4TMR
+Mean Count Total: 2101.5
+CV: 0.371134322935
+Total Taxa Discovered in 2 reps: 2973
+58.628% among 1 replicates
+41.372% among 2 replicates
+SB081213TAWMD09VV4TMR
+Mean Count Total: 1799.5
+CV: 0.335183153294
+Total Taxa Discovered in 2 reps: 2605
+61.843% among 1 replicates
+38.157% among 2 replicates
+SB081213TAWMD10VV4TMR
+Mean Count Total: 2463.0
+CV: 0.544899988101
+Total Taxa Discovered in 2 reps: 3632
+64.372% among 1 replicates
+35.628% among 2 replicates
+SB081213TAWMD11VV4TMR
+Mean Count Total: 2743.5
+CV: 0.399753095542
+Total Taxa Discovered in 2 reps: 3925
+60.204% among 1 replicates
+39.796% among 2 replicates
+SB081213TAWMD14VV4TMR
+Mean Count Total: 1587.0
+CV: 0.346647180695
+Total Taxa Discovered in 2 reps: 2321
+63.249% among 1 replicates
+36.751% among 2 replicates
+SB081213TAWMD15VV4TMR
+Mean Count Total: 302.5
+CV: 0.194016075499
+Total Taxa Discovered in 2 reps: 454
+66.740% among 1 replicates
+33.260% among 2 replicates
+SB081213TAWMD17VV4TMR
+Mean Count Total: 1742.0
+CV: 0.188345319443
+Total Taxa Discovered in 2 reps: 2442
+57.330% among 1 replicates
+42.670% among 2 replicates
+SB081308TAWMD03VV4TMR
+Mean Count Total: 540.0
+CV: nan
+Total Taxa Discovered in 1 reps: 540
+100.000% among 1 replicates
+SB081308TAWMD08VV4V5TQR
+Mean Count Total: 1402.0
+CV: 0.732324569389
+Total Taxa Discovered in 2 reps: 2329
+79.605% among 1 replicates
+20.395% among 2 replicates
+SB081308TAWMD17VV4TQR
+Mean Count Total: 504.0
+CV: nan
+Total Taxa Discovered in 1 reps: 504
+100.000% among 1 replicates
+SB081308TAWMD19VV4TMR
+Mean Count Total: 714.0
+CV: nan
+Total Taxa Discovered in 1 reps: 714
+100.000% among 1 replicates
+SB081613TAWMD08VV4TMR
+Mean Count Total: 215.5
+CV: 0.246092847281
+Total Taxa Discovered in 2 reps: 312
+61.859% among 1 replicates
+38.141% among 2 replicates
+SB081613TAWMD12VV4TMR
+Mean Count Total: 2067.0
+CV: 0.107417285579
+Total Taxa Discovered in 2 reps: 3050
+64.459% among 1 replicates
+35.541% among 2 replicates
+SB081613TAWMD15VV4TMR
+Mean Count Total: 1793.0
+CV: 0.176678102605
+Total Taxa Discovered in 2 reps: 2461
+54.287% among 1 replicates
+45.713% among 2 replicates
+SB081613TAWMD20VV4TMR
+Mean Count Total: 3238.0
+CV: 0.334117781104
+Total Taxa Discovered in 2 reps: 4416
+53.351% among 1 replicates
+46.649% among 2 replicates
+SB082912TAWMD01VV4TMR
+Mean Count Total: 1721.5
+CV: 0.11213485406
+Total Taxa Discovered in 2 reps: 2383
+55.518% among 1 replicates
+44.482% among 2 replicates
+SB082912TAWMD08VV4TMR
+Mean Count Total: 1780.5
+CV: 0.36179403407
+Total Taxa Discovered in 2 reps: 2592
+62.616% among 1 replicates
+37.384% among 2 replicates
+SB082912TAWMD13VV4TMR
+Mean Count Total: 1459.0
+CV: 0.0310177066456
+Total Taxa Discovered in 2 reps: 2681
+91.160% among 1 replicates
+8.840% among 2 replicates
+SB082912TAWMD22VV4TMR
+Mean Count Total: 1050.0
+CV: nan
+Total Taxa Discovered in 1 reps: 1050
+100.000% among 1 replicates
+SB100212TAWMD01VV4TMR
+Mean Count Total: 2270.5
+CV: 0.0202430921723
+Total Taxa Discovered in 2 reps: 3214
+58.712% among 1 replicates
+41.288% among 2 replicates
+SB100212TAWMD03VV4TMR
+Mean Count Total: 2023.0
+CV: 0.29221021704
+Total Taxa Discovered in 2 reps: 2922
+61.533% among 1 replicates
+38.467% among 2 replicates
+SB100212TAWMD05VV4TMR
+Mean Count Total: 1528.0
+CV: 0.260074614546
+Total Taxa Discovered in 2 reps: 2213
+61.907% among 1 replicates
+38.093% among 2 replicates
+SB100212TAWMD07VV4TMR
+Mean Count Total: 2882.5
+CV: 0.0507792207131
+Total Taxa Discovered in 2 reps: 4165
+61.585% among 1 replicates
+38.415% among 2 replicates
+SB100212TAWMD09VV4TMR
+Mean Count Total: 1955.0
+CV: 0.163353248681
+Total Taxa Discovered in 3 reps: 3904
+65.958% among 1 replicates
+17.853% among 2 replicates
+16.189% among 3 replicates
+SB100212TAWMD11VV4TMR
+Mean Count Total: 1558.0
+CV: 0.205142660524
+Total Taxa Discovered in 2 reps: 2286
+63.692% among 1 replicates
+36.308% among 2 replicates
+SB100212TAWMD13VV4TMR
+Mean Count Total: 1155.0
+CV: 0.0257129738613
+Total Taxa Discovered in 2 reps: 1824
+73.355% among 1 replicates
+26.645% among 2 replicates
+SB100212TAWMD15VV4TMR
+Mean Count Total: 2095.0
+CV: nan
+Total Taxa Discovered in 1 reps: 2095
+100.000% among 1 replicates
+SB100212TAWMD17VV4TMR
+Mean Count Total: 2088.5
+CV: 0.0660214614946
+Total Taxa Discovered in 2 reps: 3000
+60.767% among 1 replicates
+39.233% among 2 replicates
+SB100212TAWMD19VV4TMR
+Mean Count Total: 1712.0
+CV: 0.134647669782
+Total Taxa Discovered in 2 reps: 2582
+67.390% among 1 replicates
+32.610% among 2 replicates
+SB100912TAWMD10VV4TMR
+Mean Count Total: 434.5
+CV: 0.0244110511342
+Total Taxa Discovered in 2 reps: 636
+63.365% among 1 replicates
+36.635% among 2 replicates
+SB100912TAWMD13VV4TMR
+Mean Count Total: 329.5
+CV: 0.212453934256
+Total Taxa Discovered in 2 reps: 488
+64.959% among 1 replicates
+35.041% among 2 replicates
+SB100912TAWMD16VV4TMR
+Mean Count Total: 1255.0
+CV: nan
+Total Taxa Discovered in 1 reps: 1255
+100.000% among 1 replicates
+SB110211TAWMD05VV4TMR
+Mean Count Total: 1914.0
+CV: 0.141125804814
+Total Taxa Discovered in 2 reps: 3001
+72.443% among 1 replicates
+27.557% among 2 replicates
+SB110211TAWMD20VV4TMR
+Mean Count Total: 1414.0
+CV: nan
+Total Taxa Discovered in 1 reps: 1414
+100.000% among 1 replicates
+SB110212TAWMD05VV4TMR
+Mean Count Total: 2737.42857143
+CV: 0.479091325444
+Total Taxa Discovered in 7 reps: 8179
+50.458% among 1 replicates
+18.474% among 2 replicates
+9.414% among 3 replicates
+6.089% among 4 replicates
+5.062% among 5 replicates
+4.548% among 6 replicates
+5.954% among 7 replicates
+SB110212TAWMD20VV4TMR
+Mean Count Total: 4023.0
+CV: nan
+Total Taxa Discovered in 1 reps: 4023
+100.000% among 1 replicates
+SB110212TAWMD21VV4TMR
+Mean Count Total: 2134.6
+CV: 0.376532857359
+Total Taxa Discovered in 5 reps: 4901
+49.500% among 1 replicates
+17.160% among 2 replicates
+11.161% among 3 replicates
+10.426% among 4 replicates
+11.753% among 5 replicates
+SB111212TAWMD09VV4TMR
+Mean Count Total: 917.0
+CV: 0.382469971067
+Total Taxa Discovered in 2 reps: 1389
+67.963% among 1 replicates
+32.037% among 2 replicates
+SB111212TAWMD15VV4TMR
+Mean Count Total: 612.5
+CV: 0.389053037159
+Total Taxa Discovered in 2 reps: 932
+68.562% among 1 replicates
+31.438% among 2 replicates
+SB120412TAWMD00VV4TMR
+Mean Count Total: 376.0
+CV: 1.2111084231
+Total Taxa Discovered in 2 reps: 701
+92.725% among 1 replicates
+7.275% among 2 replicates
+SB120412TAWMD02VV4TMR
+Mean Count Total: 1035.0
+CV: 0.233652675523
+Total Taxa Discovered in 2 reps: 1503
+62.275% among 1 replicates
+37.725% among 2 replicates
+SB120412TAWMD10VV4TMR
+Mean Count Total: 357.333333333
+CV: 0.562745917878
+Total Taxa Discovered in 3 reps: 702
+62.536% among 1 replicates
+22.222% among 2 replicates
+15.242% among 3 replicates
+SB120412TAWMD14VV4TMR
+Mean Count Total: 1131.0
+CV: 0.512668046484
+Total Taxa Discovered in 2 reps: 1712
+67.874% among 1 replicates
+32.126% among 2 replicates
+SB120412TAWMD16VV4TMR
+Mean Count Total: 617.5
+CV: 0.218716429484
+Total Taxa Discovered in 2 reps: 948
+69.726% among 1 replicates
+30.274% among 2 replicates
+SB120412TAWMD22VV4TMR
+Mean Count Total: 928.0
+CV: 0.527497985355
+Total Taxa Discovered in 3 reps: 1834
+63.413% among 1 replicates
+21.374% among 2 replicates
+15.213% among 3 replicates
