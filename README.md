@@ -1,14 +1,8 @@
 ## GLM Wrapper
 
-This is a pipeline from various data sources into the General Lake Model. 
+This is a pipeline from various data sources into the General Lake Model among many other things.
 
-It is written in Python 2.7. 
+The following is a manifest:
 
-It is dependent on the following Python packages:
-
-numpy
-matplotlib
-pandas
-scipy
-netCDF4
-xarray
+- GLM_Executables: Contains all binaries & source code for GLM as well as *example configurations*
+- 
