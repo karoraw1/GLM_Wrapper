@@ -1,20 +1,20 @@
 &glm_setup
 #- deep_mixing = [.true., .false.],[bool]
-- Kw = [0.25, 0.75, 0.025],[float]
-- min_layer_vol = [0.018, 0.022, 0.001],[float] 
+#- Kw = [0.25, 0.75, 0.025],[float]
+#- min_layer_vol = [0.018, 0.022, 0.001],[float] 
 #- min_layer_thick = [0.10, 0.34, 0.01],[float]
 #- max_layer_thick = [0.35, 1.05, 0.01],[float]
-- coef_mix_conv = [0.0625, 0.1875, 0.00625],[float]
-- coef_wind_stir = [0.115, 0.345, 0.0115],[float]
-- coef_mix_shear = [0.01, 0.3, 0.01],[float]
-- coef_mix_turb = [0.255, 0.765, 0.0255],[float]
-- coef_mix_KH = [0.15, 0.45, 0.015],[float]
-- coef_mix_hyp = [0.25, 0.75, 0.025],[float]
+#- coef_mix_conv = [0.0625, 0.1875, 0.00625],[float]
+#- coef_wind_stir = [0.115, 0.345, 0.0115],[float]
+#- coef_mix_shear = [0.01, 0.3, 0.01],[float]
+#- coef_mix_turb = [0.255, 0.765, 0.0255],[float]
+#- coef_mix_KH = [0.15, 0.45, 0.015],[float]
+#- coef_mix_hyp = [0.25, 0.75, 0.025],[float]
 &morphometry
 #- longitude = [-161, 170, 15],[float]
 #- latitude = [-78, 73, 15],[float]
-#- bsn_len = [55.0, 2145.0, 55.0],[float]
-#- bsn_wid = [30.0, 1170.0, 30.0],[float]
+- bsn_len = [55.0, 2145.0, 55.0],[float]
+- bsn_wid = [30.0, 1170.0, 30.0],[float]
 #- A = [0.5, 1.5, 0.1],[list]
 #- H = [0.8, 1.2, 0.05],[list]
 &init_profiles
@@ -23,15 +23,15 @@
 &outflow
 #- outl_elvs = [0.1, 24.1, 1.0],[float]
 #- seepage_rate = [0.0, 0.2, 0.05],[float]
-#- bsn_len_outl = [99, 1099, 50],[int]
-#- bsn_wid_outl = [24, 599, 25],[int]
+- bsn_len_outl = [99, 1099, 50],[int]
+- bsn_wid_outl = [24, 599, 25],[int]
 #- outflow_factor = [0.8, 1.2, 0.05],[float]
 &inflow
 - coef_inf_entrain = [0.0, 1, 0.1],[float]
 - strmbd_drag = [0.004, 0.0320, 0.004],[float]
 - strmbd_slope = [0.05, 4.0, 0.05],[float]
 - strm_hf_angle = [0.05, 20.0, 0.05],[float]
-#- inflow_factor = [0.5, 1.0, 0.1],[float]
+- inflow_factor = [0.5, 1.0, 0.1],[float]
 &meteorology
 #- met_sw = [.true., .false.],[bool]
 #- catchrain = [.true., .false.],[bool]
@@ -39,21 +39,21 @@
 #- albedo_mode = [1, 3, 1],[int]
 #- cloud_mode = [1, 4, 1],[int]
 # rainfall amount (m) required before runoff from exposed banks
-- rain_threshold = [0.00, 0.05, 0.01],[float]
+#- rain_threshold = [0.00, 0.05, 0.01],[float]
 # conversion of rainfall to runoff in exposed lake banks
-- runoff_coef = [0.0, 0.7, 0.05],[float]
+#- runoff_coef = [0.0, 0.7, 0.05],[float]
 # Scaling factor that is used to multiply the wind speed data that is read in.
-- wind_factor = [-1.5, 1.5, 0.05],[float]
+#- wind_factor = [-1.5, 1.5, 0.05],[float]
 # Scaling factor that is used to multiply the rainfall data that is read in.
-- rain_factor = [-1.5, 1.5, 0.05],[float]
+#- rain_factor = [-1.5, 1.5, 0.05],[float]
 # Scaling factor that is used to multiply the air temperature data that is read in.
-- at_factor = [-1.5, 1.5, 0.05],[float]
+#- at_factor = [-1.5, 1.5, 0.05],[float]
 # Scaling factor that is used to multiply the relative humidity data that is read in. 
-- rh_factor = [-1.5, 1.5, 0.05],[float]
+#- rh_factor = [-1.5, 1.5, 0.05],[float]
 # Scaling factor that is used to multiply the shortwave data that is read in. 
-- sw_factor = [-1.5, 1.5, 0.05],[float]
+#- sw_factor = [-1.5, 1.5, 0.05],[float]
 # Scaling factor that is used to multiply the longwave data that is read in.
-- lw_factor = [-1.5, 1.5, 0.05],[float]
-- cd = [0.00065, 0.00195, 6.5e-05],[float]
-- ce = [0.00065, 0.00195, 6.5e-05],[float]
-- ch = [0.00065, 0.00195, 6.5e-05],[float]
+#- lw_factor = [-1.5, 1.5, 0.05],[float]
+#- cd = [0.00065, 0.00195, 6.5e-05],[float]
+#- ce = [0.00065, 0.00195, 6.5e-05],[float]
+#- ch = [0.00065, 0.00195, 6.5e-05],[float]

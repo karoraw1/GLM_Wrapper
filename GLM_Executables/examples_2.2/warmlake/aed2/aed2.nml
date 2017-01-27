@@ -564,6 +564,5 @@
               'PHY_green'
    TOC_varscale = 1.0, 1.0, 1.0, 1.0
    TSS_vars = 'TRC_ss1',
-              'PHY_green' !, ....
-!  TSS_varscale = 0.1,0.1            !,  <vector same length as TSS names>
+              'PHY_green'
 /

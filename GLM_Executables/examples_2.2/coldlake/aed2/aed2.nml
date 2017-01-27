@@ -11,7 +11,7 @@
 !
 !-------------------------------------------------------------------------------
 &aed2_models
-   models = ! 'aed2_sedflux',
+   models = 'aed2_sedflux',
             'aed2_oxygen',
             'aed2_carbon',
             'aed2_silica',
@@ -39,7 +39,7 @@
 !                                        - computed by model
 !-------------------------------------------------------------------------------
 &aed2_sedflux
-   sedflux_model = 'Constant'
+   sedflux_model = 'Dynamic'
 /
 
 
@@ -105,7 +105,6 @@
    Fsed_oxy = -50.0
    Ksed_oxy = 50.0
    theta_sed_oxy = 1.08
-!  Fsed_oxy_variable = 'SDF_Fsed_oxy'
 /
 
 
@@ -191,7 +190,6 @@
    Ksed_rsi = 50.0
    theta_sed_rsi = 1.08
    silica_reactant_variable='OXY_oxy'
-!  Fsed_rsi_variable = 'SDF_Fsed_rsi'
 /
 
 
@@ -256,9 +254,7 @@
    theta_sed_amm = 1.08
    theta_sed_nit = 1.08
    nitrif_reactant_variable='OXY_oxy'
-   denit_product_variable=''  !'NIT_N20'
-!  Fsed_amm_variable='SDF_Fsed_amm'
-!  Fsed_nit_variable='SDF_Fsed_nit'
+   denit_product_variable='' !'NIT_N20'
 /
 
 !###############################################################################
@@ -308,7 +304,6 @@
    Ksed_frp = 50.0
    theta_sed_frp = 1.08
    phosphorus_reactant_variable = '' !'OXY_oxy'
-!  Fsed_frp_variable ='SDF_Fsed_frp'
    simPO4Adsorption = .true.
    ads_use_external_tss = .true.
    po4sorption_target_variable =''
@@ -419,12 +414,6 @@
    KePOM=0.001
    doc_miner_reactant_variable='OXY_oxy'
    doc_miner_product_variable= 'CAR_dic'
-!  Fsed_pon_variable='SDF_Fsed_pon'
-!  Fsed_don_variable='SDF_Fsed_don'
-!  Fsed_pop_variable='SDF_Fsed_pop'
-!  Fsed_dop_variable='SDF_Fsed_dop'
-!  Fsed_poc_variable='SDF_Fsed_poc'
-!  Fsed_doc_variable='SDF_Fsed_doc'
 /
 
 !###############################################################################

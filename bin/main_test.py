@@ -14,7 +14,6 @@ and later use the command when terminal starts:
 @author: Keith Arora-Williams
 """
 from __future__ import division
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
 import os
 import cPickle
@@ -31,7 +30,7 @@ print time.ctime(time.time())
 print ""
 
 # these are code names for each trial
-cases = ["testcase_3"]
+cases = ["testcase_4"]
 
 # this is the directory you want to work in
 mainFolder = os.path.dirname(os.getcwd())
@@ -42,6 +41,9 @@ mainFolder = os.path.dirname(os.getcwd())
 
 superDir = os.path.join(mainFolder, 'glm_case_folders')
 LakeModel.make_dir(superDir, verbose=False)
+
+print "Adding all data file paths to memory"
+
 met_fn = "BostonLoganAirportWeather.csv"
 ceres_fn = "CERES_SSF_XTRK-MODIS_Edition3A_Subset_2010010102-2014010116.nc"
 ceres_fn2 = "CERES_SYN1deg-Day_200508-201406.nc"
@@ -68,6 +70,8 @@ waterDataPaths = {i:os.path.join(mainFolder, 'waterdata', waterDataFiles[i])
 
 newDirs = [os.path.join(superDir, x) for x in cases]
 _ = [LakeModel.make_dir(i, verbose=False) for i in newDirs]
+
+print "Instantiating a lake"
 test = LakeModel.Lake(cases[0], newDirs[0])
 
 test.write_glm_config(verbose=False)
@@ -130,12 +134,9 @@ precipR.name = "Rain"
 precipS = BOS_weather.df.snow_fall
 precipS.name = "Snow"
 
-# Pack up variables for flow csvs 
-
-def CubicftPerS_to_MegalitersPerDay(df):
-    return df*2.44658
+# Pack up variables for flow csvs
     
-In_Discharge = CubicftPerS_to_MegalitersPerDay(inflow.df['Discharge, cubic feet per second (Mean)'])
+In_Discharge = LakeModel.CubicftPerS_to_MegalitersPerDay(inflow.df['Discharge, cubic feet per second (Mean)'])
 In_Discharge.name = "INFLOW"
 
 Out_Discharge = copy.deepcopy(In_Discharge)*0.8
@@ -160,59 +161,11 @@ test.create_metcsv(metPack)
 test.create_flowcsvs(inPack, outPack)
 
 ## This version is the best version
-test = LakeModel.run_model(test, verbose=True, forceRerun=True)
+test = LakeModel.run_model(test, verbose=False, forceRerun=True)
 test = LakeModel.pull_output_nc(test, force=True)
 test.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
 
-
-def plotLakeandError(scored_Lake):
-    modelled_dm = scored_Lake.observed_dm
-    plt.figure(figsize=(16,8))
-    titles = ["Observed temps", scored_Lake.name+" modelled Temps", "Error"]
-    ylabs_ = [str(i.date()) for i in Lake_temps.index]
-    for i, v in enumerate([Lake_temps, modelled_dm, abs(Lake_temps-modelled_dm)]):
-        ax = plt.subplot(1, 3, i+1)
-        ax1 = plt.imshow(v)
-        plt.title(titles[i])
-        if i == 0:
-            plt.yticks(np.arange(-2,18,2), ylabs_)
-        else:
-            plt.yticks(np.arange(-2,18,2), [""]*len(ylabs_))
-        if i == 1:
-            plt.xlabel("Depth in meters")
-    divider = make_axes_locatable(ax)
-    cax1 = divider.append_axes("right", size="5%", pad="3%")
-    plt.colorbar(ax1, cax=cax1)
-    error = abs(Lake_temps-modelled_dm).sum().sum()
-    denom = (Lake_temps.shape[0]*Lake_temps.shape[1])
-    print error/denom, "average error per voxel"
-
-def plotLakeProfiles(scored_lake):
-    fig = plt.figure(1, figsize=(18,9))
-    ax = fig.add_subplot(3,1,1)
-    ax.set_title("Elevation", fontsize=18)
-    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['z'].iloc[:, :150].T))
-    divider = make_axes_locatable(ax)
-    cax1 = divider.append_axes("right", size="5%", pad="3%")
-    plt.colorbar(cax, cax=cax1)
-    
-    ax = fig.add_subplot(3,1,2)
-    ax.set_title("Temperature", fontsize=18)
-    ax.set_ylabel("Layer Number", fontsize=16)
-    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['temp'].iloc[:, :150].T))
-    divider = make_axes_locatable(ax)
-    cax1 = divider.append_axes("right", size="5%", pad="3%")
-    plt.colorbar(cax, cax=cax1)
-    
-    ax = fig.add_subplot(3,1,3)
-    ax.set_title("Salinity", fontsize=18)
-    ax.set_xlabel("Time Steps (12 hour)", fontsize=16)
-    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['salt'].iloc[:, :150].T))
-    divider = make_axes_locatable(ax)
-    cax1 = divider.append_axes("right", size="5%", pad="3%")
-    plt.colorbar(cax, cax=cax1)
-    
-#plotLakeandError(test)
+LakeModel.plotLakeandError(test, Lake_temps)
 #This is the potential model space 
 test.read_variants('../test_files/optimize_these.txt', verbose=False)
 #Here we want to create a new lake at a random starting point
@@ -245,95 +198,66 @@ for i, l in enumerate(variant_lakes):
 vars_lik = {i.liklihood: (i.variant_var, i.variant_val) for i in variant_lakes_w_data if ~np.isnan(i.liklihood)}
 max_lik = np.array(vars_lik.keys()).max()
 print vars_lik[max_lik], max_lik
+
 sys.exit()
 
 start_time = time.time()
 
-for mults in range(50):
+rand_case_name = "randomize_4"
+total_trials = 25250
+max_pickle_size = 500
+repeats = np.ceil(total_trials/ max_pickle_size)
+trial_counter = 0
+for mults in range(repeats):
     bad_lakes = []
     single_run = time.time()
-    errors = np.zeros(500)
-    bootstraps = np.arange(500)
+    
+    if (total_trials - trial_counter) < max_pickle_size:
+        these_boots = total_trials - trial_counter
+    else:
+        these_boots = max_pickle_size
+    errors = np.zeros(these_boots)
+    bootstraps = np.arange(these_boots)
     this_err = np.nan
-    random_lake = test.randomize("randomize_3", True)
+    random_lake = test.randomize(rand_case_name, True)
     bstps_results = {'config':{},
                      'error':{}}
     
     for rep in bootstraps:
+        trial_counter+=1
         # retry if run fails or error is nan
         while random_lake.ran == False or np.isnan(this_err):
-            random_lake = LakeModel.run_model(random_lake, verbose=True, forceRerun=True)        
+            random_lake = LakeModel.run_model(random_lake, verbose=True, 
+                                              forceRerun=True)        
             random_lake = LakeModel.pull_output_nc(random_lake, force=True)
-            this_err = random_lake.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
+            this_err = random_lake.score_variant(Lake_temps, test, 'temp', 
+                                                 lik_fxn='NSE')
             if random_lake.ran == False or np.isnan(this_err):
                 if len(bad_lakes) < 10000:
                     bad_lakes.append(copy.deepcopy(random_lake.glm_config))
                 del random_lake
-                random_lake = test.randomize("randomize_3", True)
+                random_lake = test.randomize(rand_case_name, True)
                 
         # Save the config and the error
         bstps_results['config'][rep] = copy.deepcopy(random_lake.glm_config)
         bstps_results['error'][rep] = this_err
         del random_lake
-        random_lake = test.randomize("randomize_3", True)
+        random_lake = test.randomize(rand_case_name, True)
     
     
     print("--- %s, %s seconds ---" % ((time.time() - start_time),
                                       (time.time() - single_run)))
-    pickleName = "run3_results_{}.pickle".format(mults+1)
+    pickleName = rand_case_name+"_res_{}.pickle".format(mults+1)
     to_be_pickled = [bstps_results, bad_lakes]
     results_pickle = os.path.join(random_lake.dir_path, pickleName)
-    f = open(results_pickle, 'wb')   # 'wb' instead 'w' for binary file
-    cPickle.dump(to_be_pickled, f, -1)       # -1 specifies highest binary protocol
-    f.close()
+    with open(results_pickle, 'wb') as f:
+        cPickle.dump(to_be_pickled, f, -1)
+        
 sys.exit()
 
+# the lake with best likelihood is singled out
 
-
-
-# the lake with best likelihood is singled out 
-
-def print_minimums(Lake):
-    var_dict = Lake.variants
-    for k in var_dict['grid'].keys():
-        print "Variable:", k
-        liks = var_dict['likelihood'][k]
-        liks[np.isnan(liks)] = -1
-        best_lik = liks.max()
-        best_idxes = np.where(liks == best_lik)[0]
-        best_idx = best_idxes[0]
-        best_val = test.variants['grid'][k][best_idx]
-
-        for k2, v2 in Lake.glm_config.items():
-            if k in v2.keys():
-                orig_val = v2[k]
-        
-
-        print "\t Original Value: %r" % orig_val
-        if type(orig_val) == str:
-            orig_idxes = np.where(var_dict['grid'][k] == orig_val)[0]
-        elif type(orig_val) == list:
-            orig_idxes = np.where(np.isclose(var_dict['grid'][k],1.0, rtol=5e-02))[0]
-        else:                
-            orig_idxes = np.where(np.isclose(var_dict['grid'][k],orig_val, rtol=5e-02))[0]
-            
-        if len(orig_idxes) == 0:
-            orig_lik = liks[1:2].mean()
-        else:
-            orig_lik = liks[orig_idxes][0]
-            
-        if liks[best_idx] == orig_lik:
-            print "Variable", k, "was set at thet best setting"            
-        else:
-            print "\t Best Value: %r" % best_val
-            print "\t Likelihood: %.2f" % best_lik
-            print "\t Relative diff:", abs(orig_lik-best_lik)/abs(orig_lik)
-            if len(best_idxes) > 1:
-                    print "\tMultiple peaks at:", best_idxes
-                    for i in best_idxes:
-                        print liks[i]
-
-print_minimums(test)
+LakeModel.print_minimums(test)
 
 
 """

@@ -19,8 +19,98 @@ import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 import JD_converter as jd
 import subprocess as sp
-from functools import wraps 
- 
+from functools import wraps
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+def CubicftPerS_to_MegalitersPerDay(df):
+    return df*2.44658
+
+def print_minimums(Lake):
+    var_dict = Lake.variants
+    for k in var_dict['grid'].keys():
+        print "Variable:", k
+        liks = var_dict['likelihood'][k]
+        liks[np.isnan(liks)] = -1
+        best_lik = liks.max()
+        best_idxes = np.where(liks == best_lik)[0]
+        best_idx = best_idxes[0]
+        best_val = Lake.variants['grid'][k][best_idx]
+
+        for k2, v2 in Lake.glm_config.items():
+            if k in v2.keys():
+                orig_val = v2[k]
+        
+
+        print "\t Original Value: %r" % orig_val
+        if type(orig_val) == str:
+            orig_idxes = np.where(var_dict['grid'][k] == orig_val)[0]
+        elif type(orig_val) == list:
+            orig_idxes = np.where(np.isclose(var_dict['grid'][k],1.0, rtol=5e-02))[0]
+        else:                
+            orig_idxes = np.where(np.isclose(var_dict['grid'][k],orig_val, rtol=5e-02))[0]
+            
+        if len(orig_idxes) == 0:
+            orig_lik = liks[1:2].mean()
+        else:
+            orig_lik = liks[orig_idxes][0]
+            
+        if liks[best_idx] == orig_lik:
+            print "Variable", k, "was set at thet best setting"            
+        else:
+            print "\t Best Value: %r" % best_val
+            print "\t Likelihood: %.2f" % best_lik
+            print "\t Relative diff:", abs(orig_lik-best_lik)/abs(orig_lik)
+            if len(best_idxes) > 1:
+                    print "\tMultiple peaks at:", best_idxes
+                    for i in best_idxes:
+                        print liks[i]
+
+def plotLakeandError(scored_Lake, Lake_temps):
+    modelled_dm = scored_Lake.observed_dm
+    plt.figure(figsize=(16,8))
+    titles = ["Observed temps", scored_Lake.name+" modelled Temps", "Error"]
+    ylabs_ = [str(i.date()) for i in Lake_temps.index]
+    for i, v in enumerate([Lake_temps, modelled_dm, abs(Lake_temps-modelled_dm)]):
+        ax = plt.subplot(1, 3, i+1)
+        ax1 = plt.imshow(v)
+        plt.title(titles[i])
+        if i == 0:
+            plt.yticks(np.arange(-2,18,2), ylabs_)
+        else:
+            plt.yticks(np.arange(-2,18,2), [""]*len(ylabs_))
+        if i == 1:
+            plt.xlabel("Depth in meters")
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(ax1, cax=cax1)
+    error = abs(Lake_temps-modelled_dm).sum().sum()
+    denom = (Lake_temps.shape[0]*Lake_temps.shape[1])
+    print error/denom, "average error per voxel"
+
+def plotLakeProfiles(scored_lake):
+    fig = plt.figure(1, figsize=(18,9))
+    ax = fig.add_subplot(3,1,1)
+    ax.set_title("Elevation", fontsize=18)
+    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['z'].iloc[:, :150].T))
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(cax, cax=cax1)
+    
+    ax = fig.add_subplot(3,1,2)
+    ax.set_title("Temperature", fontsize=18)
+    ax.set_ylabel("Layer Number", fontsize=16)
+    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['temp'].iloc[:, :150].T))
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(cax, cax=cax1)
+    
+    ax = fig.add_subplot(3,1,3)
+    ax.set_title("Salinity", fontsize=18)
+    ax.set_xlabel("Time Steps (12 hour)", fontsize=16)
+    cax = ax.imshow(np.flipud(scored_lake.depth_dfs['salt'].iloc[:, :150].T))
+    divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="5%", pad="3%")
+    plt.colorbar(cax, cax=cax1)
  
 def hard_round(x):
     return int(x*1000.0)/1000.0
@@ -95,7 +185,7 @@ def import_config(dl_default=False, verbose=True):
                    "latitude": 42,  
                    "longitude": -71,
                    "bsn_len": 1012.0,
-                   "bsn_wid": 536.0, 
+                   "bsn_wid": 570.0, 
                    "bsn_vals": None,
                    "A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69,
                         397077.50, 460778.04, 524802.66, 560051.22]}
@@ -140,8 +230,8 @@ def import_config(dl_default=False, verbose=True):
                      "the_depths": [1, 5, 9, 13, 17, 21], 
                      "the_temps": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0], 
                      }
-    the_sals = [200., 400., 600., 800., 1000., 1200.]                 
-    init_profiles["the_sals"] = [i*2 for i in the_sals]
+    the_sals = [200., 400., 600., 800., 1000., 1200.]              
+    init_profiles["the_sals"] = [i*3.3 for i in the_sals]
     init_profiles['num_depths'] = len(init_profiles["the_depths"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_temps"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_sals"])
@@ -186,7 +276,7 @@ def import_config(dl_default=False, verbose=True):
               "names_of_strms": "'Aberjona'", 
               "subm_flag": ".false.", 
               "strm_hf_angle": 1.1, 
-              "strmbd_slope": 3.35, 
+              "strmbd_slope": 0.5, 
               "strmbd_drag": 0.008, 
               "inflow_factor": 0.8, 
               "inflow_fl": "'inflow.csv'", 
@@ -734,7 +824,7 @@ class Lake(object):
         random_lake = copy.deepcopy(self)
         random_lake.ran = False
         random_lake.name = path
-        random_lake.dir_path = os.path.join(os.path.dirname(self.dir_path), "randomize_2")
+        random_lake.dir_path = os.path.join(self.dir_path, path)
         if not os.path.exists(random_lake.dir_path):
             os.mkdir(random_lake.dir_path)
         random_lake.glm_path = os.path.join(random_lake.dir_path, "glm2.nml")
