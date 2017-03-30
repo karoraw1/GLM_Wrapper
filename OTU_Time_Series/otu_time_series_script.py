@@ -314,7 +314,7 @@ for baton in baton_twirler.columns:
     
     lookatTheTrees = rForestReg(n_estimators=X_tr.shape[1],
                                 min_samples_split = 2,
-                                n_jobs=1)
+                                n_jobs=2, verbose=10)
     
     lookatTheTrees.fit(X_tr, y_tr)
     y_pred = lookatTheTrees.predict(X_te)
