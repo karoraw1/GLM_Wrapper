@@ -20,8 +20,10 @@ import cPickle
 import LakeModel
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pandas as pd
 import copy, sys
+from collections import OrderedDict
 
 plotting = False
 plt.style.use('fivethirtyeight')
@@ -30,7 +32,7 @@ print time.ctime(time.time())
 print ""
 
 # these are code names for each trial
-cases = ["testcase_4"]
+cases = ["testcase_5"]
 
 # this is the directory you want to work in
 mainFolder = os.path.dirname(os.getcwd())
@@ -144,8 +146,10 @@ Out_Discharge.name = "OUTFLOW"
 
 In_Temp = Hobbs_o.df['Temperature, water, degrees Celsius (Mean)'].interpolate()
 In_Temp.name = "TEMP"
-In_Salt = Hobbs_o.df[Hobbs_o.df.columns[6]].interpolate()
+In_Cond = Hobbs_o.df[Hobbs_o.df.columns[6]].interpolate() 
+In_Salt = LakeModel.cond2sal(In_Cond)
 In_Salt.name = "SALT"
+
 
 data_pack = [shortWaveNet, longWaveIn, airTemp, relHumidity, windSpeed, 
              precipR, precipS, cloudFrac, Out_Discharge, In_Discharge, 
@@ -157,201 +161,205 @@ metPack = ['ShortWave','LongWave','AirTemp','RelHum','WindSpeed','Rain','Snow',
            'Clouds']
 inPack = ['INFLOW','TEMP','SALT']
 outPack = ['OUTFLOW']
+
 test.create_metcsv(metPack)
 test.create_flowcsvs(inPack, outPack)
+test.write_aed_files(None, None, None, None)
 
 ## This version is the best version
 test = LakeModel.run_model(test, verbose=False, forceRerun=True)
 test = LakeModel.pull_output_nc(test, force=True)
-test.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
 
-LakeModel.plotLakeandError(test, Lake_temps)
+# Pull Observations 
+chem_dir = os.path.join(mainFolder, 'ChemData')
+obs_pack = LakeModel.readInElisasAndPreheimData(chem_dir)
+do_elisas, ph_elisas, do_preheim, no3_preheim, temp_preheim = obs_pack
+
+# Assign Observations
+test.assign_observation_matrix(temp_preheim, 'temp', 'celsius')
+test.assign_observation_matrix(do_elisas, 'OXY_oxy', 'mg/L')
+test.assign_observation_matrix(ph_elisas, 'CAR_pH', None)
+test.assign_observation_matrix(do_preheim, 'OXY_oxy', 'mg/L')
+test.assign_observation_matrix(no3_preheim, 'NIT_nit', 'mg/L')
+
+# Score model against available observations
+temp_NSE = test.score_variant(test, 'temp', lik_fxn='NSE')
+print "Temp error score: {}".format(temp_NSE)
+oxy_NSE = test.score_variant(test, 'OXY_oxy', lik_fxn='NSE')
+print "Oxy error score: {}".format(oxy_NSE)
+no3_NSE = test.score_variant(test, 'NIT_nit', lik_fxn='NSE')
+print "NO3 error score: {}".format(no3_NSE)
+#ph_NSE = test.score_variants(test, 'CAR_pH', lik_fxn='NSE')
+#print "PH error score: {}".format(ph_NSE)
+
+LakeModel.plotLakeandError(test, test.observations_mod, 9)
+LakeModel.plotLakeProfiles(test, 10)
+
+# Make skeleton dataframe with expected time/depth shape
+# Pull out depth dfs, convert layers to depths, and prepare plot
+time_depth_axis = pd.DataFrame(index=test.depth_dfs['NIT_amm'].index,
+                               columns=Lake_temps.columns)
+
+fig1_od, fig2_od = OrderedDict(), OrderedDict()
+fig3_od, fig4_od = OrderedDict(), OrderedDict()
+fig5_od, fig6_od = OrderedDict(), OrderedDict()
+fig7_od, fig8_od = OrderedDict(), OrderedDict()
+
+amm_df = LakeModel.extractDepthDf(test, 'NIT_amm', time_depth_axis)
+fig1_od['Ammonia'] = amm_df
+
+nit_df = LakeModel.extractDepthDf(test, 'NIT_nit', time_depth_axis)
+fig1_od['Nitrate'] = nit_df
+
+meth_df = LakeModel.extractDepthDf(test, 'CAR_ch4', time_depth_axis)
+fig2_od['Methane'] = meth_df
+
+meth_ox_df = LakeModel.extractDepthDf(test, 'CAR_ch4ox', time_depth_axis)
+fig2_od['MethaneOxidation'] = meth_ox_df
+
+nitrif_df = LakeModel.extractDepthDf(test,'NIT_nitrif', time_depth_axis)
+fig3_od['Nitrification'] = nitrif_df
+
+denit_df = LakeModel.extractDepthDf(test, 'NIT_denit', time_depth_axis)
+fig3_od['Denitrification'] = denit_df
+
+dic_df = LakeModel.extractDepthDf(test, 'CAR_dic', time_depth_axis)
+fig4_od['Dissolved Inorganic Carbon'] = dic_df
+
+oxy_df = LakeModel.extractDepthDf(test, 'OXY_oxy', time_depth_axis)
+fig4_od['Oxygen'] = oxy_df
+
+phs_df = LakeModel.extractDepthDf(test, 'PHS_frp', time_depth_axis)
+fig5_od['Phosphorus'] = phs_df
+
+phy_green_df = LakeModel.extractDepthDf(test, 'PHY_green', time_depth_axis)
+fig5_od['Model Green Algae'] = phy_green_df
+
+pH_df = LakeModel.extractDepthDf(test, 'CAR_pH', time_depth_axis)
+fig6_od['pH'] = pH_df.round(decimals=3)
+
+doc_df = LakeModel.extractDepthDf(test, 'OGM_doc', time_depth_axis)
+fig6_od['Dissolved Organic Carbon'] = doc_df
+
+aed_df_pack = [amm_df, nit_df, nitrif_df, denit_df]
+aed_df_fns = ['AmmoniaVdepthVtime.csv',
+              'NitrateVdepthVtime.csv',
+              'NitrificationVdepthVtime.csv',
+              'DenitrificationVdepthVtime.csv']
+              
+for aed_df, aed_fn in zip(aed_df_pack, aed_df_fns):
+    aed_df.to_csv(aed_fn)
+
+
+temp_df = LakeModel.extractDepthDf(test, 'temp', time_depth_axis)
+sal_df = LakeModel.extractDepthDf(test, 'salt', time_depth_axis)
+radiation_df = LakeModel.extractDepthDf(test, 'rad', time_depth_axis)
+height_df = LakeModel.extractDepthDf(test, 'z', time_depth_axis)
+
+fig7_od["Temperature"] = temp_df
+fig7_od["Salinity"] = sal_df
+fig8_od["Solar Radiation"] = radiation_df
+fig8_od["Layer Height"] = height_df
+
+def plot2profiles(df_lab_dict, fignum):
+    fig = plt.figure(fignum, figsize=(18,9))
+    labs, dfs = zip(*df_lab_dict.items())
+    for num, lab, df_ in zip([1,2], labs, dfs):
+        ax = fig.add_subplot(2,1,num)
+        ax.set_title(lab, fontsize=14)
+        cax = ax.imshow(df_.T, interpolation='nearest', aspect='auto')
+        divider = make_axes_locatable(ax)
+        cax1 = divider.append_axes("right", size="5%", pad="3%")
+        plt.colorbar(cax, cax=cax1)
+        
+plot2profiles(fig1_od, 1)
+plot2profiles(fig2_od, 2)
+plot2profiles(fig3_od, 3)
+plot2profiles(fig4_od, 4)
+plot2profiles(fig5_od, 5)
+plot2profiles(fig6_od, 6)
+plot2profiles(fig7_od, 7)
+plot2profiles(fig8_od, 8)
+
+
+sys.exit()
+
 #This is the potential model space 
 test.read_variants('../test_files/optimize_these.txt', verbose=False)
 #Here we want to create a new lake at a random starting point
 
-variant_lakes = test.write_variant_configs(copycsvs=True, verbose=False)
+do_edging_optimiztion = False
+do_random_optimization = True
 
-#Run them all & score them all
-variant_lakes_w_data = []
-for i, l in enumerate(variant_lakes):
-    statvfs = os.statvfs(os.getcwd())
-    bytes_avail = statvfs.f_frsize * statvfs.f_bavail
-    if bytes_avail < 104857600/2:
-        sys.exit("Disk space less than 100 Mb, aborting")
-    print "~{} Mb of disk space remaining".format(bytes_avail/1024/1024)    
-    print "Running #", i+1, "out of", len(variant_lakes)
-    print "%r = %r" % (l.variant_var, l.variant_val)
-    ran_lake = LakeModel.run_model(l, verbose=True, forceRerun=True)
-    data_lake = LakeModel.pull_output_nc(ran_lake, force=True)
-    if data_lake.ran == True:
-        variant_lakes_w_data.append(data_lake)
-        try: 
-            data_lake.score_variant(Lake_temps, test, 'temp', lik_fxn='NSE')
-        except ValueError:
-            sys.exit()
-        data_lake.cleanup(verbose=True)
+if do_edging_optimiztion:
+    variant_lakes = test.test_variant_configs(Lake_temps, copycsvs=True, 
+                                          verbose=False)
+    variants_ = np.array(variant_lakes)
+    y = variants_[:, 2]
+    print "failed runs\n", len(variants_[np.isnan(y.astype(float))])
+    if len(variants_[np.isnan(y.astype(float))]) > 0:
+        variants_real = variants_[~np.isnan(y.astype(float))]
+        y = variants_real[:, 2]
+        print "best score: ", y.astype(float).max()
+        print "parameter value: ", variants_[np.argmax(y.astype(float)), :]
     else:
-        print "Variant %s failed and was removed" % data_lake.glm_config['glm_setup']['sim_name']
+        print "best score: ", y.astype(float).max()
+        print "parameter value: ", variants_[np.argmax(y.astype(float)), :]
 
-# Find the best improvement 
-vars_lik = {i.liklihood: (i.variant_var, i.variant_val) for i in variant_lakes_w_data if ~np.isnan(i.liklihood)}
-max_lik = np.array(vars_lik.keys()).max()
-print vars_lik[max_lik], max_lik
-
-sys.exit()
-
-start_time = time.time()
-
-rand_case_name = "randomize_4"
-total_trials = 25250
-max_pickle_size = 500
-repeats = np.ceil(total_trials/ max_pickle_size)
-trial_counter = 0
-for mults in range(repeats):
-    bad_lakes = []
-    single_run = time.time()
-    
-    if (total_trials - trial_counter) < max_pickle_size:
-        these_boots = total_trials - trial_counter
-    else:
-        these_boots = max_pickle_size
-    errors = np.zeros(these_boots)
-    bootstraps = np.arange(these_boots)
-    this_err = np.nan
-    random_lake = test.randomize(rand_case_name, True)
-    bstps_results = {'config':{},
-                     'error':{}}
-    
-    for rep in bootstraps:
-        trial_counter+=1
-        # retry if run fails or error is nan
-        while random_lake.ran == False or np.isnan(this_err):
-            random_lake = LakeModel.run_model(random_lake, verbose=True, 
-                                              forceRerun=True)        
-            random_lake = LakeModel.pull_output_nc(random_lake, force=True)
-            this_err = random_lake.score_variant(Lake_temps, test, 'temp', 
-                                                 lik_fxn='NSE')
-            if random_lake.ran == False or np.isnan(this_err):
-                if len(bad_lakes) < 10000:
-                    bad_lakes.append(copy.deepcopy(random_lake.glm_config))
-                del random_lake
-                random_lake = test.randomize(rand_case_name, True)
-                
-        # Save the config and the error
-        bstps_results['config'][rep] = copy.deepcopy(random_lake.glm_config)
-        bstps_results['error'][rep] = this_err
-        del random_lake
-        random_lake = test.randomize(rand_case_name, True)
-    
-    
-    print("--- %s, %s seconds ---" % ((time.time() - start_time),
-                                      (time.time() - single_run)))
-    pickleName = rand_case_name+"_res_{}.pickle".format(mults+1)
-    to_be_pickled = [bstps_results, bad_lakes]
-    results_pickle = os.path.join(random_lake.dir_path, pickleName)
-    with open(results_pickle, 'wb') as f:
-        cPickle.dump(to_be_pickled, f, -1)
+if do_random_optimization:
+    # Find the best improvement
+    start_time = time.time()
+    rand_case_name = "randomize_5"
+    total_trials = 25250-2500
+    max_pickle_size = 500
+    repeats = int(np.ceil(total_trials/ max_pickle_size))
+    trial_counter = 0
+    for mults in range(repeats):
+        bad_lakes = []
+        single_run = time.time()
         
-sys.exit()
+        if (total_trials - trial_counter) < max_pickle_size:
+            these_boots = total_trials - trial_counter
+        else:
+            these_boots = max_pickle_size
+        errors = np.zeros(these_boots)
+        bootstraps = np.arange(these_boots)
+        this_err = np.nan
+        random_lake = test.randomize(rand_case_name, True)
+        bstps_results = {'config':{},
+                         'error':{}}
+        
+        for rep in bootstraps:
+            trial_counter+=1
+            # retry if run fails or error is nan
+            while random_lake.ran == False or np.isnan(this_err):
+                random_lake = LakeModel.run_model(random_lake, verbose=True, 
+                                                  forceRerun=True)        
+                random_lake = LakeModel.pull_output_nc(random_lake, force=True)
+                this_err = random_lake.score_variant(test, 'temp', lik_fxn='NSE')
+                if random_lake.ran == False or np.isnan(this_err):
+                    if len(bad_lakes) < 10000:
+                        bad_lakes.append(copy.deepcopy(random_lake.glm_config))
+                    del random_lake
+                    random_lake = test.randomize(rand_case_name, True)
+                    
+            # Save the config and the error
+            bstps_results['config'][rep] = copy.deepcopy(random_lake.glm_config)
+            bstps_results['error'][rep] = this_err
+            del random_lake
+            random_lake = test.randomize(rand_case_name, True)
+        
+        
+        print("--- %s, %s seconds ---" % ((time.time() - start_time),
+                                          (time.time() - single_run)))
+        pickleName = rand_case_name+"_res_{}.pickle".format(mults+1)
+        to_be_pickled = [bstps_results, bad_lakes]
+        results_pickle = os.path.join(random_lake.dir_path, pickleName)
+        with open(results_pickle, 'wb') as f:
+            cPickle.dump(to_be_pickled, f, -1)
+            
+    sys.exit()
 
 # the lake with best likelihood is singled out
 
 LakeModel.print_minimums(test)
-
-
-"""
-This is a plot of inflow, precip, lake, and cumulative inflow vols
-plt.figure(figsize=(12,8))
-plt.plot(test.csv_dict['lake.csv']['Volume'], label = "Lake Volume", alpha=0.7)
-ax = plt.gca()
-ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
-plt.plot(test.csv_dict['lake.csv']['Tot Inflow Vol'], label = "Inflow Volume", alpha=0.7)
-rain, _ = subsectbydate_2(BOS_weather.df.precip, test.csv_dict['lake.csv']['Volume'])
-plt.plot(rain*10e7, label = 'Precipitation', alpha=0.7)
-cumInVol = test.csv_dict['lake.csv']['Tot Inflow Vol'].cumsum()
-ymin, ymax = plt.ylim()
-plt.plot(cumInVol, label = "Cumulative Inflow Vol", alpha=0.7)
-plt.ylim([ymin, ymax])
-xmin, xmax = plt.xlim()
-plt.xlim([xmin-10, xmax])
-plt.legend(loc=1)
-plt.ylabel('cubic meters, cubic meters/day or mm/day')
-"""
-
-
-"""
-#plots the given inflow and the processed output inflow, needs modified alpha
-plt.plot(test.csv_dict['lake.csv']['Tot Outflow Vol'], label="Outflow")
-plt.plot(test.csv_dict['lake.csv']['Tot Inflow Vol'], label="Inflow")
-plt.plot(test.csv_dict['lake.csv']['Overflow Vol'], label="Overflow")
-plt.plot(100000*In_Discharge[In_Discharge.index[-1551:(-1551+731)]], label="A priori inflow")
-
-
-if plot_now:
-    plt.figure(1)
-    plt.plot(test.csv_dict['lake']['LakeNumber'], c='g', label="Lake Number", alpha=0.5)
-    plt.legend(loc='best')
-    plt.figure(2)
-    plt.plot(test.csv_dict['lake']['Tot Inflow Vol'], c='r', label="Inflow Vol", alpha=0.5)
-    plt.plot(test.csv_dict['lake']['Tot Outflow Vol'], c='b', label="Outflow Vol", alpha=0.5)
-    plt.legend(loc='best')
-    plt.figure(3)
-    plt.plot(test.csv_dict['lake']['Evaporation'], c='m', label="Evaporation", alpha=0.5)
-    plt.legend(loc='best')
-    plt.figure(4)
-    plt.plot(test.csv_dict['lake']['Max Temp'], label='Max Temp')
-    plt.plot(test.csv_dict['lake']['Min Temp'], label='Min Temp')
-    plt.plot(test.csv_dict['lake']['Surface Temp'], label='Surface Temp')
-    plt.legend()
-    
-
-base_temp = test.output_nc['temp'][:,:,0,0].data
-variant_temps = [vLr.output_nc['temp'][:,:,0,0].data for vLr in variant_lakes_ran]
-base_temp[base_temp > 1000] = 0
-for vLr in variant_temps:
-    vLr[vLr > 1000] = 0
-
-error = [((vt - base_temp)**2).sum() for vt in variant_temps]
-variant_names = [n.name for n in variant_lakes_ran]
-error_df = pd.DataFrame(index = variant_names, columns = ['error'],
-                        data = error)
-error_df.sort_values('error', ascending=False, inplace=True)
-
-1. atm_stab
-2. max_layer_thick (2-21)
-3. strm_hf_angle (10-16) (not in order)
-4. min_layer_thick
-5. strmbd_slope
-6. lw_factor
-7. wind_factor
-8. rain_factor
-9. seepage_rate
-10. rh_factor
-
-plt.figure()
-for k in test.variants['likelihood'].keys():
-    grid_size = test.variants['likelihood'][k].shape[0]
-    if grid_size > 11:
-        plt.plot(np.arange(grid_size), test.variants['likelihood'][k], label=k)
-plt.legend(loc='best')
-
-counter = 0
-fig=plt.figure(figsize=(11,8))
-for k in test.variants['likelihood'].keys():
-    grid_size = test.variants['likelihood'][k].shape[0]
-    if counter == 0:
-        ax=fig.add_subplot(2,1,1)
-        ax.set_ylabel('likelihood')
-    if counter == 6:
-        ax.legend(loc='best')
-        ax=fig.add_subplot(2,1,2)
-        ax.set_ylabel('likelihood')     
-    if grid_size == 11:
-        counter+=1
-        ax.plot(np.arange(grid_size), test.variants['likelihood'][k], label=k)
-
-ax.legend(loc='best')
-"""
-
-

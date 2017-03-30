@@ -9,6 +9,9 @@ https://asimpleweblog.wordpress.com/2010/06/20/julian-date-calculator/
 @author: login
 """
 
+from parse_aed_config import read_aed_nml, read_cell_params, read_zoo_params
+from parse_aed_config import write_aed2_eco_configs, write_aed2_config
+from parse_aed_config import load_aed_var_types
 
 import scipy.stats as st
 import re, mmap, cPickle, os, copy, time, sys, shutil
@@ -22,6 +25,78 @@ import subprocess as sp
 from functools import wraps
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+def preheim_date_parser(date_str):
+    date_part = date_str.split("_")[1]
+    new_str = date_part[2:4] + "-" + date_part[4:6] + "-" + date_part[0:2]
+    return pd.to_datetime(new_str)
+
+def readInElisasAndPreheimData(chem_dir):
+    do_eliza_fn = os.path.join(chem_dir, "Elizas_DO_data_mg.csv")
+    ph_eliza_fn = os.path.join(chem_dir, "Elizas_PH_data.csv")
+    do_preheim_fn = os.path.join(chem_dir, "Preheim_DO_mg.tsv")
+    no3_preheim_fn = os.path.join(chem_dir, "Preheim_NO3_mg.tsv")
+    temp_preheim_fn = os.path.join(chem_dir, "Preheim_TEMP_C.tsv")
+    
+    do_eliza_df = pd.read_csv(do_eliza_fn, index_col=0, dtype=float)
+    do_eliza_df.columns = [pd.to_datetime(i) for i in do_eliza_df.columns]
+    do_eliza_df = do_eliza_df.T
+    
+    ph_eliza_df = pd.read_csv(ph_eliza_fn, index_col=0, dtype=float)
+    ph_eliza_df.columns = map(pd.to_datetime, ph_eliza_df.columns)
+    ph_eliza_df = ph_eliza_df.T
+    
+    do_preheim_df = pd.read_csv(do_preheim_fn, sep="\t", index_col=0, dtype=float)
+    do_preheim_df.columns = map(preheim_date_parser, do_preheim_df.columns)
+    do_preheim_df.interpolate(axis=0, inplace=True)
+    surf_null_mask_2 = do_preheim_df.ix[0, :].isnull().values
+    do_preheim_df.ix[0, surf_null_mask_2] = do_preheim_df.ix[1, surf_null_mask_2]
+    do_preheim_df = do_preheim_df.T
+    idx_to_drop = do_preheim_df.index[5]
+
+    print "dropping this {}".format(idx_to_drop)
+    do_preheim_df.drop(idx_to_drop, axis=0, inplace=True)
+    
+    no3_preheim_df = pd.read_csv(no3_preheim_fn, sep="\t", index_col=0, dtype=float)
+    no3_preheim_df.columns = map(preheim_date_parser, 
+                                 no3_preheim_df.columns)
+    no3_preheim_df.interpolate(axis=0, inplace=True)
+    surf_null_mask_1 = no3_preheim_df.ix[0, :].isnull().values
+    no3_preheim_df.ix[0, surf_null_mask_1] = no3_preheim_df.ix[1, surf_null_mask_1]
+    no3_preheim_df = no3_preheim_df.T
+    
+    temp_preheim_df = pd.read_csv(temp_preheim_fn, sep="\t", index_col=0, 
+                                  dtype=float)
+    temp_preheim_df.columns = map(preheim_date_parser, 
+                                  temp_preheim_df.columns)
+    temp_preheim_df.ix[1, '2012-11-12'] = temp_preheim_df.ix[2, '2012-11-02']
+    surf_null_mask_0 = temp_preheim_df.ix[0, :].isnull().values
+    temp_preheim_df.ix[0, surf_null_mask_0] = temp_preheim_df.ix[1, surf_null_mask_0]
+    temp_preheim_df.interpolate(axis=0, inplace=True)
+    temp_preheim_df = temp_preheim_df.T
+    
+    new_cols = list(temp_preheim_df.columns)
+    new_cols.reverse()
+    temp_preheim_df.columns = new_cols
+    temp_preheim_df.columns = [int(i) for i in temp_preheim_df.columns]
+    no3_preheim_df.columns = new_cols
+    no3_preheim_df.columns = [int(i) for i in no3_preheim_df.columns]
+    do_preheim_df.columns = new_cols
+    do_preheim_df.columns = [int(i) for i in do_preheim_df.columns]
+
+    ph_eliza_df.columns = new_cols
+    ph_eliza_df.columns = [int(i) for i in ph_eliza_df.columns]
+                           
+    do_eliza_df.columns = new_cols
+    do_eliza_df.columns = [int(i) for i in do_eliza_df.columns]
+                               
+    obs_pack = [do_eliza_df, ph_eliza_df, do_preheim_df, no3_preheim_df, 
+                temp_preheim_df]
+    return obs_pack
+    
+    
+def cond2sal(sal_ser):
+    return 10**((np.log10(sal_ser.copy())*0.909)-2.823)
+    
 def CubicftPerS_to_MegalitersPerDay(df):
     return df*2.44658
 
@@ -65,10 +140,10 @@ def print_minimums(Lake):
                     for i in best_idxes:
                         print liks[i]
 
-def plotLakeandError(scored_Lake, Lake_temps):
-    modelled_dm = scored_Lake.observed_dm
-    plt.figure(figsize=(16,8))
-    titles = ["Observed temps", scored_Lake.name+" modelled Temps", "Error"]
+def plotLakeandError(scored_Lake, Lake_temps, fignum):
+    modelled_dm = scored_Lake.modelled_mat
+    plt.figure(fignum, figsize=(16,8))
+    titles = ["Observed", "Model", "Error"]
     ylabs_ = [str(i.date()) for i in Lake_temps.index]
     for i, v in enumerate([Lake_temps, modelled_dm, abs(Lake_temps-modelled_dm)]):
         ax = plt.subplot(1, 3, i+1)
@@ -80,15 +155,15 @@ def plotLakeandError(scored_Lake, Lake_temps):
             plt.yticks(np.arange(-2,18,2), [""]*len(ylabs_))
         if i == 1:
             plt.xlabel("Depth in meters")
-    divider = make_axes_locatable(ax)
-    cax1 = divider.append_axes("right", size="5%", pad="3%")
-    plt.colorbar(ax1, cax=cax1)
+        divider = make_axes_locatable(ax)
+        cax1 = divider.append_axes("right", size="5%", pad="3%")
+        plt.colorbar(ax1, cax=cax1)
     error = abs(Lake_temps-modelled_dm).sum().sum()
     denom = (Lake_temps.shape[0]*Lake_temps.shape[1])
     print error/denom, "average error per voxel"
 
-def plotLakeProfiles(scored_lake):
-    fig = plt.figure(1, figsize=(18,9))
+def plotLakeProfiles(scored_lake, fignum):
+    fig = plt.figure(fignum, figsize=(18,9))
     ax = fig.add_subplot(3,1,1)
     ax.set_title("Elevation", fontsize=18)
     cax = ax.imshow(np.flipud(scored_lake.depth_dfs['z'].iloc[:, :150].T))
@@ -130,14 +205,15 @@ def fn_timer(function):
         return result
     return function_timer
     
-def import_config(dl_default=False, verbose=True):
+def import_glm_config(dl_default=False, verbose=False):
     # the glm contains the following blocks:
     # &glm_setup: 13 general simulation info and mixing parameters
+    print "Importing AED baseline config"
     if dl_default:
         default_config = {'others':{}}
         default_order = {}
         block_order = []
-        with open('../test_files/sample_glm.nml', 'r') as f:
+        with open('../test_files/sample_aed_glm.nml', 'r') as f:
             for line in f:
                 key = line[0]
                 line = line.strip()
@@ -169,7 +245,7 @@ def import_config(dl_default=False, verbose=True):
                  'min_layer_vol' :0.02, 
                  'min_layer_thick' :0.32, 
                  'max_layer_thick' :1.0,  
-                 'Kw' : 0.6, 
+                 'Kw' : 0.4, 
                  'coef_mix_conv' : 0.1125, 
                  'coef_wind_stir' : 0.1625, 
                  'coef_mix_shear' : 0.21, 
@@ -178,20 +254,31 @@ def import_config(dl_default=False, verbose=True):
                  'coef_mix_hyp' : 0.675,
                  'deep_mixing':'.false.'}
                  
-    wq_setup = {}
+    wq_setup = {'wq_lib': "'aed2'",
+                'wq_nml_file': "'aed2.nml'",
+                'ode_method': 11,
+                'split_factor': 1,
+                'bioshade_feedback': '.true.',
+                'repair_state': '.true.',
+                'benthic_mode': 1}
     
     # &morphometry: 8 vars
     morphometry = {'lake_name': "'UpperMysticLake'", 
                    "latitude": 42,  
                    "longitude": -71,
-                   "bsn_len": 1012.0,
+                   "bsn_len": 1595.0,
                    "bsn_wid": 570.0, 
                    "bsn_vals": None,
+                   #"A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69,
+                   #    397077.50, 460778.04, 524802.66, 560051.22]
                    "A":[ 77373.80, 148475.73, 202472.97, 257818.95, 338552.69,
-                        397077.50, 460778.04, 524802.66, 560051.22]}
-    morphometry['H'] = [  0., 3.048, 6.096, 9.144, 12.192, 15.24, 18.288,
-                        21.336,  24.384]
-                        
+                       397077.50, 460778.04, 629763.19, 784071.71]
+                   
+                        }
+    depths_ = [ 0., 3.048, 6.096, 9.144, 12.192, 15.24, 18.288, 21.336,  24.384]
+    depths_.reverse()
+    morphometry['H'] = [i*-1. for i in depths_]
+
     morphometry['bsn_vals'] = len(morphometry['H'])
     assert len(morphometry['H']) == len(morphometry['A'])
     
@@ -204,43 +291,51 @@ def import_config(dl_default=False, verbose=True):
             
     start_t = pd.Timestamp(time["start"])
     end_t = pd.Timestamp(time["stop"])
-    time['num_days'] = (end_t-start_t).days
+    time['num_days'] = (end_t-start_t).days + 1
     
     # &output 14 vars 
-    output = {"out_dir" : "", 
-              "out_fn" : "'output_'",
-              "nsave" : 12, 
+    output = {"out_dir" : None, # set at write time
+              "out_fn" : None,  # set at write time 
+              "nsave" : 24, 
               "csv_lake_fname" : "'lake'",
-              "csv_point_nlevs" : 0,
+              "csv_point_nlevs" : None,
               "csv_point_fname" : "'WQ_'",
-              "csv_point_at" : [1, 5, 9, 13, 17, 21],
-              "csv_point_nvars" : 2,
-              "csv_point_vars" : [ 'temp', 'salt'],
+              "csv_point_at" :  list(np.arange(1,21,3)) + [21],
+              "csv_point_nvars" : None,
+              "csv_point_vars" : ['temp', 'salt', 'OXY_oxy', 'CAR_dic', 'CAR_pH',
+                                  'CAR_ch4', 'SIL_rsi', 'NIT_amm', 'NIT_nit',
+                                  'PHS_frp', 'OGM_don', 'OGM_pon', 'OGM_dop',
+                                  'OGM_pop','OGM_doc','OGM_poc','PHY_green'],
               "csv_outlet_allinone" : ".false.",
               "csv_outlet_fname" : "'outlet_'",
-              "csv_outlet_nvars" : 3,
-              "csv_outlet_vars" : ['flow', 'temp', 'salt'],
+              "csv_outlet_nvars" : None,
+              "csv_outlet_vars" : None,
               "csv_ovrflw_fname" : "\"overflow\"" }
-              
+
+    output["csv_outlet_vars"] = ['flow']+output['csv_point_vars']
+    output["csv_outlet_nvars"] = len(output["csv_outlet_vars"])
     output["csv_point_nlevs"] = len(output["csv_point_at"])
+    output["csv_point_nvars"] = len(output["csv_point_vars"])
+    
     
     #&init_profiles            
     init_profiles = {"lake_depth": 24.384, 
                      "num_depths": 6, 
                      "the_depths": [1, 5, 9, 13, 17, 21], 
                      "the_temps": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0], 
-                     }
-    the_sals = [200., 400., 600., 800., 1000., 1200.]              
-    init_profiles["the_sals"] = [i*3.3 for i in the_sals]
+                     "the_sals": [0.549, 1.10, 1.492, 1.937, 2.373, 2.801]}
+    
     init_profiles['num_depths'] = len(init_profiles["the_depths"])
+    init_profiles['the_sals'] = [(i*1.8*1.945*1.91) for i in init_profiles['the_sals']]
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_temps"])
     assert len(init_profiles["the_depths"]) == len(init_profiles["the_sals"])
     
-    if wq_setup.keys() != []:        
-        init_profiles["num_wq_vars"] = 0
-        init_profiles["wq_names"] = []
-        init_profiles["wq_init_vals"] = "" 
-                     
+    init_profiles["wq_names"] = ['OGM_don', 'OGM_pon', 'OGM_dop', 'OGM_pop',
+                                 'OGM_doc', 'OGM_poc']
+    init_profiles["num_wq_vars"] = len(init_profiles["wq_names"])
+    #init_profiles["wq_init_vals"] = [.5, .5, .5, .5, .5, .5]*6
+    init_profiles["wq_init_vals"] = [.5, .5, .5, .5, .5, .5]*6
+
     #&meteorology                 
     meteorology = {"met_sw" : ".true.",
                    "lw_type" : "'LW_IN'", 
@@ -252,9 +347,9 @@ def import_config(dl_default=False, verbose=True):
                    "cloud_mode": 3, 
                    "subdaily": '.false.', 
                    "meteo_fl": "'met_daily.csv'",
-                   "wind_factor": 1.0,
+                   "wind_factor": 0.7,
                    "sw_factor":  1.0,
-                   "lw_factor": 1.0, 
+                   "lw_factor": 1.1, 
                    "at_factor": 1.0,
                    "rh_factor": 1.0,
                    "rain_factor": 1.00,
@@ -278,16 +373,19 @@ def import_config(dl_default=False, verbose=True):
               "strm_hf_angle": 1.1, 
               "strmbd_slope": 0.5, 
               "strmbd_drag": 0.008, 
-              "inflow_factor": 0.8, 
+              "inflow_factor": 0.55, 
               "inflow_fl": "'inflow.csv'", 
-              "inflow_varnum": 3, 
-              "inflow_vars": ['FLOW','TEMP','SALT'],
+              "inflow_varnum": None, 
+              "inflow_vars": ['FLOW','TEMP','SALT','OXY_oxy','SIL_rsi','NIT_amm',
+                              'NIT_nit','PHS_frp','OGM_don','OGM_pon','OGM_dop',
+                              'OGM_pop','OGM_doc','OGM_poc','PHY_green',
+                              'PHY_crypto','PHY_diatom', 'CAR_dic', 'CAR_pH'],
               "coef_inf_entrain": 0.7 }
-              
+    inflow["inflow_varnum"] = len(inflow['inflow_vars'])
     #&outflow
     outflow = {"num_outlet": 1,
                "flt_off_sw": ".false.",
-               "outl_elvs": 24.,
+               "outl_elvs": 0.,
                "bsn_len_outl": 100.0, 
                "bsn_wid_outl" : 274.0,
                "outflow_fl" : "'outflow.csv'",
@@ -307,6 +405,34 @@ def import_config(dl_default=False, verbose=True):
                    "inflow" : inflow }
 
     return glm_config, default_config, default_order, block_order
+
+def calculate_vector_space_by_midpoint(midpoints, increment_n):
+    """
+    This function takes a list of values and prints the inputs for np.arange()
+    such that a vector of equidistant points is created around each value. 
+    If the boundaries of the space fall into negative territory, the entire
+    space is shifted in the positive direction until the lower limit is 
+    equal to the midpoint[x]*(1/increment_n)
+    """
+    #midpoints = [0.4, 0.1125, 0.1625, 0.21, 0.6375, 0.315, 0.675, 1595.0, 
+    #             570.0, 1.0, 1.0, 100.0, 274.0, 0.7, 0.008, 0.5, 1.1, 0.55, 
+    #             0.03, 0.7, 1.00, 1.0, 1.0, 1.0, 1.1, 0.0015, 0.001, 0.0011]
+    #opt_space = 200
+    opt_space = increment_n
+    pct_inc = (1/float(opt_space))
+    for i in midpoints:
+        increment = i*pct_inc
+        low_point = i - increment*(opt_space/2)
+        high_point = i + increment*(opt_space/2 + 1)
+        if low_point < 0:
+            neg_dist = 0 - low_point
+            low_point += neg_dist+increment
+            high_point += neg_dist+increment
+        print ""
+        print "{}, {}, {}".format(low_point, high_point, increment)
+        print "{0:.2f}\t{1:.2f}".format(i, np.arange(low_point, high_point, increment).mean())
+        print "num points:", len(np.arange(low_point, high_point, increment))
+    
 
 def log_likelihood(err, t_obs):
     std=100    #EDIT THIS VALUE
@@ -564,25 +690,83 @@ def ncdump(nc_fid, verb=True):
 class Lake(object):
     
     def __init__(self, name, dir_path):
+        # modelled matrices subsected to match observation matrices
+        self.modelled_sub = {}
+        # corresponding (posibly) subsected observation matrices
+        self.observations_sub = {}        
+        # Dicts for raw observation matrices and liklihood scores
+        self.observations = {}
+        self.liklihood = {}
+        # Dict of modelled vars & corresponding units
+        self.model_var_units = {}
+        # Flag to flip after execution and objects for output pipes to fill
         self.stdout, self.stderr, self.ran = None, None, False
+        # Identifier for optimization variants
         self.variant_var, self.variant_val = "baseline", "baseline"
-        self.liklihood = None
+
         self.name = name
         self.dir_path = dir_path
         make_dir(dir_path, verbose=False)
         self.glm_path = os.path.join(self.dir_path,"glm2.nml")
         
-        config_pack = import_config(dl_default=True, verbose=False)
+        config_pack = import_glm_config(dl_default=True, verbose=False)
         self.glm_config, self.default_config = config_pack[0], config_pack[1]
         self.default_order, self.block_order = config_pack[2], config_pack[3]
         self.baseline_configured=False
+        self.aed_config = read_aed_nml()
+        self.pathogen_config = read_cell_params('pathogen')
+        self.phyto_config = read_cell_params('phyto')
+        self.zoo_config = read_zoo_params()
+        self.patho_params = load_aed_var_types('pathogen')
+        self.phyto_params = load_aed_var_types('phyto')
+        self.zoo_params = load_aed_var_types('zoo')
        
     def cleanup(self, verbose=True):
         shutil.rmtree(self.dir_path)
         
+    def write_aed_files(self, aed_dict=None, phyto_dict=None, patho_dict=None, 
+                        zoo_dict=None):
+        """
+        This function writes the values in the configuration dictionaries
+        to the appropriate file names as specified in the `glm_config` object.
+        If None is provided for a given dictionary, the default values are 
+        written out.
+        """
+        aed_fn = self.glm_config['wq_setup']['wq_nml_file'][1:-1]
+        self.aed_path = os.path.join(self.dir_path, aed_fn)
+        phyto_fn = 'aed2_phyto_pars.nml'
+        patho_fn = 'aed2_pathogen_pars.nml'
+        zoo_fn = 'aed2_zoop_pars.nml'
+        self.phyto_path = os.path.join(self.dir_path, phyto_fn)
+        self.patho_path = os.path.join(self.dir_path, patho_fn) 
+        self.zoo_path =  os.path.join(self.dir_path, zoo_fn)
+        
+        if not aed_dict:
+            _ = write_aed2_config(self.aed_config, self.aed_path)
+        else:
+            _ = write_aed2_config(aed_dict, self.aed_path)
+            
+        if not phyto_dict:
+            _ = write_aed2_eco_configs(self.phyto_config, self.phyto_path, 
+                                       'phyto')
+        else:
+            _ = write_aed2_eco_configs(phyto_dict, self.phyto_path, 'phyto')
+            
+        if not patho_dict:
+            _ = write_aed2_eco_configs(self.pathogen_config, self.patho_path, 
+                                       'pathogen')
+        else:
+            _ = write_aed2_eco_configs(patho_dict, self.patho_path, 'pathogen')
+            
+        if not zoo_dict:
+            _ = write_aed2_eco_configs(self.zoo_config, self.zoo_path, 'zoo')
+        else:
+            _ = write_aed2_eco_configs(zoo_dict, self.zoo_path, 'zoo')
+        del _
+        
     def write_glm_config(self, verbose=True):
-        self.glm_config['output']['out_dir'] = "'"+str(self.dir_path)+"'"
-        self.glm_config['output']['out_fn'] = self.glm_config['output']['out_fn'][0:-1] +"'"
+        self.glm_config['output']['out_dir'] = "'"+self.dir_path+"'"
+        self.glm_config['output']['out_fn'] = "'full_output'"
         self.glm_config['glm_setup']['sim_name'] = "'"+str(self.name)+"'"
         
         if verbose:
@@ -618,14 +802,14 @@ class Lake(object):
                     print block, param
                 value = self.glm_config[block][param]
                 if type(value) == list:
-                    glm_handle.write("   {0} = ".format(param))
+                    glm_handle.write("{0} = ".format(param))
                     for i, v in enumerate(value):
                         if (i+1) == len(value):
                             glm_handle.write("%r\n" % v)
                         else:
-                            glm_handle.write("%r, " % v)
+                            glm_handle.write("%r," % v)
                 else:
-                    glm_handle.write("   {0} = {1}\n".format(param, value))
+                    glm_handle.write("{0} = {1}\n".format(param, value))
             glm_handle.write("/\n")
         glm_handle.close()
         
@@ -652,9 +836,19 @@ class Lake(object):
             raise IOError
     
     def temporal_clipping(self, data_pack):
+        """
+        This fxn does temporal alignment of input datasets
+        """
+        self.firstDay = pd.to_datetime(self.glm_config['time']['start'][1:-1])
+        self.lastDay = pd.to_datetime(self.glm_config['time']['stop'][1:-1])
+        data_first_day = np.max([i.index[0] for i in data_pack])
+        data_last_day = np.min([i.index[-1] for i in data_pack])
         
-        self.firstDay = np.max([i.index[0] for i in data_pack])
-        self.lastDay = np.min([i.index[-1] for i in data_pack])
+        if data_first_day > self.firstDay:
+            sys.exit("Simulation begins before input data")
+        elif data_last_day < self.lastDay:
+            sys.exit("Prescribed simulation ends before input data")
+        
         frontCrit = [i.index >= self.firstDay for i in data_pack]
         backCrit = [i.index <= self.lastDay for i in data_pack]
         self.aligned_columns = {}
@@ -679,14 +873,12 @@ class Lake(object):
         for i in metPack:
             self.met_df[i] = self.aligned_columns[i]
             
-        print "\tWriting met.csv"
+        print "\tWriting met.csv for:"
+        print self.met_df.index[0], "to", self.met_df.index[-1]
         self.met_df.to_csv(path_or_buf=self.metcsv_path, index_label='time')
         
-    def create_flowcsvs(self, InPack, OutPack):
+    def create_flowcsvs(self, InPack, OutPack, verbose=False):
         """
-        This fxn does temporal alignment of input datasets. It pulls the 
-        the expected file name from the `expectations` object and writes a 
-        csv to that location. 
         """
         out_fn = self.glm_config['outflow']['outflow_fl'][1:-1]
         in_fn = self.glm_config['inflow']['inflow_fl'][1:-1]
@@ -702,10 +894,15 @@ class Lake(object):
             
         self.out_df.rename(columns = {'OUTFLOW':'FLOW'}, inplace = True)
         self.in_df.rename(columns = {'INFLOW':'FLOW'}, inplace = True)
-        
-        print "\tWriting inflow.csv"
-        self.in_df.to_csv(path_or_buf=self.incsv_path, index_label='time')
-        print "\tWriting outflow.csv"
+        if verbose:
+            print "Adding AED columns to a matrix of size:"
+            print self.in_df.shape
+        self.in_df_aed = add_aed_columns_to_input(self.in_df)
+        if verbose:
+            print "\tWriting inflow.csv"
+        self.in_df_aed.to_csv(path_or_buf=self.incsv_path, index_label='time')
+        if verbose:
+            print "\tWriting outflow.csv"
         self.out_df.to_csv(path_or_buf=self.outcsv_path, index_label='time')
 
         
@@ -836,7 +1033,7 @@ class Lake(object):
             csv_new = os.path.join(random_lake.dir_path, csv_bn)
             if not os.path.exists(csv_new):
                 os.symlink(csv_old, csv_new)
-                
+        
         p_count = 0
         p_found = 0
         if self.variants:
@@ -857,6 +1054,7 @@ class Lake(object):
                                                 
             if p_flag == False:
                 print param, "not found"
+                
             print p_count, "external parameter spaces defined"
             print p_found, "of them matched to internal declarations"
             out_el = random_lake.glm_config['outflow']['outl_elvs']
@@ -868,17 +1066,25 @@ class Lake(object):
                 random_lake.glm_config['outflow']['outl_elvs'] = lake_crest
                     
             random_lake.write_glm_config(False)
+            
+            aed_ps = [random_lake.aed_path, random_lake.phyto_path, 
+                      random_lake.pathogen_path, random_lake.zoo_path]
+                      
+            aed_fs = [os.path.basename(i) for i in aed_ps]
+            random_lake.write_aed_files(aed_fs[0],aed_fs[1],
+                                            aed_fs[2],aed_fs[3])
         else:
             sys.exit("No variants detected")
 
             
         return random_lake
         
-    def write_variant_configs(self, copycsvs=False, verbose=True):
+    def test_variant_configs(self, Lake_temps, copycsvs=False, verbose=True):
         
         if self.glm_config and self.variant_cases:
             variant_lakes = []
-            for i in self.variant_cases:
+            lakes_n = len(self.variant_cases)
+            for n_var, i in enumerate(self.variant_cases):
                 variant_lake = copy.deepcopy(self)
                 key1, key2, val, simname = i[0],i[1],i[2],i[3]
                 listVars = ['the_temps', 'the_sals', 'A', 'H' ]
@@ -915,6 +1121,11 @@ class Lake(object):
                 variant_lake.glm_path = os.path.join(variant_lake.dir_path,
                                                      "glm2.nml")
                 variant_lake.write_glm_config(verbose)
+                aed_ps = [variant_lake.aed_path, variant_lake.phyto_path, 
+                          variant_lake.pathogen_path, variant_lake.zoo_path]
+                aed_fs = [os.path.basename(i) for i in aed_ps]
+                variant_lake.write_aed_files(aed_fs[0],aed_fs[1],
+                                                 aed_fs[2],aed_fs[3])
                 
                 if copycsvs==True:
                     if verbose==True:
@@ -940,19 +1151,47 @@ class Lake(object):
                     if verbose==True:
                         print "Original data csvs not moved into variant folders"
                     
-                variant_lakes.append(variant_lake)
+                variant_lake.assign_observation_matrix(Lake_temps, 'temp', 'celsius')
+                #Run them all & score them all
+                score_list = run_test_variant((n_var, variant_lake, 
+                                               lakes_n, self))
+                del variant_lake
+                variant_lakes.append(score_list)
         return variant_lakes
     
-    
-
-    def score_variant(self, observations, base, obs_type, lik_fxn='NSE'):
-        # ensure input object is a Lake model that was run and has had its 
-        # data collected. 
+    def assign_observation_matrix(self, observations, var_type, units):
+        if units:
+            if units.lower() == 'mg/l':
+                if var_type == 'OXY_oxy':
+                    print "Converting DO obs. units"
+                    mg_DO_to_uM = (1./0.0319988)
+                    observations *= mg_DO_to_uM
+                elif var_type == 'NIT_nit':
+                    mg_NO3_to_uM = 16.1278
+                    observations *= mg_NO3_to_uM
+                    print "Converting NO3 obs. units"    
+                units = 'mmol/m**3'
+        
+        if var_type in self.observations.keys():
+            old_obs, unit_type = self.observations[var_type]
+            if unit_type == units:
+                new_obs = old_obs.append(observations)
+                self.observations[var_type] = (new_obs, units)
+            else:
+                sys.exit('convert observations to compatible units')
+        else:
+            self.observations[var_type] = (observations, units)
+            
+            
+        
+        
+    def score_variant(self, base, obs_type, lik_fxn='NSE'):
+        # check if model was ran
         if self.ran == False:
             print "Scoring attempt on Bad Run Skipped"
             return np.nan
-            
-        assert type(self) == Lake
+        
+        # check if data was collected
         assert self.csv_dict
 
         #is top bottom orientation correct??
@@ -960,14 +1199,7 @@ class Lake(object):
         # This is developed for 'temp' but can be expanded to check other 
         # locations for outputs to score
         if obs_type in self.depth_dfs.keys():
-            # baseline here is our best guess for parameter sets. we resample
-            # because the example configuration decided to save a tune step 
-            # every 12 hours
-            # observations is a Dataframe containing real world data, but is
-            # restricted to just a few time points and layers are not matched 
-            # to actual depths so the model output needs to be resectioned
-            # Use the error function written previously to calculate the error
-            # Currently only NSE is a supported likelihood function
+           
             
             # Now repeat the last 3 steps for all variant runs in variant_list
             # Pull out each tweaked parameter and the corresponding value
@@ -976,11 +1208,21 @@ class Lake(object):
             # Pull out the value's position in the vector of all tested values
             modelled = self.depth_dfs[obs_type].resample('D').mean()
             self.z_index = self.depth_dfs['z'].resample('D').mean()
-            self.observed_dm = time_depth_df_filter(modelled, observations,
-                                                    self.z_index)
-            err = error_metrics(observations.values, self.observed_dm)
-            print err[lik_fxn]
-            self.liklihood = err[lik_fxn]
+            
+            try:
+                observations, _ = self.observations[obs_type]  
+            except NameError:
+                sys.exit("No observations assigned")
+                
+            modelled_sub, observations_sub = time_depth_df_filter(modelled, 
+                                                                  observations,
+                                                                  self.z_index)
+            
+            self.modelled_sub[obs_type] = modelled_sub
+            self.observations_sub[obs_type] = observations_sub
+
+            err = error_metrics(observations_sub.values, modelled_sub)
+            self.liklihood[obs_type] = err[lik_fxn]
                 
             if sub_block_ != 'baseline':
                 all_idxs = np.where(base.variants['grid'][sub_block_] == curr_val)
@@ -1007,35 +1249,69 @@ class Lake(object):
                         # posterior by that value to get the real posterior
                         evidence=np.trapz(raw_post, base.variants['grid'][sb2])
                         base.variants['posterior'][sb2]=raw_post/evidence
+        
         return err[lik_fxn]
     
+def run_test_variant(variant_lake_tuple):
+    i = variant_lake_tuple[0]
+    l = variant_lake_tuple[1]
+    mod_fam_size = variant_lake_tuple[2]
+    baseline_case = variant_lake_tuple[3]
+    
+    # test disk size 
+    statvfs = os.statvfs(os.getcwd())
+    bytes_avail = statvfs.f_frsize * statvfs.f_bavail
+    if bytes_avail < 104857600/2:
+        sys.exit("Disk space less than 100 Mb, aborting")
+    #print "~{} Mb of disk space remaining".format(bytes_avail/1024/1024)
+    
+    print "Running #", i+1, "out of", mod_fam_size
+    #print "%r = %r" % (l.variant_var, l.variant_val)
+    print l.glm_config['output']["out_fn"]
+    ran_lake = run_model(l, verbose=False, forceRerun=True)
+    print ran_lake.variant_val
+    print ran_lake.variant_var
+    data_lake = pull_output_nc(ran_lake, force=True)
+    if data_lake.ran == True:
+        try: 
+            NSE = data_lake.score_variant(baseline_case, 'temp', lik_fxn='NSE')
+        except ValueError:
+            sys.exit()
+        data_lake.cleanup(verbose=True)
+        to_return = [data_lake.variant_var, data_lake.variant_val, NSE]
+        del data_lake
+        return to_return
+    else:
+        print "Variant %s failed and was removed" % data_lake.glm_config['glm_setup']['sim_name']
+        return None
 
-                
-            
 def time_depth_df_filter(baseline, observations, depths):
     #only extract the rows where we have corresponding dates
     time_matched_vals = baseline[baseline.index.isin(observations.index)]
-    time_matched_depth = depths[depths.index.isin(observations.index)]
+    time_matched_heights = depths[depths.index.isin(observations.index)]
+    observations_mod, _ = subsectbydate_2(observations, time_matched_vals)
     
-    observed_dm = np.zeros(observations.shape)
-    obs_days, e_cols = observations.shape
-    
+    observed_dm = np.zeros(observations_mod.shape)
+    obs_days, e_cols = observations_mod.shape
     for row in range(obs_days):
-        this_row = time_matched_vals.iloc[row, :].dropna()
-        this_z = time_matched_depth.iloc[row, :].dropna()        
+        this_row = time_matched_vals.iloc[row, :].dropna(axis=0)
+        this_z = time_matched_heights.iloc[row, :].dropna(axis=0)
         
         elevations = range(e_cols)
         elevations.reverse()
         elevations = np.array(elevations) + 1
+        depths_ = range(e_cols)
         
-        for m,e in zip(range(e_cols), elevations):
+        for m,e in zip(depths_, elevations):
             if m != range(e_cols)[0]:
-                
-                observed_dm[row, m] = this_row[(this_z > e-1) & (this_z < e)].mean()
+                up_elev_bool = (this_z > e-1)
+                low_elev_bool = (this_z < e)
+                sweet_spot_bool = up_elev_bool & low_elev_bool
+                observed_dm[row, m] = this_row[sweet_spot_bool].mean()
             else:
                 observed_dm[row, m] = this_row[(this_z > e)].mean()
                 
-    return observed_dm
+    return observed_dm, observations_mod
 
     
 class USGS_water_data(object):
@@ -1274,6 +1550,7 @@ def run_model(Lake, ex_loc=None, verbose=True, forceRerun=False):
     specefied in `ex_loc`
     """
     report_path = os.path.join(Lake.dir_path, "Run_report.txt")
+    print report_path
     unique_divider = "\n*\n"
     
     if os.path.exists(report_path) and forceRerun == False:
@@ -1347,6 +1624,7 @@ def run_model(Lake, ex_loc=None, verbose=True, forceRerun=False):
 
 def pull_output_nc(Lake, force, verbose=False, plot=True, plot_var=[],
                    pickle=True):
+    
     if Lake.ran == True:
         
         # This section calculates the expected time interval for saved time
@@ -1357,7 +1635,7 @@ def pull_output_nc(Lake, force, verbose=False, plot=True, plot_var=[],
         interval = pd.date_range(start=Lake.glm_config['time']['start'], 
                                  end=Lake.glm_config['time']['stop'], 
                                  freq=freq_S)
-        Lake.nc_interval = interval[1:]
+        Lake.nc_interval = interval
         if verbose == True:
             print "The time steps in the output netCDF are %s" % freq_S
         
@@ -1379,13 +1657,21 @@ def pull_output_nc(Lake, force, verbose=False, plot=True, plot_var=[],
             Lake.lake_df = unpickled[1]
             Lake.output_nc = None
         else:
+            print Lake.output_nc_path
             output = Dataset(Lake.output_nc_path, "r")
-            nc_vars = output.variables.keys()             
+            nc_vars = output.variables.keys()
+            for ncv in nc_vars:
+                try:
+                    Lake.model_var_units[ncv] = output[ncv].units
+                except AttributeError:
+                    Lake.model_var_units[ncv] = None
+
             if 'time' in nc_vars:
                 t_vector = output['time'][:]
                 start_t = pd.to_datetime(output['time'].units[12:])
                 d_vector = [start_t + DateOffset(hours=t) for t in t_vector]
-
+            #print len(d_vector)
+            #print len(Lake.nc_interval)
             assert len(d_vector) == len(Lake.nc_interval)
             if verbose == True:
                 print "THe netCDF time vector is the expected size"
@@ -1406,7 +1692,10 @@ def pull_output_nc(Lake, force, verbose=False, plot=True, plot_var=[],
                     col_n = range(data_mat.shape[1])
                     this_df = pd.DataFrame(columns = col_n, index = d_vector, 
                                            data = data_mat)
-                    assert data_buff.mask.sum() == this_df.isnull().sum().sum()
+                    #print ncv
+                    #print data_buff.mask.sum(), this_df.isnull().sum().sum()
+                    if not (data_buff.mask.sum() == this_df.isnull().sum().sum()):
+                        print "Warning: illegal variable size"
                     depth_dfs[ncv] = this_df
     
             Lake.depth_dfs = depth_dfs
@@ -1498,3 +1787,106 @@ def pull_output_nc(Lake, force, verbose=False, plot=True, plot_var=[],
     else:
         print "Model not executed"
     return Lake
+
+    
+from collections import OrderedDict
+from ChemDataVectors import LoadChemDFs
+
+
+def add_aed_columns_to_input(inflow_orig):
+    # Pull full inflow, meteorology, and outflow time series
+    # Pull in surface & depth profile chem data
+    depthGrad_df, surfaceM_df = LoadChemDFs()
+
+    # Drop outflow & lake surface columns & trim column names
+    extra_cols = [col for col in list(surfaceM_df.columns) 
+                          if 'AberjonaRiver(Lower)' not in col]
+    inflow_chem = surfaceM_df.drop(extra_cols, axis=1, inplace=False)
+    new_columns = [i[:-21] for i in inflow_chem.columns]
+    inflow_chem.columns = new_columns # concordance checked by mean
+    
+    ## Convert Units of Inflow vars
+    
+    # input O2 units are mg/L -> Multiply by (mmol / g of o2) * (1 L / 0.001 m^3)
+    DO_multiplier = (3.12512*10**-2)*(1/0.001)
+    depthGrad_df.DO = depthGrad_df.DO * DO_multiplier
+    inflow_chem.DO = inflow_chem.DO * DO_multiplier
+    
+    # convert specific conductance to freshwater salinity 
+    inflow_chem['Salinity'] = cond2sal(inflow_chem.SpecCond)
+    
+    # convert NH4 from mg/L to mmol / m^3
+    NH4_multiplier = (1000/18.0385)
+    inflow_chem.NH4 = inflow_chem.NH4 * NH4_multiplier
+    TP_multiplier = 10.5294857189
+    inflow_chem.TotalP = inflow_chem.TotalP*TP_multiplier
+    NO_multiplier = 16.127757645
+    inflow_chem.NO3NO2 = inflow_chem.NO3NO2*NO_multiplier
+    
+    # convert period index to datetime index centered on the 1st of each month
+    new_index = []
+    for period in inflow_chem.index:
+        ide = pd.to_datetime(str(period)+'-01')
+        new_index.append(ide)
+    inflow_chem.index = new_index
+
+    # Trim extratemporaneous time points from MRWA dataset
+    new_index = pd.date_range((pd.Timestamp('20121231')+pd.DateOffset(months=-12)), 
+                              periods=37, freq='MS')
+    alt_chem = pd.DataFrame(index=new_index, columns=inflow_chem.columns,
+                            data=inflow_chem.values)
+    inflow_mod1, mrwa_chem = subsectbydate_2(inflow_orig, alt_chem)
+
+    # Fill in the rest of the month using a second order spline
+    mrwa_upsample = mrwa_chem.reindex(inflow_mod1.index)
+    mrwa_up_splined = mrwa_upsample.interpolate(method='pchip')
+    
+    # TODO: Convert Units of Depth Profiles for grading purposes
+    
+    aed_inflow_params = OrderedDict()
+    aed_inflow_params['OXY_oxy'] = None # 225 # None
+    aed_inflow_params['SIL_rsi'] = 12.5
+    aed_inflow_params['NIT_amm'] = None # 12.5 # None
+    aed_inflow_params['NIT_nit'] = None # 27.6 # None
+    aed_inflow_params['PHS_frp'] = None # 0.25 # None
+    aed_inflow_params['OGM_don'] = 70.
+    aed_inflow_params['OGM_pon'] = 5.
+    aed_inflow_params['OGM_dop'] = 10.
+    aed_inflow_params['OGM_pop'] = 10.
+    aed_inflow_params['OGM_doc'] = 80.
+    aed_inflow_params['OGM_poc'] = 700.
+    aed_inflow_params['PHY_green'] = 40.
+    aed_inflow_params['PHY_crypto'] = 40.
+    aed_inflow_params['PHY_diatom'] = 40. 
+    aed_inflow_params['CAR_dic'] = 1600.
+    aed_inflow_params['CAR_pH'] = 7.5
+    
+    inflow_mod2 = inflow_mod1.copy()
+
+    for name, value in aed_inflow_params.items():
+        if value:
+            inflow_mod2[name] = np.ones((inflow_mod2.shape[0],))*value
+        elif name == 'OXY_oxy':
+            inflow_mod2[name] = mrwa_up_splined['DO']
+        elif name == 'NIT_amm':
+            inflow_mod2[name] = mrwa_up_splined['NH4']
+        elif name == 'NIT_nit':
+            inflow_mod2[name] = mrwa_up_splined['NO3NO2']
+        elif name == 'PHS_frp':
+            inflow_mod2[name] = mrwa_up_splined['TotalP']
+        else:
+            sys.exit("Illegal Inflow Parameter")
+
+    return inflow_mod2
+    
+    
+def extractDepthDf(lake, var_string, time_depth_axis):
+    var_df = lake.depth_dfs[var_string]
+    print "Extracting", var_string
+    var_meters, time_depth_axis = time_depth_df_filter(var_df, time_depth_axis, 
+                                                       lake.z_index)
+    var_df_clean = pd.DataFrame(index=var_df.index,
+                                columns=range(var_meters.shape[1]),
+                                data=var_meters)
+    var_df_clean_2 = var_df_clean.interpolate(axis=1)
+    return var_df_clean_2

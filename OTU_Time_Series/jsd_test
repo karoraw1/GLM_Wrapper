@@ -1,0 +1,41 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Feb 22 13:18:39 2017
+
+@author: login
+"""
+
+
+import pandas as pd
+import numpy as np
+
+test_mat = np.array([[0, 0, 0, 1],
+                    [1, 1, 1, 1],
+                    [2, 1, 1, 0],
+                    [20, 10, 10, 5],
+                    [5, 0, 0, 0],
+                    [2, 8, 8, 2]])
+test_df = pd.DataFrame(data=test_mat)
+
+
+def JensenShannonDiv_Sqrt(df_otu):
+    ps_df = df_otu.copy()+1
+    print ps_df
+    ps_n_df = ps_df.divide(ps_df.sum(axis=1), axis=0)
+    shape_sq = len(ps_n_df.index)    
+    dist_dat = np.zeros((shape_sq, shape_sq))
+    
+    for r_idx, r in enumerate(ps_n_df.index):
+        for c_idx, c in enumerate(ps_n_df.index):
+            x_ = ps_n_df.ix[r, :]
+            y_ = ps_n_df.ix[c, :]
+            m_ = (x_+y_) / 2
+            jsd_sqrt = (0.5*(x_*np.log2(x_/m_) + y_*np.log2(y_/m_)).sum())**0.5
+            dist_dat[r_idx, c_idx] = jsd_sqrt
+
+    dist_mat = pd.DataFrame(index=ps_n_df.index, columns=ps_n_df.index,
+                            data=dist_dat)
+    return dist_mat
+    
+print JensenShannonDiv_Sqrt(test_df)

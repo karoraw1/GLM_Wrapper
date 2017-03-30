@@ -22,6 +22,7 @@ def parseConfigPickles(dir_list, prefix_list, verbose=True):
         sys.exit("\nBase Directory Not Detected")
     
     caseDirs = [os.path.join(caseBase, i) for i in dir_list]
+    
     cases = []
     for i in caseDirs:            
         if os.path.exists(i) and verbose:
@@ -57,19 +58,7 @@ def parseConfigPickles(dir_list, prefix_list, verbose=True):
             compiled_runs[master_counter] = (bstps_results['config'][m],
                                              bstps_results['error'][m])
     return compiled_runs, all_bad_lakes
-        
 
-#optimized = [ "Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
-#             "coef_mix_conv", "coef_wind_stir", "coef_mix_shear", 
-#             "coef_mix_turb", "coef_mix_KH", "coef_mix_hyp", "longitude", 
-#             "latitude", "bsn_len", "bsn_wid", "A", "H", "the_temps", 
-#             "the_sals", "seepage_rate", "bsn_len_outl", "bsn_wid_outl", 
-#             "coef_inf_entrain", "strmbd_drag", "strmbd_slope", 
-#             "strm_hf_angle", "rain_threshold", "runoff_coef", "wind_factor", 
-#             "rain_factor", "at_factor", "rh_factor", "sw_factor", "lw_factor",
-#             "cd", "ce", "ch"]             
-#dir_list = ['randomize', 'randomize_2']
-#prefix_list = ['results', 'Results', 'run2_results']
 
 optimized = ["Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick", 
              "coef_mix_conv", "coef_wind_stir", "coef_mix_shear", 
@@ -81,6 +70,7 @@ optimized = ["Kw", "min_layer_vol", "min_layer_thick", "max_layer_thick",
              "sw_factor", "lw_factor", "cd", "ce", "ch"]
 
 prefix_list = ['run3_results']
+
 dir_list = ['randomize_2']
 result, bad_lakes = parseConfigPickles(dir_list, prefix_list)
 errorList = np.array([n[1] for n in result.values()])

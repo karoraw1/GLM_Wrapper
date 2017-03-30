@@ -11,6 +11,33 @@ import sys, os
 from sklearn.decomposition import PCA, TruncatedSVD, LatentDirichletAllocation
 from sklearn.preprocessing import StandardScaler
 
+def append_depths(df, depths_vector):
+    """
+    This takes a df with a series of surface concentrations i.e. has a depth
+    column that has 0 in all the rows. It then:
+        1. copies the df as provided to create a template
+        2. iterates over the depth_vector, pulling out each depth sequentially
+        2. copies the template
+        3. modifies the copied template to the particular depth 
+        4. appends the template to the original provided DF
+        
+    The purpose of this is to use regression base methods to see if the concentration
+    at the surface is somehow related to the distributions of microbes throughout
+    the water column. 
+    """
+    n_rows, _ = df.shape
+    multiples = len(depths_vector)
+    expected_rows_n = n_rows*multiples
+    new_depth_template = df.copy()
+    for d in depths_vector:
+        if d != 0:
+            this_depth = new_depth_template.copy()
+            this_depth['depth'] = np.ones((new_depth_template.shape[0], ))*d
+            df = df.append(this_depth)
+    print "Returning df of shape {}, expecting {} rows".format(df.shape, 
+                                                               expected_rows_n)
+    return df
+
 def removeZeroCols(df):
     return (df.T[(df != 0).any()]).T
 
@@ -137,7 +164,7 @@ def listRepGroups(df):
     return unq_rep_groups
 
 def JensenShannonDiv_Sqrt(df_otu):
-    ps_df = df_otu.copy().replace(0.0, 1.0)
+    ps_df = df_otu.copy()+1
     ps_n_df = ps_df.divide(ps_df.sum(axis=1), axis=0)
     shape_sq = len(ps_n_df.index)    
     dist_dat = np.zeros((shape_sq, shape_sq))
@@ -165,6 +192,8 @@ def ReplicateReport(df, df_otus, rep_groups, verbose=True, metric="JSD"):
         
         this_grps = df_otus.ix[group, :]
         dist_mat = JensenShannonDiv_Sqrt(this_grps)
+        # Returns a symmetric matrix with 0s on the diagonal
+        # So we pull out all unique excluding those on the diagonal
         for a_d in np.unique(dist_mat.values):
             if a_d != 0:
                 in_rep_distances.append(a_d)
@@ -309,7 +338,7 @@ def scalePCAcorrelate(df_numerical, df_w_mdata, metadata_cols, transformed):
     
     rows_n, cols_n = X_std2.shape
     print "\nPerforming PCA"
-    print "Matrix has {} samples and {} features".format(rows_n, cols_n)
+    print "Matrix has {} features and {} samples".format(rows_n, cols_n)
     pca2 = TruncatedSVD(n_components=100, n_iter=20, random_state=42)
     pca2.fit(X_std2)
     print "Top two components explain {} and {} of variance.".format(pca2.explained_variance_ratio_[0],
@@ -321,7 +350,7 @@ def scalePCAcorrelate(df_numerical, df_w_mdata, metadata_cols, transformed):
         print "Metadata Variable:", mdata
         print "Max Correlation:", np.array(corrs).max()
         pca_comp_no = np.argmax(np.array(corrs))
-        print "PCA component No:", pca_comp_no
+        print "PCA component No:", pca_comp_no+1
         print "Explained Variance:", pca2.explained_variance_ratio_[pca_comp_no]
         print ""
     return pca2
@@ -597,7 +626,7 @@ def lda_tuner(ingroup_otu, best_models):
     
 
     
-def collapseBdiversity(dist_mat, raw_data_m, metaData_var):
+def collapseBdiversity(dist_mat, raw_data_m, metaData_var, verbose=False):
     metaOptions = np.unique(raw_data_m.ix[:, metaData_var])
     n_ = len(metaOptions)
     metaDistance = np.full((n_, n_), np.nan)
@@ -616,8 +645,9 @@ def collapseBdiversity(dist_mat, raw_data_m, metaData_var):
             dist_filt_nz = dist_filt_flat[dist_filt_flat != 0]
             mD = np.median(dist_filt_nz)
             mDev = dist_filt_nz.std()
-            print "{} versus {} metadistance".format(r, c)
-            print "\t {} ({})".format(mD, mDev)
+            if verbose:
+                print "{} versus {} metadistance".format(r, c)
+                print "\t {} ({})".format(mD, mDev)
             metaDistance[r_i,c_i] = mD
             metaDeviation[r_i,c_i] = mDev
     return metaDistance, metaDeviation
@@ -645,12 +675,22 @@ score = clf.score(X_test, y_test)
 
 import subprocess as sp
 
-def varStabTransform(path, df_otus):
+def varStabTransform(path, df_otus, df_m, method):
     """
     Uses edgeR's variance stabilizing transformation to transform sequence counts
     into OTU abundances. Involves adding and subtracting psuedocounts. 
+
     """
-    wrapper_file = os.path.join(os.getcwd(), "edgeRwrapper.R")
+    print "VST Method selected is {}".format(method)
+    if method == 'TMM':
+        wrapper_file = os.path.join(os.getcwd(), "edgeRwrapper_tmm.R")
+        base_cmd = "Rscript edgeRwrapper_tmm.R"
+    elif method == 'RLE':
+        wrapper_file = os.path.join(os.getcwd(), "edgeRwrapper_rle.R")
+        base_cmd = "Rscript edgeRwrapper_rle.R"
+    else:
+        sys.exit("Incorrect transformation method specified")
+        
     if not os.path.exists(wrapper_file):
         sys.exit("Accessory script missing")
         
@@ -660,22 +700,164 @@ def varStabTransform(path, df_otus):
     arg_1 = os.path.dirname(to_transform)
     arg_2 = to_transform.split("/")[-1]
     # export data to disk
-    shared_otus.to_csv(to_transform, sep=",")
-    # run R script 
-    base_cmd = "Rscript edgeRwrapper.R"
+    shared_otus.to_csv(to_transform, sep=",")        
     cmd = " ".join([base_cmd, arg_1, arg_2])
     p = sp.Popen(cmd, cwd=os.getcwd(), shell=True, stderr=sp.PIPE, stdout=sp.PIPE)
     stdout, stderr = p.communicate()
+    
     if "Execution halted" in stderr:
         sys.exit("R wrapper failed")
     
     to_read_back = os.path.join(arg_1, arg_2.split(".")[0]+"_vst.csv")
     shared_vst = pd.read_csv(to_read_back, index_col = 0)
+    dropped_otus = len(shared_vst.columns) - len(shared_otus.columns)
+    if dropped_otus > 0:
+        print "{} OTUS dropped".format(dropped_otus)
+        
     for i, j in zip(shared_vst.index, shared_otus.index):
-        assert i == j
-    for i, j in zip(shared_vst.columns, shared_otus.columns):
         assert i == j 
     
     for temps in [to_read_back, to_transform]:
         os.remove(temps)
-    return shared_vst
+    
+    vs_T_m = shared_vst.copy()
+    lost_cols = [i for i in df_m.columns if not i.startswith('seq')]
+    alphaList = ['enspie', 'shannon', 'chao1']
+    for alpha_d in alphaList:
+        if alpha_d in lost_cols:
+            lost_cols.remove(alpha_d)
+    
+    for lost_col in lost_cols:
+        vs_T_m[lost_col] = df_m[lost_col]
+
+    vs_T_otus, vs_T_m = alpha_diversity(shared_vst, vs_T_m, alphaList)
+    
+    return vs_T_otus, vs_T_m
+
+def importratesandconcentrations_mod(path_):
+    assert os.path.exists(path_)
+    conc_f_dict = {"concs_1.txt" : "O",
+                   "concs_2.txt" : "C",
+                   "concs_3.txt" : "N+",
+                   "concs_4.txt" : "N-",
+                   "concs_5.txt" : "S+",
+                   "concs_6.txt" : "S-",
+                   "concs_7.txt" : "Fe+",
+                   "concs_8.txt" : "Fe-",
+                   "concs_9.txt" : "CH4",
+                   "concs_10.txt" : "Null"}
+    rate_f_dict = { "rate_1.txt" : "iron_oxidation_(oxygen)",
+                    "rate_2.txt" : "ammonia_oxidation",
+                    "rate_3.txt" : "sulfur_oxidation",
+                    "rate_4.txt" : "iron_oxidation_(nitrate)",
+                    "rate_5.txt" : "methanotrophy_(oxygen)",
+                    "rate_6.txt" : "methanotrophy_(sulfate)",
+                    "rate_7.txt" : "aerobic_heterotrophy",
+                    "rate_8.txt" : "denitrification",
+                    "rate_9.txt" : "iron_reduction",
+                    "rate_10.txt" : "sulfate_reduction",
+                    "rate_11.txt" : "methanogenesis" }
+    rate_dict, conc_dict = {}, {}
+    for d_dict, f_dict in zip([conc_dict, rate_dict], [conc_f_dict, rate_f_dict]):
+        for c_f, spec in f_dict.items():
+            c_p = os.path.join(path_, c_f)
+            c_df = pd.read_csv(c_p, sep="\t")
+            d_dict[spec] = c_df
+            print "{} has shape {}".format(spec, c_df.shape)
+            
+    return (rate_dict, conc_dict)
+        
+from scipy.interpolate import interp1d
+
+def time_scale_modeled_chem_data(rate_dict, conc_dict, n_days, start_date, end_date):
+    """
+    1. Create a date index for the new dataframes
+    2. Create new dictionaries to hold the new dataframes
+    3. Unload each DF one at a time 
+    4. Interpolate each depth vector along new axis
+    5. Load into new numpy array
+    6. Assign date index & numpy array to new dataframe object
+    7. Reload new dataframe into new dictionary, accessible by name string
+    8. Return newly minted dictionaries
+    """
+    dr = pd.date_range(start_date, end_date)
+    assert len(dr) == n_days
+
+    new_rate_dict, new_conc_dict = {}, {}
+    for a_dict, new_dict in zip([rate_dict, conc_dict], [new_rate_dict, new_conc_dict]):
+        
+        for a_spec in a_dict.keys():
+            this_df = a_dict[a_spec]
+            depths, columns = this_df.shape
+            n_slices = columns
+            assert n_slices < n_days
+            idx = np.arange(n_slices)
+            new_interval = max(idx) / float(n_days)
+            new_columns = np.arange(idx.min(), idx.max(), new_interval)
+            new_df_data = np.zeros((depths, len(new_columns)))
+            for depth in xrange(depths):
+                a_vector = this_df.ix[depth, :].values
+                f2 = interp1d(idx, a_vector, kind='cubic')
+                new_df_data[depth, :] = f2(new_columns)
+            new_df = pd.DataFrame(data=new_df_data.T, columns=np.arange(6,6+depths),
+                                  index=dr)
+            new_dict[a_spec] = new_df.T.unstack()
+    
+    rate_cols = sorted(new_rate_dict.keys())
+    conc_cols = sorted(new_conc_dict.keys())
+    all_cols = rate_cols + conc_cols    
+    full_idx = new_rate_dict[rate_cols[0]].index
+
+    full_df = pd.DataFrame(index=full_idx, columns=all_cols)
+    
+    for name in all_cols:
+        if name in rate_cols:
+            full_df.ix[:, name] = new_rate_dict[name]
+        elif name in conc_cols:
+            full_df.ix[:, name] = new_conc_dict[name]
+
+    return full_df
+
+def preheim_date_parser(date_str):
+    date_part = date_str.split("_")[1]
+    new_str = date_part[2:4] + "-" + date_part[4:6] + "-" + date_part[0:2]
+    return pd.to_datetime(new_str)
+    
+def importratesandconcentrations_obs(chem_dir):
+    assert os.path.exists(chem_dir)
+    obs_conc_f_dict = { "Chloride" : "Cl_mg_ClL-1.txt",
+                      "Dissolved Oxygen" : "DO.txt",
+                      "Nitrate" : "NO3_mg_NL-1.txt",
+                      "Conductance" : "SCP.txt",
+                      "Sulfate" : "SO4_mg_SL-1.txt",
+                      "Temperature" : "TEMP.txt" }
+                      
+    obs_conc_df_dict = {}
+    for name, fname in obs_conc_f_dict.items():
+        this_path = os.path.join(chem_dir, fname)
+        this_df = pd.read_csv(this_path, sep="\t", index_col=0, dtype=float)
+        this_df.columns = map(preheim_date_parser, this_df.columns)
+        if name == "Temperature" or name == "Conductance":
+            this_df.ix[1, '2012-11-12'] = this_df.ix[2, '2012-11-02']
+        this_df.interpolate(axis=0, inplace=True)
+        surf_null_mask = this_df.ix[0, :].isnull().values
+        this_df.ix[0, surf_null_mask] = this_df.ix[1, surf_null_mask]
+        this_df = this_df.T
+        if name == "Dissolved Oxygen":
+            idx_to_drop = this_df.index[5]
+            this_df.drop(idx_to_drop, axis=0, inplace=True)
+#       new_cols = list(this_df.columns)
+#        new_cols.reverse()
+#        this_df.columns = new_cols
+        this_df.columns = [int(i) for i in this_df.columns]
+        print "Total Null Vals in {}: {}".format(name, this_df.isnull().sum().sum())
+        obs_conc_df_dict[name] = this_df.T.unstack()
+        
+    conc_cols = sorted(obs_conc_df_dict.keys())
+    full_idx = obs_conc_df_dict[conc_cols[0]].index
+    obs_conc_df = pd.DataFrame(index=full_idx, columns=conc_cols)
+    
+    for name in conc_cols:
+        obs_conc_df.ix[:, name] = obs_conc_df_dict[name]
+        
+    return obs_conc_df

@@ -1,0 +1,480 @@
+Reading config from glm2.nml
+No snow and ice section, setting default parameters and assuming no snowfall
+No sed_heat section, turning off sediment heating
+No diffuser data, setting default values
+X) split_factor 1 mobility_off 0 bioshade_feedback 1 repair_state 1 ode_method 11 benthic_mode 1 do_plots 0
+ init_glm_aed2 from aed2.nml
+ libaed2 version 1.1.1
+ Reading aed2_models config from aed2.nml
+ aed2_sedflux initialization
+ PO4 adsorption is configured to use external TSS
+Estimating temperature functions for phytoplankton - 
+ Temperature function of the form :
+
+    fT = v^(T-20)-v^(k(T-a))+b
+
+Estimating temperature functions for phytoplankton - 
+ Temperature function of the form :
+
+    fT = v^(T-20)-v^(k(T-a))+b
+
+ TN : NIT_nit *    1.00000000000000     
+ TN : NIT_amm *    1.00000000000000     
+ TN : OGM_don *    1.00000000000000     
+ TN : OGM_pon *    1.00000000000000     
+ TN : PHY_green_IN *   0.150000000000000     
+ TP : PHS_frp *    1.00000000000000     
+ TP : PHS_frp_ads *    1.00000000000000     
+ TP : OGM_dop *    1.00000000000000     
+ TP : OGM_pop *    1.00000000000000     
+ TP : PHY_green_IP *   1.000000000000000E-002
+ TOC : OGM_doc *    1.00000000000000     
+ TOC : OGM_poc *    1.00000000000000     
+ TOC : PHY_green *    1.00000000000000     
+ TSS : TRC_ss1 *    1.00000000000000     
+ TSS : PHY_green *    1.00000000000000     
+ AED2 : n_aed2_vars =           71  MaxLayers =          300
+ AED2 : n_vars      =           27  n_vars_ben=            0
+ AED2 : n_vars_diag =           27  n_vars_diag_sheet            9
+ AED2 var name(           1 ) : OXY_oxy
+ AED2 var name(           2 ) : CAR_dic
+ AED2 var name(           3 ) : CAR_pH
+ AED2 var name(           4 ) : CAR_ch4
+ AED2 var name(           5 ) : SIL_rsi
+ AED2 var name(           6 ) : NIT_amm
+ AED2 var name(           7 ) : NIT_nit
+ AED2 var name(           8 ) : PHS_frp
+ AED2 var name(           9 ) : PHS_frp_ads
+ AED2 var name(          10 ) : OGM_doc
+ AED2 var name(          11 ) : OGM_poc
+ AED2 var name(          12 ) : OGM_don
+ AED2 var name(          13 ) : OGM_pon
+ AED2 var name(          14 ) : OGM_dop
+ AED2 var name(          15 ) : OGM_pop
+ AED2 var name(          16 ) : PHY_green
+ AED2 var name(          17 ) : PHY_green_IN
+ AED2 var name(          18 ) : PHY_green_IP
+ AED2 var name(          19 ) : PHY_diatom
+ AED2 var name(          20 ) : PHY_diatom_IN
+ AED2 var name(          21 ) : PHY_diatom_IP
+ AED2 var name(          22 ) : PHY_crypto
+ AED2 var name(          23 ) : PHY_crypto_IN
+ AED2 var name(          24 ) : PHY_crypto_IP
+ AED2 var name(          25 ) : ZOO_zoo01
+ AED2 var name(          26 ) : TRC_ss1
+ AED2 var name(          27 ) : TRC_ret
+ AED2 diag name(           1 ) : OXY_sat
+ AED2 diag name(           2 ) : CAR_ch4ox
+ AED2 diag name(           3 ) : NIT_nitrif
+ AED2 diag name(           4 ) : NIT_denit
+ AED2 diag name(           5 ) : OGM_CDOM
+ AED2 diag name(           6 ) : PHY_green_NtoP
+ AED2 diag name(           7 ) : PHY_diatom_NtoP
+ AED2 diag name(           8 ) : PHY_crypto_NtoP
+ AED2 diag name(           9 ) : PHY_GPP
+ AED2 diag name(          10 ) : PHY_NCP
+ AED2 diag name(          11 ) : PHY_PPR
+ AED2 diag name(          12 ) : PHY_NPR
+ AED2 diag name(          13 ) : PHY_NUP
+ AED2 diag name(          14 ) : PHY_PUP
+ AED2 diag name(          15 ) : PHY_CUP
+ AED2 diag name(          16 ) : PHY_PAR
+ AED2 diag name(          17 ) : PHY_TCHLA
+ AED2 diag name(          18 ) : PHY_TPHYS
+ AED2 diag name(          19 ) : PHY_IN
+ AED2 diag name(          20 ) : PHY_IP
+ AED2 diag name(          21 ) : ZOO_grz
+ AED2 diag name(          22 ) : ZOO_resp
+ AED2 diag name(          23 ) : ZOO_mort
+ AED2 diag name(          24 ) : TOT_tn
+ AED2 diag name(          25 ) : TOT_tp
+ AED2 diag name(          26 ) : TOT_toc
+ AED2 diag name(          27 ) : TOT_tss
+ AED2 diag sheet name(           1 ) : OXY_sed_oxy
+ AED2 diag sheet name(           2 ) : OXY_atm_oxy_exch
+ AED2 diag sheet name(           3 ) : CAR_sed_dic
+ AED2 diag sheet name(           4 ) : CAR_atm_co2_exch
+ AED2 diag sheet name(           5 ) : CAR_atm_ch4_exch
+ AED2 diag sheet name(           6 ) : SIL_sed_rsi
+ AED2 diag sheet name(           7 ) : NIT_sed_amm
+ AED2 diag sheet name(           8 ) : NIT_sed_nit
+ AED2 diag sheet name(           9 ) : PHS_sed_frp
+Num_WQ_Vars = 27
+       ------------------------------------------------
+       |  General Lake Model (GLM)   Version 2.2.0rc4    |
+       ------------------------------------------------
+nDays 366 timestep 3600.000000
+Maximum lake depth is 24.384000
+Wall clock start time :  Mon Jan 30 17:17:47 2017
+Simulation begins...
+Running day  2456294, 0.27% of days complete
+Running day  2456295, 0.55% of days complete
+Running day  2456296, 0.82% of days complete
+Running day  2456297, 1.09% of days complete
+Running day  2456298, 1.37% of days complete
+Running day  2456299, 1.64% of days complete
+Running day  2456300, 1.91% of days complete
+Running day  2456301, 2.19% of days complete
+Running day  2456302, 2.46% of days complete
+Running day  2456303, 2.73% of days complete
+Running day  2456304, 3.01% of days complete
+Running day  2456305, 3.28% of days complete
+Running day  2456306, 3.55% of days complete
+Running day  2456307, 3.83% of days complete
+Running day  2456308, 4.10% of days complete
+Running day  2456309, 4.37% of days complete
+Running day  2456310, 4.64% of days complete
+Running day  2456311, 4.92% of days complete
+Running day  2456312, 5.19% of days complete
+Running day  2456313, 5.46% of days complete
+Running day  2456314, 5.74% of days complete
+Running day  2456315, 6.01% of days complete
+Running day  2456316, 6.28% of days complete
+Running day  2456317, 6.56% of days complete
+Running day  2456318, 6.83% of days complete
+Running day  2456319, 7.10% of days complete
+Running day  2456320, 7.38% of days complete
+Running day  2456321, 7.65% of days complete
+Running day  2456322, 7.92% of days complete
+Running day  2456323, 8.20% of days complete
+Running day  2456324, 8.47% of days complete
+Running day  2456325, 8.74% of days complete
+Running day  2456326, 9.02% of days complete
+Running day  2456327, 9.29% of days complete
+Running day  2456328, 9.56% of days complete
+Running day  2456329, 9.84% of days complete
+Running day  2456330, 10.11% of days complete
+Running day  2456331, 10.38% of days complete
+Running day  2456332, 10.66% of days complete
+Running day  2456333, 10.93% of days complete
+Running day  2456334, 11.20% of days complete
+Running day  2456335, 11.48% of days complete
+Running day  2456336, 11.75% of days complete
+Running day  2456337, 12.02% of days complete
+Running day  2456338, 12.30% of days complete
+Running day  2456339, 12.57% of days complete
+Running day  2456340, 12.84% of days complete
+Running day  2456341, 13.11% of days complete
+Running day  2456342, 13.39% of days complete
+Running day  2456343, 13.66% of days complete
+Running day  2456344, 13.93% of days complete
+Running day  2456345, 14.21% of days complete
+Running day  2456346, 14.48% of days complete
+Running day  2456347, 14.75% of days complete
+Running day  2456348, 15.03% of days complete
+Running day  2456349, 15.30% of days complete
+Running day  2456350, 15.57% of days complete
+Running day  2456351, 15.85% of days complete
+Running day  2456352, 16.12% of days complete
+Running day  2456353, 16.39% of days complete
+Running day  2456354, 16.67% of days complete
+Running day  2456355, 16.94% of days complete
+Running day  2456356, 17.21% of days complete
+Running day  2456357, 17.49% of days complete
+Running day  2456358, 17.76% of days complete
+Running day  2456359, 18.03% of days complete
+Running day  2456360, 18.31% of days complete
+Running day  2456361, 18.58% of days complete
+Running day  2456362, 18.85% of days complete
+Running day  2456363, 19.13% of days complete
+Running day  2456364, 19.40% of days complete
+Running day  2456365, 19.67% of days complete
+Running day  2456366, 19.95% of days complete
+Running day  2456367, 20.22% of days complete
+Running day  2456368, 20.49% of days complete
+Running day  2456369, 20.77% of days complete
+Running day  2456370, 21.04% of days complete
+Running day  2456371, 21.31% of days complete
+Running day  2456372, 21.58% of days complete
+Running day  2456373, 21.86% of days complete
+Running day  2456374, 22.13% of days complete
+Running day  2456375, 22.40% of days complete
+Running day  2456376, 22.68% of days complete
+Running day  2456377, 22.95% of days complete
+Running day  2456378, 23.22% of days complete
+Running day  2456379, 23.50% of days complete
+Running day  2456380, 23.77% of days complete
+Running day  2456381, 24.04% of days complete
+Running day  2456382, 24.32% of days complete
+Running day  2456383, 24.59% of days complete
+Running day  2456384, 24.86% of days complete
+Running day  2456385, 25.14% of days complete
+Running day  2456386, 25.41% of days complete
+Running day  2456387, 25.68% of days complete
+Running day  2456388, 25.96% of days complete
+Running day  2456389, 26.23% of days complete
+Running day  2456390, 26.50% of days complete
+Running day  2456391, 26.78% of days complete
+Running day  2456392, 27.05% of days complete
+Running day  2456393, 27.32% of days complete
+Running day  2456394, 27.60% of days complete
+Running day  2456395, 27.87% of days complete
+Running day  2456396, 28.14% of days complete
+Running day  2456397, 28.42% of days complete
+Running day  2456398, 28.69% of days complete
+Running day  2456399, 28.96% of days complete
+Running day  2456400, 29.23% of days complete
+Running day  2456401, 29.51% of days complete
+Running day  2456402, 29.78% of days complete
+Running day  2456403, 30.05% of days complete
+Running day  2456404, 30.33% of days complete
+Running day  2456405, 30.60% of days complete
+Running day  2456406, 30.87% of days complete
+Running day  2456407, 31.15% of days complete
+Running day  2456408, 31.42% of days complete
+Running day  2456409, 31.69% of days complete
+Running day  2456410, 31.97% of days complete
+Running day  2456411, 32.24% of days complete
+Running day  2456412, 32.51% of days complete
+Running day  2456413, 32.79% of days complete
+Running day  2456414, 33.06% of days complete
+Running day  2456415, 33.33% of days complete
+Running day  2456416, 33.61% of days complete
+Running day  2456417, 33.88% of days complete
+Running day  2456418, 34.15% of days complete
+Running day  2456419, 34.43% of days complete
+Running day  2456420, 34.70% of days complete
+Running day  2456421, 34.97% of days complete
+Running day  2456422, 35.25% of days complete
+Running day  2456423, 35.52% of days complete
+Running day  2456424, 35.79% of days complete
+Running day  2456425, 36.07% of days complete
+Running day  2456426, 36.34% of days complete
+Running day  2456427, 36.61% of days complete
+Running day  2456428, 36.89% of days complete
+Running day  2456429, 37.16% of days complete
+Running day  2456430, 37.43% of days complete
+Running day  2456431, 37.70% of days complete
+Running day  2456432, 37.98% of days complete
+Running day  2456433, 38.25% of days complete
+Running day  2456434, 38.52% of days complete
+Running day  2456435, 38.80% of days complete
+Running day  2456436, 39.07% of days complete
+Running day  2456437, 39.34% of days complete
+Running day  2456438, 39.62% of days complete
+Running day  2456439, 39.89% of days complete
+Running day  2456440, 40.16% of days complete
+Running day  2456441, 40.44% of days complete
+Running day  2456442, 40.71% of days complete
+Running day  2456443, 40.98% of days complete
+Running day  2456444, 41.26% of days complete
+Running day  2456445, 41.53% of days complete
+Running day  2456446, 41.80% of days complete
+Running day  2456447, 42.08% of days complete
+Running day  2456448, 42.35% of days complete
+Running day  2456449, 42.62% of days complete
+Running day  2456450, 42.90% of days complete
+Running day  2456451, 43.17% of days complete
+Running day  2456452, 43.44% of days complete
+Running day  2456453, 43.72% of days complete
+Running day  2456454, 43.99% of days complete
+Running day  2456455, 44.26% of days complete
+Running day  2456456, 44.54% of days complete
+Running day  2456457, 44.81% of days complete
+Running day  2456458, 45.08% of days complete
+Running day  2456459, 45.36% of days complete
+Running day  2456460, 45.63% of days complete
+Running day  2456461, 45.90% of days complete
+Running day  2456462, 46.17% of days complete
+Running day  2456463, 46.45% of days complete
+Running day  2456464, 46.72% of days complete
+Running day  2456465, 46.99% of days complete
+Running day  2456466, 47.27% of days complete
+Running day  2456467, 47.54% of days complete
+Running day  2456468, 47.81% of days complete
+Running day  2456469, 48.09% of days complete
+Running day  2456470, 48.36% of days complete
+Running day  2456471, 48.63% of days complete
+Running day  2456472, 48.91% of days complete
+Running day  2456473, 49.18% of days complete
+Running day  2456474, 49.45% of days complete
+Running day  2456475, 49.73% of days complete
+Running day  2456476, 50.00% of days complete
+Running day  2456477, 50.27% of days complete
+Running day  2456478, 50.55% of days complete
+Running day  2456479, 50.82% of days complete
+Running day  2456480, 51.09% of days complete
+Running day  2456481, 51.37% of days complete
+Running day  2456482, 51.64% of days complete
+Running day  2456483, 51.91% of days complete
+Running day  2456484, 52.19% of days complete
+Running day  2456485, 52.46% of days complete
+Running day  2456486, 52.73% of days complete
+Running day  2456487, 53.01% of days complete
+Running day  2456488, 53.28% of days complete
+Running day  2456489, 53.55% of days complete
+Running day  2456490, 53.83% of days complete
+Running day  2456491, 54.10% of days complete
+Running day  2456492, 54.37% of days complete
+Running day  2456493, 54.64% of days complete
+Running day  2456494, 54.92% of days complete
+Running day  2456495, 55.19% of days complete
+Running day  2456496, 55.46% of days complete
+Running day  2456497, 55.74% of days complete
+Running day  2456498, 56.01% of days complete
+Running day  2456499, 56.28% of days complete
+Running day  2456500, 56.56% of days complete
+Running day  2456501, 56.83% of days complete
+Running day  2456502, 57.10% of days complete
+Running day  2456503, 57.38% of days complete
+Running day  2456504, 57.65% of days complete
+Running day  2456505, 57.92% of days complete
+Running day  2456506, 58.20% of days complete
+Running day  2456507, 58.47% of days complete
+Running day  2456508, 58.74% of days complete
+Running day  2456509, 59.02% of days complete
+Running day  2456510, 59.29% of days complete
+Running day  2456511, 59.56% of days complete
+Running day  2456512, 59.84% of days complete
+Running day  2456513, 60.11% of days complete
+Running day  2456514, 60.38% of days complete
+Running day  2456515, 60.66% of days complete
+Running day  2456516, 60.93% of days complete
+Running day  2456517, 61.20% of days complete
+Running day  2456518, 61.48% of days complete
+Running day  2456519, 61.75% of days complete
+Running day  2456520, 62.02% of days complete
+Running day  2456521, 62.30% of days complete
+Running day  2456522, 62.57% of days complete
+Running day  2456523, 62.84% of days complete
+Running day  2456524, 63.11% of days complete
+Running day  2456525, 63.39% of days complete
+Running day  2456526, 63.66% of days complete
+Running day  2456527, 63.93% of days complete
+Running day  2456528, 64.21% of days complete
+Running day  2456529, 64.48% of days complete
+Running day  2456530, 64.75% of days complete
+Running day  2456531, 65.03% of days complete
+Running day  2456532, 65.30% of days complete
+Running day  2456533, 65.57% of days complete
+Running day  2456534, 65.85% of days complete
+Running day  2456535, 66.12% of days complete
+Running day  2456536, 66.39% of days complete
+Running day  2456537, 66.67% of days complete
+Running day  2456538, 66.94% of days complete
+Running day  2456539, 67.21% of days complete
+Running day  2456540, 67.49% of days complete
+Running day  2456541, 67.76% of days complete
+Running day  2456542, 68.03% of days complete
+Running day  2456543, 68.31% of days complete
+Running day  2456544, 68.58% of days complete
+Running day  2456545, 68.85% of days complete
+Running day  2456546, 69.13% of days complete
+Running day  2456547, 69.40% of days complete
+Running day  2456548, 69.67% of days complete
+Running day  2456549, 69.95% of days complete
+Running day  2456550, 70.22% of days complete
+Running day  2456551, 70.49% of days complete
+Running day  2456552, 70.77% of days complete
+Running day  2456553, 71.04% of days complete
+Running day  2456554, 71.31% of days complete
+Running day  2456555, 71.58% of days complete
+Running day  2456556, 71.86% of days complete
+Running day  2456557, 72.13% of days complete
+Running day  2456558, 72.40% of days complete
+Running day  2456559, 72.68% of days complete
+Running day  2456560, 72.95% of days complete
+Running day  2456561, 73.22% of days complete
+Running day  2456562, 73.50% of days complete
+Running day  2456563, 73.77% of days complete
+Running day  2456564, 74.04% of days complete
+Running day  2456565, 74.32% of days complete
+Running day  2456566, 74.59% of days complete
+Running day  2456567, 74.86% of days complete
+Running day  2456568, 75.14% of days complete
+Running day  2456569, 75.41% of days complete
+Running day  2456570, 75.68% of days complete
+Running day  2456571, 75.96% of days complete
+Running day  2456572, 76.23% of days complete
+Running day  2456573, 76.50% of days complete
+Running day  2456574, 76.78% of days complete
+Running day  2456575, 77.05% of days complete
+Running day  2456576, 77.32% of days complete
+Running day  2456577, 77.60% of days complete
+Running day  2456578, 77.87% of days complete
+Running day  2456579, 78.14% of days complete
+Running day  2456580, 78.42% of days complete
+Running day  2456581, 78.69% of days complete
+Running day  2456582, 78.96% of days complete
+Running day  2456583, 79.23% of days complete
+Running day  2456584, 79.51% of days complete
+Running day  2456585, 79.78% of days complete
+Running day  2456586, 80.05% of days complete
+Running day  2456587, 80.33% of days complete
+Running day  2456588, 80.60% of days complete
+Running day  2456589, 80.87% of days complete
+Running day  2456590, 81.15% of days complete
+Running day  2456591, 81.42% of days complete
+Running day  2456592, 81.69% of days complete
+Running day  2456593, 81.97% of days complete
+Running day  2456594, 82.24% of days complete
+Running day  2456595, 82.51% of days complete
+Running day  2456596, 82.79% of days complete
+Running day  2456597, 83.06% of days complete
+Running day  2456598, 83.33% of days complete
+Running day  2456599, 83.61% of days complete
+Running day  2456600, 83.88% of days complete
+Running day  2456601, 84.15% of days complete
+Running day  2456602, 84.43% of days complete
+Running day  2456603, 84.70% of days complete
+Running day  2456604, 84.97% of days complete
+Running day  2456605, 85.25% of days complete
+Running day  2456606, 85.52% of days complete
+Running day  2456607, 85.79% of days complete
+Running day  2456608, 86.07% of days complete
+Running day  2456609, 86.34% of days complete
+Running day  2456610, 86.61% of days complete
+Running day  2456611, 86.89% of days complete
+Running day  2456612, 87.16% of days complete
+Running day  2456613, 87.43% of days complete
+Running day  2456614, 87.70% of days complete
+Running day  2456615, 87.98% of days complete
+Running day  2456616, 88.25% of days complete
+Running day  2456617, 88.52% of days complete
+Running day  2456618, 88.80% of days complete
+Running day  2456619, 89.07% of days complete
+Running day  2456620, 89.34% of days complete
+Running day  2456621, 89.62% of days complete
+Running day  2456622, 89.89% of days complete
+Running day  2456623, 90.16% of days complete
+Running day  2456624, 90.44% of days complete
+Running day  2456625, 90.71% of days complete
+Running day  2456626, 90.98% of days complete
+Running day  2456627, 91.26% of days complete
+Running day  2456628, 91.53% of days complete
+Running day  2456629, 91.80% of days complete
+Running day  2456630, 92.08% of days complete
+Running day  2456631, 92.35% of days complete
+Running day  2456632, 92.62% of days complete
+Running day  2456633, 92.90% of days complete
+Running day  2456634, 93.17% of days complete
+Running day  2456635, 93.44% of days complete
+Running day  2456636, 93.72% of days complete
+Running day  2456637, 93.99% of days complete
+Running day  2456638, 94.26% of days complete
+Running day  2456639, 94.54% of days complete
+Running day  2456640, 94.81% of days complete
+Running day  2456641, 95.08% of days complete
+Running day  2456642, 95.36% of days complete
+Running day  2456643, 95.63% of days complete
+Running day  2456644, 95.90% of days complete
+Running day  2456645, 96.17% of days complete
+Running day  2456646, 96.45% of days complete
+Running day  2456647, 96.72% of days complete
+Running day  2456648, 96.99% of days complete
+Running day  2456649, 97.27% of days complete
+Running day  2456650, 97.54% of days complete
+Running day  2456651, 97.81% of days complete
+Running day  2456652, 98.09% of days complete
+Running day  2456653, 98.36% of days complete
+Running day  2456654, 98.63% of days complete
+Running day  2456655, 98.91% of days complete
+Running day  2456656, 99.18% of days complete
+Running day  2456657, 99.45% of days complete
+Running day  2456658, 99.73% of days complete
+Running day  2456659, 100.00% of days complete
+Wall clock finish time : Mon Jan 30 17:17:49 2017
+Wall clock runtime 2 seconds : 00:00:02 [hh:mm:ss]
+
+------------------------------------------------
+              Run Complete

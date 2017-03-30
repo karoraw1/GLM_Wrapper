@@ -1,0 +1,199 @@
+&glm_setup
+   sim_name = 'testcase_4'
+   max_layers = 300
+   min_layer_vol = 0.02
+   min_layer_thick = 0.32
+   max_layer_thick = 1.0
+   Kw = 0.6
+   coef_mix_conv = 0.1125
+   coef_wind_stir = 0.1625
+   coef_mix_shear = 0.21
+   coef_mix_turb = 0.6375
+   coef_mix_KH = 0.315
+   coef_mix_hyp = 0.675
+   deep_mixing = .false.
+/
+
+&wq_setup
+   wq_lib = 'aed2'
+   wq_nml_file = 'aed2.nml'
+   ode_method = 11
+   split_factor = 1
+   bioshade_feedback = .true.
+   repair_state = .true.
+   benthic_mode = 1
+/
+
+&morphometry
+   lake_name = 'UpperMysticLake'
+   latitude = 42
+   longitude = -71
+   bsn_len = 1595.0
+   bsn_wid = 570.0
+   bsn_vals = 9
+   H = 0.0, 3.048, 6.096, 9.144, 12.192, 15.24, 18.288, 21.336, 24.384
+   A = 77373.8, 148475.73, 202472.97, 257818.95, 338552.69, 397077.5, 460778.04, 524802.66, 560051.22
+/
+
+&time
+   timefmt = 3
+   start = '2012-01-01 00:00:00'
+   stop = '2014-01-01 00:00:00'
+   dt = 3600.0
+   num_days = 731
+   timezone = 5.0
+/
+
+&output
+   out_dir = '.'
+   out_fn = 'output_'
+   nsave = 12
+   csv_point_nlevs = 6
+   csv_point_fname = 'WQ_'
+   csv_point_at = 1, 5, 9, 13, 17, 21
+   csv_point_nvars = 17
+   csv_point_vars = 'temp',
+                    'salt',
+                    'OXY_oxy',
+                    'CAR_dic',
+                    'CAR_pH',
+                    'CAR_ch4',
+                    'SIL_rsi',
+                    'NIT_amm',
+                    'NIT_nit',
+                    'PHS_frp',
+                    'OGM_doc',
+                    'OGM_poc',
+                    'OGM_don',
+                    'OGM_pon',
+                    'OGM_dop',
+                    'OGM_pop',
+                    'PHY_green',
+
+   csv_lake_fname = 'lake'
+   csv_outlet_allinone = .false.
+   csv_outlet_fname = 'outlet_'
+   csv_ovrflw_fname = "overflow"
+   csv_outlet_nvars = 17
+   csv_outlet_vars = 'temp',
+                    'salt',
+                    'OXY_oxy',
+                    'CAR_dic',
+                    'CAR_pH',
+                    'CAR_ch4',
+                    'SIL_rsi',
+                    'NIT_amm',
+                    'NIT_nit',
+                    'PHS_frp',
+                    'OGM_doc',
+                    'OGM_poc',
+                    'OGM_don',
+                    'OGM_pon',
+                    'OGM_dop',
+                    'OGM_pop',
+                    'PHY_green'
+/
+
+&init_profiles
+   lake_depth = 24.384
+   num_depths = 6
+   the_depths = 1, 5, 9, 13, 17, 21
+   the_temps = 4.0, 4.0, 4.0, 4.0, 4.0, 4.0
+   the_sals = 0.54949714131604432,
+              1.0318146824244809,
+              1.4916559264845948,
+              1.9374833075872218, 
+              2.3731717579291294, 
+              2.8009472121840822
+   num_wq_vars = 9
+   wq_names =  'OGM_don',
+               'OGM_pon',
+               'OGM_dop',
+               'OGM_pop',
+               'OGM_doc',
+               'OGM_poc',
+               'PHY_green',
+               'NIT_amm',
+               'NIT_nit',
+               'PHS_frp'
+   wq_init_vals = 1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  1.1, 2.2, 3.3, 4.3, 5.3, 6.3,
+                  0.1, 0.2, 0.3, 0.4, 0.5, 0.6
+/
+&meteorology
+   met_sw = .true.
+   lw_type = 'LW_IN'
+   rain_sw = .false.
+   atm_stab = .false.
+   catchrain = .false.
+   rad_mode = 0
+   albedo_mode = 3
+   cloud_mode = 3
+   meteo_fl = 'met_daily.csv'
+   subdaily = .false.
+   wind_factor = 1.0
+   sw_factor = 1.0
+   lw_factor = 0.7
+   at_factor = 1.0
+   rh_factor = 1.0
+   rain_factor = 1.0
+   cd = 0.0015
+   ce = 0.001
+   ch = 0.0011
+   rain_threshold = 0.03
+   runoff_coef = 0.1
+/
+&bird_model
+   AP = 973
+   Oz = 0.279
+   WatVap = 1.1
+   AOD500 = 0.033
+   AOD380 = 0.038
+   Albedo = 0.2
+/
+&inflow
+   num_inflows = 1
+   names_of_strms = 'Aberjona'
+   subm_flag = .false.
+   strm_hf_angle = 1.1
+   strmbd_slope = 0.5
+   strmbd_drag = 0.008
+   inflow_factor = 0.55
+   inflow_fl = 'inflow.csv'
+   inflow_varnum  = 17,
+   inflow_vars    = 'FLOW',
+                    'TEMP',
+                    'SALT',
+                    'OXY_oxy',
+                    'SIL_rsi',
+                    'NIT_amm',
+                    'NIT_nit',
+                    'PHS_frp',
+                    'OGM_don',
+                    'OGM_pon',
+                    'OGM_dop',
+                    'OGM_pop',
+                    'OGM_doc',
+                    'OGM_poc',
+                    'PHY_green',
+                    'PHY_crypto',
+                    'PHY_diatom'
+   coef_inf_entrain = 0.7
+/
+&outflow
+   num_outlet = 1
+   flt_off_sw = .false.
+   outl_elvs = 24.0
+   bsn_len_outl = 100.0
+   bsn_wid_outl = 274.0
+   outflow_fl = 'outflow.csv'
+   outflow_factor = 0.5
+   seepage = .false.
+   seepage_rate = 0.0
+/
