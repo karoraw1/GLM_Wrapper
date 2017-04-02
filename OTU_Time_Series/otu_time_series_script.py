@@ -31,6 +31,11 @@ https://jonlefcheck.net/2015/03/31/how-much-is-enough
 http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html
 
 """
+from otu_ts_support import prettify_date_string, matchXandYbyIndex, extract_linkages
+def transform_date(date_num):
+    return pd.to_datetime(decoder['date'][date_num])
+def transform_depth(depth_num):
+    return float(decoder['depth'][depth_num])
 import pickle
 import ecopy as ep
 from matplotlib import colors
@@ -42,23 +47,36 @@ import sys, os
 from ChemDataVectors import LoadChemDFs
 from importCoverage import loadFullMetadata
 from otu_ts_support import listRepGroups, ReplicateReport, varStabTransform
-from otu_ts_support import numericEncodings# , beta_wrapper
+from otu_ts_support import numericEncodings, originate_rep_groupings# , beta_wrapper
 from otu_ts_support import importratesandconcentrations_obs, importratesandconcentrations_mod
-from otu_ts_support import scalePCAcorrelate, parseBiosample#, plotHeatmap
+from otu_ts_support import scalePCAcorrelate, parseBiosample, plotHeatmap
 from otu_ts_support import add_quadrants, plotCountTotalsByMetadata
 from otu_ts_support import analyze_alpha_diversity, alpha_diversity
 from otu_ts_support import plotCommonTaxa, dropBadReps, collapseBdiversity
 from otu_ts_support import centeredLogRatio, JensenShannonDiv_Sqrt
 from otu_ts_support import time_scale_modeled_chem_data, append_depths
 from sklearn.decomposition import TruncatedSVD #, LatentDirichletAllocation
+from otu_ts_support import bz2wrapper, write_tree_to_png
 
 # Relevant File Names OTU Table
 tree_file='unique.dbOTU.tree'
 seq_file='unique.dbOTU.nonchimera.fasta'
 otu_matrix_file = 'unique.dbOTU.nonchimera.mat.rdp'
-
+    
 print "\nReading in OTU Table"
+if not os.path.exists(otu_matrix_file):
+    # if unzipped not present add prefix and unzip
+    otu_to_unzip = otu_matrix_file + ".bz2"
+    zOut = bz2wrapper(otu_to_unzip)
+else:
+    # if present, make sure to check for archive later to zip
+    otu_to_unzip = otu_matrix_file + ".bz2"
+    
 otu_table = pd.read_csv(otu_matrix_file, sep="\t", index_col=0)
+
+if not os.path.exists(otu_to_unzip):
+    zOut = bz2wrapper(otu_matrix_file)
+
 taxa_series = otu_table.ix[:, -1]
 
 print "\nImporting metadata"
@@ -116,7 +134,12 @@ metadata += ['Sequencing Date', 'Sequencing platform', 'Forward read length',
 print "\nNumerically encoding categorical metadata"
 # Numerically encode categoricals
 only_depths_n, decoder = numericEncodings(only_depths_all, metadata, True)
-metadata += ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes']
+metadata += ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes', 'seasonality']
+
+def transform_date_to_periodic(date_time):
+    return (pd.to_datetime(decoder['date'][date_time]).month - 6.) / float(6)
+    
+only_depths_n['seasonality'] = only_depths_n.date.apply(transform_date_to_periodic)
 
 print "\nCalculating Alpha Diversity"
 # Add metadata columns pertaining to alpha diversity
@@ -144,8 +167,8 @@ do_rep_rep = False
 if not os.path.exists(shitty_reps_path) or do_rep_rep:
     print "\nMeasuring B-diversity (sqrt(JSD)) distances between replicates"
     shitty_reps, broken_groups = ReplicateReport(only_depths_n, 
-                                                       only_depth_otus, 
-                                                       rep_groups, False, "JSD")
+                                                 only_depth_otus, 
+                                                 rep_groups, False, "JSD")
         
     kept_pct = broken_groups/float(len(rep_groups))
     print "\nGroups with replicates removed: {0:.3f}%".format(kept_pct*100)
@@ -229,6 +252,7 @@ for a_metric in a_metrics:
     
     alpha_plot_df.to_csv(a_metric+'.csv', index_label='depths')
     # make an autoplotting function for 
+
     
 #plotHeatmap(alpha_plot_df, 2)
 #al_ax = plt.gca()
@@ -250,6 +274,23 @@ notzero = (shared_otus != 0).sum().sum()
 sparsity = float(notzero) / shared_otus.values.flatten().shape[0]
 print "Probability that a given OTU val is nonzero: {}".format(sparsity)
 
+print "\nReassigning replicate numberings to all start at 1"
+final_rep_groups = dropBadReps((primer_outgroup+infrequent_otus), new_rep_groups)
+final_rep_dict = originate_rep_groupings(final_rep_groups)
+for group in final_rep_dict:
+    for idx, num in group.items():
+        shared_clr_m.ix[idx, 'replicates'] = num
+
+print "\nSplitting design matrix into test and train according to replicate numberings"
+
+idx_of_replicates = list(shared_clr_m[shared_clr_m.replicates != 1].index)
+idx_of_test = list(shared_clr_m[shared_clr_m.replicates == 2].index)
+idx_of_train = list(set(list(shared_clr_m.index)).symmetric_difference(set(idx_of_test)))
+shared_test_x = shared_clr_m.drop(idx_of_train)
+shared_train_x = shared_clr_m.drop(idx_of_replicates)
+
+print "\n Pull in all metadata columns"
+
 rate_conc_f = os.path.join(os.getcwd(), 'ChemData', 'mystic_model_data')
 obs_conc_f = os.path.join(os.getcwd(), 'ChemData', 'mystic_measured_data')
 
@@ -263,113 +304,123 @@ surfaceM_df = append_depths(surfaceM_df, depths_vector)
 surfaceM_df.set_index(['date', 'depth'], inplace=True)
 
 obs_conc_df = importratesandconcentrations_obs(obs_conc_f)
-
 rate_dict, conc_dict = importratesandconcentrations_mod(rate_conc_f)
 model_proc_df = time_scale_modeled_chem_data(rate_dict, conc_dict, 146, 
                                              '03/23/2013', '08/15/2013')
 
-shared_clr_m = ingroup_clr_m.drop(infrequent_otus, axis=1)
-def transform_date_to_periodic(date_time):
-    return (pd.to_datetime(decoder['date'][date_time]).month - 6.) / float(6)
-def transform_date(date_num):
-    return pd.to_datetime(decoder['date'][date_num])
-def transform_depth(depth_num):
-    return float(decoder['depth'][depth_num])
-    
-shared_clr_m['seasonality'] = shared_clr_m.date.apply(transform_date_to_periodic)
-shared_clr_m['Date'] = shared_clr_m.date.apply(transform_date)
-shared_clr_m['depth'] = shared_clr_m.depth.apply(transform_depth)
+print "\n Force pulling any metadata columns out into lists"
+remaining_metadata, otu_columns = [],[]
+for col_ in shared_test_x.columns:
+    if not col_.startswith("seq"):
+        remaining_metadata.append(col_)
+    else:    
+        otu_columns.append(col_)
 
-clr_idx = shared_clr_m.set_index(['Date', 'depth'])
-remaining_metadata = clr_idx.columns[-16:]
-otu_columns = clr_idx.columns[:-16]
-clr_y = clr_idx.drop(otu_columns, 1)
-clr_x = clr_idx.drop(remaining_metadata, 1)
+print "\n Using date + depth multi-index for subsecting x & y vectors"
 
-parade_of_responses = [model_proc_df, obs_conc_df, surfaceM_df, depthGrad_df, clr_y]
+for design_matrix in [shared_test_x, shared_train_x]:
+    design_matrix['Date'] = design_matrix.date.apply(transform_date)
+    design_matrix['Depth'] = design_matrix.depth.apply(transform_depth)
+    design_matrix.set_index(['Date', 'Depth'], inplace=True)
+    design_matrix.drop(remaining_metadata, 1, inplace=True)
 
-#for baton_twirler in parade_of_responses:
 
-# TODO: -Ask how to aggregate model data (monthly? daily? intermediate locality? )
-# TODO: set up properly formatted files for LSA analysis
+## Heavy Hitters
+print "\n Lets demo the covariance approach and how traces follow in tandem"
+x_to_print = shared_train_x.copy()
+totals = x_to_print.sum(axis=0)
+heavy_hitters = totals[totals > 750].index
+heavy_x = x_to_print.T.ix[heavy_hitters, :]
+test_corr_mat = np.corrcoef(heavy_x)
+a_df = pd.DataFrame(data=test_corr_mat, 
+                    columns = heavy_hitters, 
+                    index = heavy_hitters)
+plotHeatmap(a_df, 22)
+mode1 = ["seq79", "seq6", "seq172"]
+mode2 = ["seq24", "seq50", "seq47"]
+x_to_print.T.ix[mode1, :].T.plot()
+x_to_print.T.ix[mode2, :].T.plot()
 
-from sklearn.model_selection import train_test_split as tts
-from sklearn.metrics import mean_squared_error, r2_score, explained_variance_score
-from sklearn.linear_model import RandomizedLasso as rlasso
+
+## Hierarchical agglomorative clustering
+from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy import dendrogram
+
+# perform clustering on rows
+test_labels = heavy_x.index
+test_corr_df = pd.DataFrame(test_corr_mat, index=test_labels, columns=test_labels)
+test_clusters = linkage(test_corr_df.values, method='complete')
+test_dendro = dendrogram(test_clusters, labels=test_labels.values)
+
+
+# cluster everything
+corr_mat = np.corrcoef(x_to_print.T)
+corr_labels = x_to_print.T.index
+row_clusters = linkage(corr_mat, method='complete')
+cluster_dict = extract_linkages(row_clusters, corr_labels)
+row_dendr = dendrogram(row_clusters, labels=corr_labels, orientation='top')
+
+
+print "\n Lets fit some models"
+
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.linear_model import LassoCV as lassoCV
 from sklearn.ensemble import RandomForestRegressor as rForestReg
 
-baton_twirler = clr_y
-score_fxns = ['r2', 'evs', 'mse']
-score_df = pd.DataFrame(data = np.zeros((len(baton_twirler.columns), len(score_fxns))),
-                        index = baton_twirler.columns,
-                        columns = ['r2', 'evs', 'mse'])
+baton_twirler = model_proc_df.copy()
+score_fxns = ['r2', 'mse', 'cv-oob']
+models = ['lasso', 'rf']
+dual_score_fxns = []
+for sf in score_fxns:
+    for m in models:
+        dual_score_fxns.append(m+"-"+sf)
+        
+score_matrix = np.zeros((len(baton_twirler.columns), 
+                         len(dual_score_fxns)))
+
+score_df = pd.DataFrame(data = score_matrix, 
+                        index = baton_twirler.columns, 
+                        columns = dual_score_fxns)
 
 feat_dict = {}
 for baton in baton_twirler.columns:
-    y = baton_twirler.ix[:, baton].values
-    X = clr_x.values
-    assert list(baton_twirler.index) == list(clr_x.index)
+    y_vector = baton_twirler.ix[:, baton]
+    X_train, y_train = matchXandYbyIndex(shared_train_x, y_vector)
+    X_test, y_test = matchXandYbyIndex(shared_test_x, y_vector)
     
-    X_tr, X_te, y_tr, y_te = tts(X, y, test_size=0.33)
+    lookatTheTrees = rForestReg(n_estimators=500, min_samples_split = 2,
+                                n_jobs=1, oob_score=True)
+    rodeo_clown = lassoCV(cv=10, max_iter=10000)
     
-    lookatTheTrees = rForestReg(n_estimators=X_tr.shape[1],
-                                min_samples_split = 2,
-                                n_jobs=2, verbose=10)
+    lookatTheTrees.fit(X_train, y_train)
+    rodeo_clown.fit(X_train, y_train)
     
-    lookatTheTrees.fit(X_tr, y_tr)
-    y_pred = lookatTheTrees.predict(X_te)
-    this_mse = mean_squared_error(y_te, y_pred)
-    this_r2 = r2_score(y_te, y_pred)
-    this_evs = explained_variance_score(y_te, y_pred)
+    y_predicted_rf = lookatTheTrees.predict(X_test)
+    y_predicted_lasso = rodeo_clown.predict(X_test)
     
-    feat_dict[baton] = (lookatTheTrees.estimators_, 
-                        lookatTheTrees.feature_importances_)
-    score_df.ix[baton, :] = np.array([this_r2, this_evs, this_mse])
+    this_oob = lookatTheTrees.oob_score_
+    this_cv = rodeo_clown.mse_path_.min()
     
-sys.exit()
+    rf_mse = mean_squared_error(y_test, y_predicted_rf)
+    lasso_mse = mean_squared_error(y_test, y_predicted_lasso)
+    
+    rf_r2 = r2_score(y_test, y_predicted_rf)
+    lasso_r2 = r2_score(y_test, y_predicted_lasso)
+    
+    feat_dict[baton] = {'rf_estimators': lookatTheTrees.estimators_, 
+                        'rf_feat_import':lookatTheTrees.feature_importances_,
+                        'lasso_coeffs': rodeo_clown.coef_}
+    
+    scores = [lasso_r2, lasso_mse, this_cv, rf_r2, rf_mse, this_oob]
+    score_df.ix[baton, :] = np.array(scores)
+    
+score_df.to_csv(os.path.join(os.getcwd(),"model_scores.tsv"), sep="\t")
 
-rlasso_params = {}
-rlasso_params['alpha'] = np.exp(np.arange(-2,2, 0.1))
-rlasso_params['l1_ratio'] = np.arange(0,1.01,0.01)
-rlasso_params['normalize'] = [True, False]
-rlasso_params['selection'] = ['random']
-rlasso_cols = ['alpha', 'l1_ratio', 'normalize', 'EVR', 'R2', 'MSE']
-rlasso_data = {}
-trial_counter = 0
-for alpha in rlasso_params['alpha']:
-    for l1_ratio in rlasso_params['l1_ratio']:
-        for normalize in rlasso_params['normalize']:
-            trial_counter+=1
-            mses_, evrs_, r2s_ = [],[],[]
-            for folds in range(5):                
-                X_tr, X_te, y_tr, y_te = tts(X, y, test_size=0.33)            
-                an_rlasso = rlasso(alpha=alpha, l1_ratio=l1_ratio, normalize=normalize, 
-                               selection=rlasso_params['selection'])
-                y_pred_rlasso = an_rlasso.fit(X_tr).predict(X_te)
-                r2s_.append(r2_score(y_te, y_pred_rlasso))
-                evrs_.append(explained_variance_score(y_te, y_pred_rlasso))
-                mses_.append(mean_squared_error(y_te, y_pred_rlasso))
-                
-            mse_arr, evr_arr, r2_arr = np.array(mses_), np.array(evrs_), np.array(r2s_)
-            
-            rlasso_data[trial_counter] = (alpha, l1_ratio, normalize, 
-                                          evr_arr.mean(), r2_arr.mean(), 
-                                          mse_arr.mean())
+with open(os.path.join(os.getcwd(), "model_feature_import.p"), "wb") as rf_feat_f:
+     pickle.dump( feat_dict, rf_feat_f )
 
 
             
-rlasso
-            
-
-
-
-
-
-
-
-
-
-
 
 
 

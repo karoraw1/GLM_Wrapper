@@ -11,6 +11,7 @@ import sys, os
 from sklearn.decomposition import PCA, TruncatedSVD, LatentDirichletAllocation
 from sklearn.preprocessing import StandardScaler
 
+
 def append_depths(df, depths_vector):
     """
     This takes a df with a series of surface concentrations i.e. has a depth
@@ -285,7 +286,44 @@ def ReplicateReport(df, df_otus, rep_groups, verbose=True, metric="JSD"):
     return (list(set(worst_reps)), cvs)
 """
 
+def originate_rep_groupings(final_rep_groups):
+    final_rep_dict = []
+    for g in final_rep_groups:
+        this_dict = {mem:(idx+1) for idx, mem in enumerate(g)}
+        final_rep_dict.append(this_dict)
+    return final_rep_dict
+
+def matchXandYbyIndex(clr_x, model_proc_df):
+    """
+    This fxn drops rows in the design matrix & response vector
+    according to index equivalency. 
+    """
+    # drop all rows in x that don't match to y
+    x_bool = clr_x.index.isin(model_proc_df.index)
+    x_1 = clr_x[x_bool]
+    # drop all values in y that don't match to x_1
+    y_bool = model_proc_df.index.isin(x_1.index)
+    y_1 = model_proc_df[y_bool]
+    
+    print "X matrix shape {} reduced to {} rows".format(clr_x.shape, 
+                                                        (x_bool).sum())
+    print "Y matrix shape {} reduced to {} rows".format(model_proc_df.shape,
+                                                        (y_bool).sum())
+    return x_1.values, y_1.values
+    
+def prettify_date_string(time_stamp):
+    return str(time_stamp).split(" ")[0]
+    
 def dropBadReps(less_diverse_reps, rep_groups):
+    """
+    1. Unpack current replicate groups
+    2. Check if any dropped reps are in a given replicate group
+    3. Drop if present, otherwise pass
+    4. If replicate groups have >1 member, add it to new group list
+    5. If not, drop it from group list
+    6. Return newly assembled list of lists
+    
+    """
     new_rep_groups = []
     for g in rep_groups:
         for l in less_diverse_reps:
@@ -293,6 +331,7 @@ def dropBadReps(less_diverse_reps, rep_groups):
                 g.remove(l)
             else:
                 pass
+    
         if len(g) > 1:
             new_rep_groups.append(g)
         else:
@@ -674,6 +713,25 @@ score = clf.score(X_test, y_test)
 """
 
 import subprocess as sp
+from sklearn import tree
+
+def write_tree_to_png(fname_no_ext, rf):
+    tree.export_graphviz(rf, out_file=fname_no_ext+".dot")
+    base_cmd = "dot -Tpng {}.dot > {}.png".format(fname_no_ext, fname_no_ext)
+    p = sp.Popen(base_cmd, cwd=os.getcwd(), shell=True, stderr=sp.PIPE, stdout=sp.PIPE)
+    stdout, stderr = p.communicate()
+    return stdout
+    
+def bz2wrapper(fpath):
+    if fpath.endswith("bz2"):
+        print "Unzipping"
+        base_cmd = "bzip2 -d {}".format(fpath)
+    else:
+        base_cmd = "bzip2 -z {}".format(fpath)
+
+    p = sp.Popen(base_cmd, cwd=os.getcwd(), shell=True, stderr=sp.PIPE, stdout=sp.PIPE)
+    stdout, stderr = p.communicate()
+    return stdout
 
 def varStabTransform(path, df_otus, df_m, method):
     """
@@ -761,7 +819,7 @@ def importratesandconcentrations_mod(path_):
     for d_dict, f_dict in zip([conc_dict, rate_dict], [conc_f_dict, rate_f_dict]):
         for c_f, spec in f_dict.items():
             c_p = os.path.join(path_, c_f)
-            c_df = pd.read_csv(c_p, sep="\t")
+            c_df = pd.read_csv(c_p, sep="\t", header=None)
             d_dict[spec] = c_df
             print "{} has shape {}".format(spec, c_df.shape)
             
@@ -861,3 +919,28 @@ def importratesandconcentrations_obs(chem_dir):
         obs_conc_df.ix[:, name] = obs_conc_df_dict[name]
         
     return obs_conc_df
+
+    
+def extract_linkages(row_clusters, labels):
+    clusters = {}
+    for row in xrange(row_clusters.shape[0]):
+        cluster_n = row + len(labels)
+        # which clusters / labels are present in this row
+        glob1, glob2 = row_clusters[row, 0], row_clusters[row, 1]
+        
+        # if this is a cluster, pull the cluster
+        this_clust = []
+        for glob in [glob1, glob2]:
+            if glob > (len(labels)-1):
+                this_clust += clusters[glob]
+            # if it isn't, add the label to this cluster
+            else:
+                this_clust.append(glob)
+        
+        clusters[cluster_n] = this_clust
+
+    return clusters
+    
+    
+    
+    
