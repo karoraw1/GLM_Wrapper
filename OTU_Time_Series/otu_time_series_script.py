@@ -343,6 +343,7 @@ x_to_print.T.ix[mode2, :].T.plot()
 
 
 ## Hierarchical agglomorative clustering
+# http://sebastianraschka.com/Articles/heatmaps_in_r.html
 from scipy.cluster.hierarchy import linkage
 from scipy.cluster.hierarchy import dendrogram
 
