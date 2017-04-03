@@ -11,6 +11,73 @@ import sys, os
 from sklearn.decomposition import PCA, TruncatedSVD, LatentDirichletAllocation
 from sklearn.preprocessing import StandardScaler
 
+from scipy import stats as ss
+
+
+def seq_to_taxa(seq_list, all_taxa, taxa_series):
+    """
+     Accepts a list of `seq` labels, the `all_taxa` set, 
+     Returns a vector of taxanomic occupancy of that set
+    """
+    def split_seq(seq):
+        return taxa_series[seq].split(";")
+        
+    long_taxa_arr = np.array(map(split_seq, seq_list))
+    axis, counts = np.unique(long_taxa_arr, return_counts=True)
+    this_taxa_ser = pd.Series(data=np.zeros((len(all_taxa),)), 
+                              index=list(all_taxa))
+    
+    for s, n in zip(axis, counts):
+        this_taxa_ser[s] = n
+    return this_taxa_ser
+    
+def score_clusters(test_cluster_dict, all_taxa, taxa_series, test_labels):
+    top_level = np.array(test_cluster_dict.keys()).max()
+    bottom_level=np.array(test_cluster_dict.keys()).min()
+    iteration_order = np.arange(bottom_level, top_level)[::-1]
+    p_values = np.ones(iteration_order.shape)
+    child_clusts = np.zeros(iteration_order.shape)
+    parent_clusts = np.zeros(iteration_order.shape)
+    
+    for idx, clust_n in enumerate(iteration_order):
+        this_clust = test_cluster_dict[clust_n]
+        this_labels = [test_labels[i] for i in this_clust]
+        this_clust_set = set(this_clust)
+        this_taxa_ser = seq_to_taxa(this_labels, all_taxa, taxa_series)
+        higher_tree_levels = np.arange(clust_n+1,top_level+1)
+        
+        for clust_m in higher_tree_levels:
+            higher_clust = set(test_cluster_dict[clust_m])
+            if this_clust_set.issubset(higher_clust):
+                parent_clust = [test_labels[i] for i in list(higher_clust)]
+                break
+            else:
+                pass
+        
+        higher_taxa_ser = seq_to_taxa(parent_clust, all_taxa, taxa_series)
+        parent_clusts[idx] = clust_m
+        child_clusts[idx] = clust_n
+        p_values[idx] = Ftest_pvalue(this_taxa_ser.values, higher_taxa_ser.values)
+        
+    cluster_df_data = np.vstack((parent_clusts,
+                                 child_clusts,
+                                 p_values)).T
+    clust_df_cols = ['parent', 'child', 'p-val']
+    cluster_df = pd.DataFrame(data=cluster_df_data, columns=clust_df_cols)
+    return cluster_df
+
+
+
+
+def Ftest_pvalue(d1,d2):
+    """takes two vectors and performs an F-test, returning the p value"""
+    df1 = len(d1) - 1
+    df2 = len(d2) - 1
+    F = np.var(d1) / np.var(d2)
+    single_tailed_pval = ss.f.cdf(F,df1,df2)
+    double_tailed_pval = single_tailed_pval * 2
+    return double_tailed_pval
+
 
 def append_depths(df, depths_vector):
     """

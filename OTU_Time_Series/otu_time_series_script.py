@@ -31,7 +31,7 @@ https://jonlefcheck.net/2015/03/31/how-much-is-enough
 http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html
 
 """
-from otu_ts_support import prettify_date_string, matchXandYbyIndex, extract_linkages
+from otu_ts_support import score_clusters, matchXandYbyIndex, extract_linkages
 def transform_date(date_num):
     return pd.to_datetime(decoder['date'][date_num])
 def transform_depth(depth_num):
@@ -56,7 +56,7 @@ from otu_ts_support import plotCommonTaxa, dropBadReps, collapseBdiversity
 from otu_ts_support import centeredLogRatio, JensenShannonDiv_Sqrt
 from otu_ts_support import time_scale_modeled_chem_data, append_depths
 from sklearn.decomposition import TruncatedSVD #, LatentDirichletAllocation
-from otu_ts_support import bz2wrapper, write_tree_to_png
+from otu_ts_support import bz2wrapper, write_tree_to_png, Ftest_pvalue
 
 # Relevant File Names OTU Table
 tree_file='unique.dbOTU.tree'
@@ -326,12 +326,17 @@ for design_matrix in [shared_test_x, shared_train_x]:
 
 
 ## Heavy Hitters
-print "\n Lets demo the covariance approach and how traces follow in tandem"
+print "\n Lets demo the covariance approach and see how traces follow in tandem"
 x_to_print = shared_train_x.copy()
 totals = x_to_print.sum(axis=0)
-heavy_hitters = totals[totals > 750].index
+heavy_hitters = totals[totals > 550].index
+heavy_hitter_pct = (totals[heavy_hitters].sum() / totals.sum())*100.
+heavy_hitter_pct2 = only_depth_otus.T.ix[heavy_hitters, :].sum().sum() 
+heavy_hitter_pct2 = heavy_hitter_pct2/only_depth_otus.T.sum().sum()*100.
+print "\tThese represent {:.2f}% of the processed data & {:.2f}% of the raw counts".format(heavy_hitter_pct,
+                                                                                 heavy_hitter_pct2)
 heavy_x = x_to_print.T.ix[heavy_hitters, :]
-test_corr_mat = np.corrcoef(heavy_x)
+test_corr_mat = np.cov(heavy_x)
 a_df = pd.DataFrame(data=test_corr_mat, 
                     columns = heavy_hitters, 
                     index = heavy_hitters)
@@ -350,9 +355,20 @@ from scipy.cluster.hierarchy import dendrogram
 # perform clustering on rows
 test_labels = heavy_x.index
 test_corr_df = pd.DataFrame(test_corr_mat, index=test_labels, columns=test_labels)
-test_clusters = linkage(test_corr_df.values, method='complete')
+test_clusters = linkage(test_corr_df.values, method='ward')
 test_dendro = dendrogram(test_clusters, labels=test_labels.values)
+test_cluster_dict = extract_linkages(test_clusters, test_labels)
 
+# create a sorted index of all the levels of taxanomy
+all_taxa = set()
+for column_ in x_to_print.columns:
+    taxa_str = taxa_series[column_]
+    all_taxa.update(taxa_str.split(";"))
+
+test_clust_df = score_clusters(test_cluster_dict, all_taxa, 
+                               taxa_series, test_labels)
+
+test_clust_df.to_csv('test_clust_df.csv', sep="\t", index_label='Iteration')
 
 # cluster everything
 corr_mat = np.corrcoef(x_to_print.T)
@@ -361,6 +377,8 @@ row_clusters = linkage(corr_mat, method='complete')
 cluster_dict = extract_linkages(row_clusters, corr_labels)
 row_dendr = dendrogram(row_clusters, labels=corr_labels, orientation='top')
 
+full_cluster_df = score_clusters(cluster_dict, all_taxa, taxa_series, corr_labels)
+full_cluster_df.to_csv('full_cluster_df.csv', sep="\t", index_label='Iteration')
 
 print "\n Lets fit some models"
 
@@ -420,11 +438,7 @@ score_df.to_csv(os.path.join(os.getcwd(),"model_scores.tsv"), sep="\t")
 with open(os.path.join(os.getcwd(), "model_feature_import.p"), "wb") as rf_feat_f:
      pickle.dump( feat_dict, rf_feat_f )
 
-
-            
 sys.exit()
-
-
 
 print "Loading Stored OTU matrices if available"
 shared_otu_path = 'shared_otu.csv'
@@ -591,37 +605,6 @@ print "\nCreate sample summary plots"
 plotCountTotalsByMetadata(shared_otus_m, decoder, metadata, 'depth', 6)
 plotCountTotalsByMetadata(shared_otus_m, decoder, metadata, 'date', 7)
 
-#print "Plotting UPGMA clustering of Unifrac Distance between samples (skipped)"
-#from cStringIO import StringIO
-#from Bio import Phylo
-#handle = StringIO(unifracDendogram)
-#tree = Phylo.read(handle, "newick")
-#tree.ladderize()   # Flip branches so deeper clades are displayed at top
-#Phylo.draw(tree)
-
-
-#print "\n Performing LDA decomposition"
-#
-#lda = LatentDirichletAllocation(n_topics=3, doc_topic_prior=0.2, 
-#                                topic_word_prior=0.1, learning_method='batch', 
-#                                random_state=42, max_iter=20)
-#X = shared_otus.values
-#lda.fit(X)
-#topic_word_dist = lda.components_
-#twd_df = pd.DataFrame(data=topic_word_dist, 
-#                      index = ['t1', 't2', 't3'], 
-#                      columns = shared_otus.columns)
-
-#distances = JensenShannonDiv_Sqrt(twd_df)
-#twd_df_t = twd_df.T
-#abundance = shared_otus.mean(axis=0)
-#twd_df_t['importance'] = abundance
-#twd_df_t.sort_values(['importance'], ascending=False, inplace=True)
-# nDMS of topic seperation
-# evaluate mixture model redundancy and distribution across time points
-
-
-sys.exit()
 
 
 
