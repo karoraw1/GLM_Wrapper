@@ -56,12 +56,17 @@ from otu_ts_support import plotCommonTaxa, dropBadReps, collapseBdiversity
 from otu_ts_support import centeredLogRatio, JensenShannonDiv_Sqrt
 from otu_ts_support import time_scale_modeled_chem_data, append_depths
 from sklearn.decomposition import TruncatedSVD #, LatentDirichletAllocation
-from otu_ts_support import bz2wrapper, write_tree_to_png, Ftest_pvalue
+from otu_ts_support import bz2wrapper
 
 # Relevant File Names OTU Table
 tree_file='unique.dbOTU.tree'
 seq_file='unique.dbOTU.nonchimera.fasta'
 otu_matrix_file = 'unique.dbOTU.nonchimera.mat.rdp'
+
+chk_pt_test_f = 'shared_test_x.csv'
+chk_pt_train_f = 'shared_test_x.csv'
+skip_ahead = True
+checkpoint = os.path.exists(chk_pt_test_f) and os.path.exists(chk_pt_train_f)
     
 print "\nReading in OTU Table"
 if not os.path.exists(otu_matrix_file):
@@ -79,215 +84,224 @@ if not os.path.exists(otu_to_unzip):
 
 taxa_series = otu_table.ix[:, -1]
 
-print "\nImporting metadata"
-metadata_df = loadFullMetadata(verbose=False)
-
-print "\nDropping -DO NOT USE- samples and those not associated with depths"
-# Drop Recommended Columns
-otu_time_table = otu_table.drop([otu_table.columns[-1]], axis=1)
-do_not_use = ['SB100912TAWMD14VV4TMR1', 'SB061713TAWMD22VV4TMR1',
-              'SB011413TAWMD22VV4TMR1', 'SB011413TAWMDSBVV4TMR1',
-              'SB011413TAWMDEBVV4TMR1', 'SB011413TAWMD22VV4TMR2',
-              'SB011413TAWMDSBVV4TMR2']
-              
-otu_time_table.drop(do_not_use, axis=1, inplace=True)
-
-print "\nParsing biosample strings into metadata columns"
-# Add Biosample metadata & convert date format
-samps_by_feats = parseBiosample(otu_time_table.T)
-undated = samps_by_feats[samps_by_feats.date == "NA"].index
-samps_by_feats.drop(undated, inplace=True)
-samps_by_feats['date'] = pd.to_datetime(samps_by_feats['date'])
-squishy_depths = ['bottom', 'SB', 'control1', 'control3', 'control6', 'mid1', 
-                  'mid2', 'mid3', 'river', 'upper', 'River', 'Neg', 'NA', 'EB', 
-                  'FB', 'CR', 'Dock', 'Bridge']
-
-# Drop samples of unknown provenance & sort by depth and date
-off_target = samps_by_feats[samps_by_feats.depth.isin(squishy_depths)].index
-only_depths = samps_by_feats.drop(off_target, inplace=False)
-only_depths.sort_values(['date', 'depth'], ascending=[True, True],
-                        inplace=True)
-
-print "\nIdenitfying replicate groups"
-# Identify replicate groupings & create OTU only matrix
-rep_groups = listRepGroups(only_depths)
-metadata = ['date', 'primers', 'kit', 'replicates', 'depth']
-only_depth_otus = only_depths.drop(metadata, axis=1)
-
-print "\nAdding quadrant metadata"
-# Add lake quadrant metadata variable
-only_depths_q = add_quadrants(only_depths)
-metadata.append("Quadrants")
-
-print "\n Adding remaining metadata by sample ID"
-# set the sample id as the index of the metadata_df 
-metadata_df.set_index('#SampleID', inplace=True)
-# drop all rows that don't correspond to the existing index
-lost_idxs = set(list(metadata_df.index)).difference(set(list(only_depths_q.index)))
-metadata_df.drop(list(lost_idxs), inplace=True, axis=0)
-# concatenate along columnar axis 
-only_depths_all = only_depths_q.join(metadata_df)
-# add categorical columns to the list for encoding
-metadata += ['Sequencing Date', 'Sequencing platform', 'Forward read length',
-             'Index read length']
-
-print "\nNumerically encoding categorical metadata"
-# Numerically encode categoricals
-only_depths_n, decoder = numericEncodings(only_depths_all, metadata, True)
-metadata += ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes', 'seasonality']
-
-def transform_date_to_periodic(date_time):
-    return (pd.to_datetime(decoder['date'][date_time]).month - 6.) / float(6)
+if (skip_ahead == True) and not checkpoint:
+    print "\nCheckpoint requirements not met"
+    print "\nImporting metadata"
+    metadata_df = loadFullMetadata(verbose=False)
     
-only_depths_n['seasonality'] = only_depths_n.date.apply(transform_date_to_periodic)
-
-print "\nCalculating Alpha Diversity"
-# Add metadata columns pertaining to alpha diversity
-alphaList = ['shannon', 'chao1', 'enspie']
-only_depth_otus, only_depths_n = alpha_diversity(only_depth_otus, 
-                                                 only_depths_n,
-                                                 alphaList)
-metadata+=alphaList
-
-print "\nTransforming counts into centered log ratios and model based methods"
-# Perform centered log-ratio transform 
-clr_T_otus, clr_T_m = centeredLogRatio(only_depth_otus, only_depths_n)
-
-to_transform = "/Users/login/Desktop/shared_otus.csv"
-
-tmm_vst_otus, tmm_vst_m = varStabTransform(to_transform, only_depth_otus, 
-                                           only_depths_n, 'TMM')
-rle_vst_otus, rle_vst_m = varStabTransform(to_transform, only_depth_otus, 
-                                           only_depths_n, 'RLE')
-
-print "\nChecking for vetted replicates file"
-
-shitty_reps_path = "shitty_reps.p"
-do_rep_rep = False
-if not os.path.exists(shitty_reps_path) or do_rep_rep:
-    print "\nMeasuring B-diversity (sqrt(JSD)) distances between replicates"
-    shitty_reps, broken_groups = ReplicateReport(only_depths_n, 
-                                                 only_depth_otus, 
-                                                 rep_groups, False, "JSD")
+    print "\nDropping -DO NOT USE- samples and those not associated with depths"
+    # Drop Recommended Columns
+    otu_time_table = otu_table.drop([otu_table.columns[-1]], axis=1)
+    do_not_use = ['SB100912TAWMD14VV4TMR1', 'SB061713TAWMD22VV4TMR1',
+                  'SB011413TAWMD22VV4TMR1', 'SB011413TAWMDSBVV4TMR1',
+                  'SB011413TAWMDEBVV4TMR1', 'SB011413TAWMD22VV4TMR2',
+                  'SB011413TAWMDSBVV4TMR2']
+                  
+    otu_time_table.drop(do_not_use, axis=1, inplace=True)
+    
+    print "\nParsing biosample strings into metadata columns"
+    # Add Biosample metadata & convert date format
+    samps_by_feats = parseBiosample(otu_time_table.T)
+    undated = samps_by_feats[samps_by_feats.date == "NA"].index
+    samps_by_feats.drop(undated, inplace=True)
+    samps_by_feats['date'] = pd.to_datetime(samps_by_feats['date'])
+    squishy_depths = ['bottom', 'SB', 'control1', 'control3', 'control6', 'mid1', 
+                      'mid2', 'mid3', 'river', 'upper', 'River', 'Neg', 'NA', 'EB', 
+                      'FB', 'CR', 'Dock', 'Bridge']
+    
+    # Drop samples of unknown provenance & sort by depth and date
+    off_target = samps_by_feats[samps_by_feats.depth.isin(squishy_depths)].index
+    only_depths = samps_by_feats.drop(off_target, inplace=False)
+    only_depths.sort_values(['date', 'depth'], ascending=[True, True],
+                            inplace=True)
+    
+    print "\nIdenitfying replicate groups"
+    # Identify replicate groupings & create OTU only matrix
+    rep_groups = listRepGroups(only_depths)
+    metadata = ['date', 'primers', 'kit', 'replicates', 'depth']
+    only_depth_otus = only_depths.drop(metadata, axis=1)
+    
+    print "\nAdding quadrant metadata"
+    # Add lake quadrant metadata variable
+    only_depths_q = add_quadrants(only_depths)
+    metadata.append("Quadrants")
+    
+    print "\n Adding remaining metadata by sample ID"
+    # set the sample id as the index of the metadata_df 
+    metadata_df.set_index('#SampleID', inplace=True)
+    # drop all rows that don't correspond to the existing index
+    lost_idxs = set(list(metadata_df.index)).difference(set(list(only_depths_q.index)))
+    metadata_df.drop(list(lost_idxs), inplace=True, axis=0)
+    # concatenate along columnar axis 
+    only_depths_all = only_depths_q.join(metadata_df)
+    # add categorical columns to the list for encoding
+    metadata += ['Sequencing Date', 'Sequencing platform', 'Forward read length',
+                 'Index read length']
+    
+    print "\nNumerically encoding categorical metadata"
+    # Numerically encode categoricals
+    only_depths_n, decoder = numericEncodings(only_depths_all, metadata, True)
+    metadata += ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes', 'seasonality']
+    
+    def transform_date_to_periodic(date_time):
+        return (pd.to_datetime(decoder['date'][date_time]).month - 6.) / float(6)
         
-    kept_pct = broken_groups/float(len(rep_groups))
-    print "\nGroups with replicates removed: {0:.3f}%".format(kept_pct*100)
-    pickle.dump( shitty_reps, open( shitty_reps_path, "wb" ) )
-else:
-    print "\tLoading pre-approved replicates"
-    shitty_reps = pickle.load( open( shitty_reps_path , "rb" ) )
+    only_depths_n['seasonality'] = only_depths_n.date.apply(transform_date_to_periodic)
     
-
-print "\nDropping most distant replicates"
-dr_tmm_vst_otus = tmm_vst_otus.drop(shitty_reps)
-dr_tmm_vst_m = tmm_vst_m.drop(shitty_reps)
-dr_rle_vst_otus = rle_vst_otus.drop(shitty_reps)
-dr_rle_vst_m = rle_vst_m.drop(shitty_reps)
-derepped_clr_m = clr_T_m.drop(shitty_reps)
-dereplicated_clr = clr_T_otus.drop(shitty_reps)
-derepped_otu_m = only_depths_n.drop(shitty_reps)
-dereplicated_otu = only_depth_otus.drop(shitty_reps)
-
-new_rep_groups = dropBadReps(shitty_reps, rep_groups)
-
-print "\nDescriptive Statistics of Alpha Diversity for var. Sample Groupings"
-
-valPairs = [(1,1),(1,2),(2,1),(2,2)]
+    print "\nCalculating Alpha Diversity"
+    # Add metadata columns pertaining to alpha diversity
+    alphaList = ['shannon', 'chao1', 'enspie']
+    only_depth_otus, only_depths_n = alpha_diversity(only_depth_otus, 
+                                                     only_depths_n,
+                                                     alphaList)
+    metadata+=alphaList
+    
+    print "\nTransforming counts into centered log ratios and model based methods"
+    # Perform centered log-ratio transform 
+    clr_T_otus, clr_T_m = centeredLogRatio(only_depth_otus, only_depths_n)
+    
+    to_transform = "/Users/login/Desktop/shared_otus.csv"
+    
+    tmm_vst_otus, tmm_vst_m = varStabTransform(to_transform, only_depth_otus, 
+                                               only_depths_n, 'TMM')
+    rle_vst_otus, rle_vst_m = varStabTransform(to_transform, only_depth_otus, 
+                                               only_depths_n, 'RLE')
+    
+    print "\nChecking for vetted replicates file"
+    
+    shitty_reps_path = "shitty_reps.p"
+    do_rep_rep = False
+    if not os.path.exists(shitty_reps_path) or do_rep_rep:
+        print "\nMeasuring B-diversity (sqrt(JSD)) distances between replicates"
+        shitty_reps, broken_groups = ReplicateReport(only_depths_n, 
+                                                     only_depth_otus, 
+                                                     rep_groups, False, "JSD")
             
-alpha_df, primer_outgroup = analyze_alpha_diversity(decoder, derepped_otu_m, 
-                                                    valPairs)
-
-print "\nDropping V4V5 primer samples"
-ingroup_tmm_vst_otus = dr_tmm_vst_otus.drop(primer_outgroup)
-ingroup_tmm_vst_m = dr_tmm_vst_m.drop(primer_outgroup)
-ingroup_rle_vst_otus = dr_rle_vst_otus.drop(primer_outgroup)
-ingroup_rle_vst_m = dr_rle_vst_m.drop(primer_outgroup)
-ingroup_otu_m = derepped_otu_m.drop(primer_outgroup)
-ingroup_otu = dereplicated_otu.drop(primer_outgroup)
-ingroup_clr_m = derepped_clr_m.drop(primer_outgroup)
-ingroup_clr = dereplicated_clr.drop(primer_outgroup)
-
-print "\Lets see how the signal holds up through PCA:"
-_ = scalePCAcorrelate(ingroup_otu, ingroup_otu_m, metadata, True)
-_ = scalePCAcorrelate(ingroup_tmm_vst_otus, ingroup_tmm_vst_m, metadata, True)
-_ = scalePCAcorrelate(ingroup_rle_vst_otus, ingroup_rle_vst_m, metadata, True)
-_ = scalePCAcorrelate(ingroup_clr, ingroup_clr_m, metadata, True)
-
-X_std2 = ingroup_clr.values
-svd = TruncatedSVD(n_components=2, n_iter=20, random_state=42)
-y_std2 = svd.fit_transform(X_std2)
-
-with plt.style.context('seaborn-whitegrid'):
-    plt.figure(4, figsize=(9, 9))
-    for lab, lab_en, col in zip(('Q1', 'Q2', 'Q3', 'Q4'),range(1,5),
-                        ('blue', 'red', 'green', 'magenta')):
-        plt.scatter(y_std2[(ingroup_clr_m.Quadrants==lab_en).values, 0],
-                    y_std2[(ingroup_clr_m.Quadrants==lab_en).values, 1],
-                    label=lab,c=col, s=40)
-    ax = plt.gca()
-    for axis in [ax.xaxis, ax.yaxis]:
-        for tick in axis.get_major_ticks():
-            tick.label.set_fontsize(16)
-    plt.xlabel('Principal Component 1', fontsize=24)
-    plt.ylabel('Principal Component 2', fontsize=24)
-    plt.legend(loc='lower left', fontsize=16)
-    plt.tight_layout()
-    plt.show()
-
-print "\nPlot Alpha Diversity Heat Map"
-a_metrics = ['shannon', 'chao1', 'enspie']
-for a_metric in a_metrics:
-    depths = np.unique(ingroup_otu_m.depth)
-    dates = np.unique(ingroup_otu_m.date)
-    alpha_plot_df = pd.DataFrame(index=depths, columns=dates)
-    for i in ingroup_otu_m.index:
-        this_depth = ingroup_otu_m.ix[i, 'depth']
-        this_date = ingroup_otu_m.ix[i, 'date']
-        alpha_plot_df.ix[this_depth, this_date] = ingroup_otu_m.ix[i, a_metric]
+        kept_pct = broken_groups/float(len(rep_groups))
+        print "\nGroups with replicates removed: {0:.3f}%".format(kept_pct*100)
+        pickle.dump( shitty_reps, open( shitty_reps_path, "wb" ) )
+    else:
+        print "\tLoading pre-approved replicates"
+        shitty_reps = pickle.load( open( shitty_reps_path , "rb" ) )
+        
     
-    decoded_depths = [str(decoder['depth'][i]) for i in depths]
-    decoded_dates = [str(decoder['date'][i]).split("T")[0] for i in dates]
-    alpha_plot_df.index = decoded_depths
-    alpha_plot_df.columns = decoded_dates
+    print "\nDropping most distant replicates"
+    dr_tmm_vst_otus = tmm_vst_otus.drop(shitty_reps)
+    dr_tmm_vst_m = tmm_vst_m.drop(shitty_reps)
+    dr_rle_vst_otus = rle_vst_otus.drop(shitty_reps)
+    dr_rle_vst_m = rle_vst_m.drop(shitty_reps)
+    derepped_clr_m = clr_T_m.drop(shitty_reps)
+    dereplicated_clr = clr_T_otus.drop(shitty_reps)
+    derepped_otu_m = only_depths_n.drop(shitty_reps)
+    dereplicated_otu = only_depth_otus.drop(shitty_reps)
     
-    alpha_plot_df.to_csv(a_metric+'.csv', index_label='depths')
-    # make an autoplotting function for 
-
+    new_rep_groups = dropBadReps(shitty_reps, rep_groups)
     
-#plotHeatmap(alpha_plot_df, 2)
-#al_ax = plt.gca()
-#al_ax.set(xlabel='date', ylabel='depth')
-
-print "\nCleaning out any OTUs that only appeared in dropped samples"
-var_thresh = (.9 * (1 - .9))
-otu_var = ingroup_otu.var(axis=0)
-var_otu_var = otu_var[otu_var < var_thresh].index
-infrequent_otus = list(var_otu_var)
-
-print "\nVariance Thresholding OTUS"
-
-shared_otus_m = ingroup_otu_m.drop(infrequent_otus, axis=1)
-shared_otus = ingroup_otu.drop(infrequent_otus, axis=1)
-shared_clr = ingroup_clr.drop(infrequent_otus, axis=1)
-shared_clr_m = ingroup_clr_m.drop(infrequent_otus, axis=1)
-notzero = (shared_otus != 0).sum().sum()
-sparsity = float(notzero) / shared_otus.values.flatten().shape[0]
-print "Probability that a given OTU val is nonzero: {}".format(sparsity)
-
-print "\nReassigning replicate numberings to all start at 1"
-final_rep_groups = dropBadReps((primer_outgroup+infrequent_otus), new_rep_groups)
-final_rep_dict = originate_rep_groupings(final_rep_groups)
-for group in final_rep_dict:
-    for idx, num in group.items():
-        shared_clr_m.ix[idx, 'replicates'] = num
-
-print "\nSplitting design matrix into test and train according to replicate numberings"
-
-idx_of_replicates = list(shared_clr_m[shared_clr_m.replicates != 1].index)
-idx_of_test = list(shared_clr_m[shared_clr_m.replicates == 2].index)
-idx_of_train = list(set(list(shared_clr_m.index)).symmetric_difference(set(idx_of_test)))
-shared_test_x = shared_clr_m.drop(idx_of_train)
-shared_train_x = shared_clr_m.drop(idx_of_replicates)
+    print "\nDescriptive Statistics of Alpha Diversity for var. Sample Groupings"
+    
+    valPairs = [(1,1),(1,2),(2,1),(2,2)]
+                
+    alpha_df, primer_outgroup = analyze_alpha_diversity(decoder, derepped_otu_m, 
+                                                        valPairs)
+    
+    print "\nDropping V4V5 primer samples"
+    ingroup_tmm_vst_otus = dr_tmm_vst_otus.drop(primer_outgroup)
+    ingroup_tmm_vst_m = dr_tmm_vst_m.drop(primer_outgroup)
+    ingroup_rle_vst_otus = dr_rle_vst_otus.drop(primer_outgroup)
+    ingroup_rle_vst_m = dr_rle_vst_m.drop(primer_outgroup)
+    ingroup_otu_m = derepped_otu_m.drop(primer_outgroup)
+    ingroup_otu = dereplicated_otu.drop(primer_outgroup)
+    ingroup_clr_m = derepped_clr_m.drop(primer_outgroup)
+    ingroup_clr = dereplicated_clr.drop(primer_outgroup)
+    
+    print "\Lets see how the signal holds up through PCA:"
+    _ = scalePCAcorrelate(ingroup_otu, ingroup_otu_m, metadata, True)
+    _ = scalePCAcorrelate(ingroup_tmm_vst_otus, ingroup_tmm_vst_m, metadata, True)
+    _ = scalePCAcorrelate(ingroup_rle_vst_otus, ingroup_rle_vst_m, metadata, True)
+    _ = scalePCAcorrelate(ingroup_clr, ingroup_clr_m, metadata, True)
+    
+    X_std2 = ingroup_clr.values
+    svd = TruncatedSVD(n_components=2, n_iter=20, random_state=42)
+    y_std2 = svd.fit_transform(X_std2)
+    
+    with plt.style.context('seaborn-whitegrid'):
+        plt.figure(4, figsize=(9, 9))
+        for lab, lab_en, col in zip(('Q1', 'Q2', 'Q3', 'Q4'),range(1,5),
+                            ('blue', 'red', 'green', 'magenta')):
+            plt.scatter(y_std2[(ingroup_clr_m.Quadrants==lab_en).values, 0],
+                        y_std2[(ingroup_clr_m.Quadrants==lab_en).values, 1],
+                        label=lab,c=col, s=40)
+        ax = plt.gca()
+        for axis in [ax.xaxis, ax.yaxis]:
+            for tick in axis.get_major_ticks():
+                tick.label.set_fontsize(16)
+        plt.xlabel('Principal Component 1', fontsize=24)
+        plt.ylabel('Principal Component 2', fontsize=24)
+        plt.legend(loc='lower left', fontsize=16)
+        plt.tight_layout()
+        plt.show()
+    
+    print "\nPlot Alpha Diversity Heat Map"
+    a_metrics = ['shannon', 'chao1', 'enspie']
+    for a_metric in a_metrics:
+        depths = np.unique(ingroup_otu_m.depth)
+        dates = np.unique(ingroup_otu_m.date)
+        alpha_plot_df = pd.DataFrame(index=depths, columns=dates)
+        for i in ingroup_otu_m.index:
+            this_depth = ingroup_otu_m.ix[i, 'depth']
+            this_date = ingroup_otu_m.ix[i, 'date']
+            alpha_plot_df.ix[this_depth, this_date] = ingroup_otu_m.ix[i, a_metric]
+        
+        decoded_depths = [str(decoder['depth'][i]) for i in depths]
+        decoded_dates = [str(decoder['date'][i]).split("T")[0] for i in dates]
+        alpha_plot_df.index = decoded_depths
+        alpha_plot_df.columns = decoded_dates
+        
+        alpha_plot_df.to_csv(a_metric+'.csv', index_label='depths')
+        # make an autoplotting function for 
+    
+        
+    #plotHeatmap(alpha_plot_df, 2)
+    #al_ax = plt.gca()
+    #al_ax.set(xlabel='date', ylabel='depth')
+    
+    print "\nCleaning out any OTUs that only appeared in dropped samples"
+    var_thresh = (.9 * (1 - .9))
+    otu_var = ingroup_otu.var(axis=0)
+    var_otu_var = otu_var[otu_var < var_thresh].index
+    infrequent_otus = list(var_otu_var)
+    
+    print "\nVariance Thresholding OTUS"
+    
+    shared_otus_m = ingroup_otu_m.drop(infrequent_otus, axis=1)
+    shared_otus = ingroup_otu.drop(infrequent_otus, axis=1)
+    shared_clr = ingroup_clr.drop(infrequent_otus, axis=1)
+    shared_clr_m = ingroup_clr_m.drop(infrequent_otus, axis=1)
+    notzero = (shared_otus != 0).sum().sum()
+    sparsity = float(notzero) / shared_otus.values.flatten().shape[0]
+    print "Probability that a given OTU val is nonzero: {}".format(sparsity)
+    
+    print "\nReassigning replicate numberings to all start at 1"
+    final_rep_groups = dropBadReps((primer_outgroup+infrequent_otus), new_rep_groups)
+    final_rep_dict = originate_rep_groupings(final_rep_groups)
+    for group in final_rep_dict:
+        for idx, num in group.items():
+            shared_clr_m.ix[idx, 'replicates'] = num
+    
+    print "\nSplitting design matrix into test and train according to replicate numberings"
+    
+    idx_of_replicates = list(shared_clr_m[shared_clr_m.replicates != 1].index)
+    idx_of_test = list(shared_clr_m[shared_clr_m.replicates == 2].index)
+    idx_of_train = list(set(list(shared_clr_m.index)).symmetric_difference(set(idx_of_test)))
+    shared_test_x = shared_clr_m.drop(idx_of_train)
+    shared_train_x = shared_clr_m.drop(idx_of_replicates)
+    shared_test_x.to_csv('shared_test_x.csv')
+    shared_train_x.to_csv('shared_train_x.csv')
+else:
+    print "Skipping ahead"
+    shared_test_x = pd.read_csv('shared_test_x.csv', index_col=0)
+    shared_train_x = pd.read_csv('shared_train_x.csv', index_col=0)
+    
 
 print "\n Pull in all metadata columns"
 
@@ -335,16 +349,30 @@ heavy_hitter_pct2 = only_depth_otus.T.ix[heavy_hitters, :].sum().sum()
 heavy_hitter_pct2 = heavy_hitter_pct2/only_depth_otus.T.sum().sum()*100.
 print "\tThese represent {:.2f}% of the processed data & {:.2f}% of the raw counts".format(heavy_hitter_pct,
                                                                                  heavy_hitter_pct2)
-heavy_x = x_to_print.T.ix[heavy_hitters, :]
-test_corr_mat = np.cov(heavy_x)
-a_df = pd.DataFrame(data=test_corr_mat, 
-                    columns = heavy_hitters, 
-                    index = heavy_hitters)
-plotHeatmap(a_df, 22)
 mode1 = ["seq79", "seq6", "seq172"]
 mode2 = ["seq24", "seq50", "seq47"]
 x_to_print.T.ix[mode1, :].T.plot()
 x_to_print.T.ix[mode2, :].T.plot()
+
+from scipy.spatial.distance import pdist, squareform
+
+heavy_x = x_to_print.T.ix[heavy_hitters, :]
+test_corr_mat = squareform(pdist(heavy_x, metric='correlation'))
+a_df = pd.DataFrame(data=test_corr_mat, 
+                    columns = heavy_hitters, 
+                    index = heavy_hitters)
+plotHeatmap(a_df, 22)
+test_corr_mat = np.corrcoef(heavy_x)
+a_df = pd.DataFrame(data=test_corr_mat, 
+                    columns = heavy_hitters, 
+                    index = heavy_hitters)
+plotHeatmap(a_df, 23)
+test_corr_mat = np.cov(heavy_x)
+a_df = pd.DataFrame(data=test_corr_mat, 
+                    columns = heavy_hitters, 
+                    index = heavy_hitters)
+plotHeatmap(a_df, 24)
+
 
 
 ## Hierarchical agglomorative clustering
@@ -365,20 +393,26 @@ for column_ in x_to_print.columns:
     taxa_str = taxa_series[column_]
     all_taxa.update(taxa_str.split(";"))
 
+print "lets test clustering"
 test_clust_df = score_clusters(test_cluster_dict, all_taxa, 
                                taxa_series, test_labels)
 
 test_clust_df.to_csv('test_clust_df.csv', sep="\t", index_label='Iteration')
 
 # cluster everything
-corr_mat = np.corrcoef(x_to_print.T)
+print "Lets cluster all the data"
+corr_mat = np.cov(x_to_print.T)
 corr_labels = x_to_print.T.index
-row_clusters = linkage(corr_mat, method='complete')
+corr_mat_2A = pdist(x_to_print.values, metric='correlation')
+corr_mat_2 = squareform(corr_mat_2A)
+row_clusters = linkage(corr_mat, method='ward')
 cluster_dict = extract_linkages(row_clusters, corr_labels)
 row_dendr = dendrogram(row_clusters, labels=corr_labels, orientation='top')
 
 full_cluster_df = score_clusters(cluster_dict, all_taxa, taxa_series, corr_labels)
 full_cluster_df.to_csv('full_cluster_df.csv', sep="\t", index_label='Iteration')
+
+sys.exit("awaiting your command")
 
 print "\n Lets fit some models"
 

@@ -32,6 +32,7 @@ def seq_to_taxa(seq_list, all_taxa, taxa_series):
     return this_taxa_ser
     
 def score_clusters(test_cluster_dict, all_taxa, taxa_series, test_labels):
+    print "Scoring clusters"
     top_level = np.array(test_cluster_dict.keys()).max()
     bottom_level=np.array(test_cluster_dict.keys()).min()
     iteration_order = np.arange(bottom_level, top_level)[::-1]
@@ -41,7 +42,7 @@ def score_clusters(test_cluster_dict, all_taxa, taxa_series, test_labels):
     
     for idx, clust_n in enumerate(iteration_order):
         this_clust = test_cluster_dict[clust_n]
-        this_labels = [test_labels[i] for i in this_clust]
+        this_labels = [test_labels[int(i)] for i in this_clust]
         this_clust_set = set(this_clust)
         this_taxa_ser = seq_to_taxa(this_labels, all_taxa, taxa_series)
         higher_tree_levels = np.arange(clust_n+1,top_level+1)
@@ -64,6 +65,7 @@ def score_clusters(test_cluster_dict, all_taxa, taxa_series, test_labels):
                                  p_values)).T
     clust_df_cols = ['parent', 'child', 'p-val']
     cluster_df = pd.DataFrame(data=cluster_df_data, columns=clust_df_cols)
+    print "Analyzed clusters"
     return cluster_df
 
 
