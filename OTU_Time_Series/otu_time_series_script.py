@@ -32,6 +32,8 @@ http://deneflab.github.io/MicrobeMiseq/demos/mothur_2_phyloseq.html
 
 """
 from otu_ts_support import score_clusters, matchXandYbyIndex, extract_linkages
+def date_to_periodic(date_time):
+    return (pd.to_datetime(decoder['date'][date_time]).month - 6.) / float(6)
 def transform_date(date_num):
     return pd.to_datetime(decoder['date'][date_num])
 def transform_depth(depth_num):
@@ -46,9 +48,9 @@ import numpy as np
 import sys, os
 from ChemDataVectors import LoadChemDFs
 from importCoverage import loadFullMetadata
-from otu_ts_support import listRepGroups, ReplicateReport, varStabTransform
+from otu_ts_support import listRepGroups, ReplicateReport, edgeRtmm, DESeqRlog, standardScaled
 from otu_ts_support import numericEncodings, originate_rep_groupings# , beta_wrapper
-from otu_ts_support import importratesandconcentrations_obs, importratesandconcentrations_mod
+from otu_ts_support import importratesandconcs_obs, importratesandconcs_mod
 from otu_ts_support import scalePCAcorrelate, parseBiosample, plotHeatmap
 from otu_ts_support import add_quadrants, plotCountTotalsByMetadata
 from otu_ts_support import analyze_alpha_diversity, alpha_diversity
@@ -56,7 +58,9 @@ from otu_ts_support import plotCommonTaxa, dropBadReps, collapseBdiversity
 from otu_ts_support import centeredLogRatio, JensenShannonDiv_Sqrt
 from otu_ts_support import time_scale_modeled_chem_data, append_depths
 from sklearn.decomposition import TruncatedSVD #, LatentDirichletAllocation
-from otu_ts_support import bz2wrapper
+from otu_ts_support import bz2wrapper, simpleProportions, rarefyOTUtables
+from otu_ts_support import plot_interreplicate_distances, distant_replicate_covariates
+
 
 # Relevant File Names OTU Table
 tree_file='unique.dbOTU.tree'
@@ -65,7 +69,7 @@ otu_matrix_file = 'unique.dbOTU.nonchimera.mat.rdp'
 
 chk_pt_test_f = 'shared_test_x.csv'
 chk_pt_train_f = 'shared_test_x.csv'
-skip_ahead = True
+skip_ahead = False
 checkpoint = os.path.exists(chk_pt_test_f) and os.path.exists(chk_pt_train_f)
     
 print "\nReading in OTU Table"
@@ -79,12 +83,12 @@ else:
     
 otu_table = pd.read_csv(otu_matrix_file, sep="\t", index_col=0)
 
-if not os.path.exists(otu_to_unzip):
-    zOut = bz2wrapper(otu_matrix_file)
+#if not os.path.exists(otu_to_unzip):
+#    zOut = bz2wrapper(otu_matrix_file)
 
 taxa_series = otu_table.ix[:, -1]
 
-if (skip_ahead == True) and not checkpoint:
+if (skip_ahead == False):
     print "\nCheckpoint requirements not met"
     print "\nImporting metadata"
     metadata_df = loadFullMetadata(verbose=False)
@@ -120,13 +124,20 @@ if (skip_ahead == True) and not checkpoint:
     rep_groups = listRepGroups(only_depths)
     metadata = ['date', 'primers', 'kit', 'replicates', 'depth']
     only_depth_otus = only_depths.drop(metadata, axis=1)
-    
-    print "\nAdding quadrant metadata"
+    plot_interreplicate_distances(only_depth_otus, rep_groups, 66)
+
+    print "\nMeasuring B-diversity (sqrt(JSD)) distances between replicates"
+    shitty_reps, broken_groups_n = ReplicateReport(only_depths, 
+                                                 only_depth_otus, 
+                                                 rep_groups, False, "JSD")
+        
+    kept_pct = broken_groups_n/float(len(rep_groups))
+    flat_replicates = [item for sublist in rep_groups for item in sublist]
+        
+    print "\nAdding quadrant column and full metadata df"
     # Add lake quadrant metadata variable
     only_depths_q = add_quadrants(only_depths)
     metadata.append("Quadrants")
-    
-    print "\n Adding remaining metadata by sample ID"
     # set the sample id as the index of the metadata_df 
     metadata_df.set_index('#SampleID', inplace=True)
     # drop all rows that don't correspond to the existing index
@@ -138,112 +149,146 @@ if (skip_ahead == True) and not checkpoint:
     metadata += ['Sequencing Date', 'Sequencing platform', 'Forward read length',
                  'Index read length']
     
+    print "Adding solo replicates to shitty replicates & binning distances"
+    new_rep_groups, broken_groups = dropBadReps(shitty_reps, rep_groups)   
+    meta_dict_u = distant_replicate_covariates(broken_groups, only_depth_otus, 
+                                               only_depths_all, metadata)
+    covars = [(i, j.mean(), len(j)) for i, j in meta_dict_u.items()]
+    covars.sort(key=lambda x: (x[1]), reverse=True)
+    
+    print "\nDropping most distant replicates"
+    all_shitty = [i for sl in broken_groups for i in sl]
+    alt_kept_pct = len(all_shitty) / float(len(flat_replicates))
+    print "\nGroups with replicates removed: {0:.3f}%".format(kept_pct*100)
+    print "% of all replicates dropped : {0:.3f}%".format(alt_kept_pct*100)
+    dereplicated_otu = only_depth_otus.drop(all_shitty)
+    dereplicated_m = only_depths_all.drop(all_shitty)
+    
+    jsd_dist_mat_fn = "jsd_dist_full.p"
+    if os.path.exists(jsd_dist_mat_fn):
+        dist_mat = pickle.load( open(jsd_dist_mat_fn, "rb" ) )
+    else:
+        dist_mat = JensenShannonDiv_Sqrt(dereplicated_otu)
+        pickle.dump( dist_mat, open(jsd_dist_mat_fn, "wb") )
+        
+    plt.figure(67)
+    plt.clf()
+    plt.hist(dist_mat.values.flatten(), facecolor='g', bins=100)
+    plt.tick_params(labelsize=14)
+    plt.xlabel("root JS distance (all)", fontsize=14)
+    plt.ylabel("N", fontsize=14)
+    
     print "\nNumerically encoding categorical metadata"
     # Numerically encode categoricals
-    only_depths_n, decoder = numericEncodings(only_depths_all, metadata, True)
-    metadata += ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes', 'seasonality']
-    
-    def transform_date_to_periodic(date_time):
-        return (pd.to_datetime(decoder['date'][date_time]).month - 6.) / float(6)
-        
-    only_depths_n['seasonality'] = only_depths_n.date.apply(transform_date_to_periodic)
+    metadata += ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes']
+    dereplicated_m2, decoder = numericEncodings(dereplicated_m, metadata, False)
+    metadata += ['seasonality']
+    dereplicated_m2['seasonality'] = dereplicated_m2.date.apply(date_to_periodic)
     
     print "\nCalculating Alpha Diversity"
     # Add metadata columns pertaining to alpha diversity
     alphaList = ['shannon', 'chao1', 'enspie']
-    only_depth_otus, only_depths_n = alpha_diversity(only_depth_otus, 
-                                                     only_depths_n,
-                                                     alphaList)
+    derepped_otus, derepped_m = alpha_diversity(dereplicated_otu, 
+                                                dereplicated_m2,
+                                                alphaList)
     metadata+=alphaList
-    
-    print "\nTransforming counts into centered log ratios and model based methods"
-    # Perform centered log-ratio transform 
-    clr_T_otus, clr_T_m = centeredLogRatio(only_depth_otus, only_depths_n)
-    
-    to_transform = "/Users/login/Desktop/shared_otus.csv"
-    
-    tmm_vst_otus, tmm_vst_m = varStabTransform(to_transform, only_depth_otus, 
-                                               only_depths_n, 'TMM')
-    rle_vst_otus, rle_vst_m = varStabTransform(to_transform, only_depth_otus, 
-                                               only_depths_n, 'RLE')
-    
-    print "\nChecking for vetted replicates file"
-    
-    shitty_reps_path = "shitty_reps.p"
-    do_rep_rep = False
-    if not os.path.exists(shitty_reps_path) or do_rep_rep:
-        print "\nMeasuring B-diversity (sqrt(JSD)) distances between replicates"
-        shitty_reps, broken_groups = ReplicateReport(only_depths_n, 
-                                                     only_depth_otus, 
-                                                     rep_groups, False, "JSD")
-            
-        kept_pct = broken_groups/float(len(rep_groups))
-        print "\nGroups with replicates removed: {0:.3f}%".format(kept_pct*100)
-        pickle.dump( shitty_reps, open( shitty_reps_path, "wb" ) )
-    else:
-        print "\tLoading pre-approved replicates"
-        shitty_reps = pickle.load( open( shitty_reps_path , "rb" ) )
-        
-    
-    print "\nDropping most distant replicates"
-    dr_tmm_vst_otus = tmm_vst_otus.drop(shitty_reps)
-    dr_tmm_vst_m = tmm_vst_m.drop(shitty_reps)
-    dr_rle_vst_otus = rle_vst_otus.drop(shitty_reps)
-    dr_rle_vst_m = rle_vst_m.drop(shitty_reps)
-    derepped_clr_m = clr_T_m.drop(shitty_reps)
-    dereplicated_clr = clr_T_otus.drop(shitty_reps)
-    derepped_otu_m = only_depths_n.drop(shitty_reps)
-    dereplicated_otu = only_depth_otus.drop(shitty_reps)
-    
-    new_rep_groups = dropBadReps(shitty_reps, rep_groups)
-    
+
     print "\nDescriptive Statistics of Alpha Diversity for var. Sample Groupings"
     
     valPairs = [(1,1),(1,2),(2,1),(2,2)]
-                
-    alpha_df, primer_outgroup = analyze_alpha_diversity(decoder, derepped_otu_m, 
-                                                        valPairs)
+    chao1_df, primer_outgroup = analyze_alpha_diversity(decoder, derepped_m, 
+                                                        valPairs, 'chao1')
+    enspie_df, primer_outgroup = analyze_alpha_diversity(decoder, derepped_m, 
+                                                        valPairs, 'enspie')
     
-    print "\nDropping V4V5 primer samples"
-    ingroup_tmm_vst_otus = dr_tmm_vst_otus.drop(primer_outgroup)
-    ingroup_tmm_vst_m = dr_tmm_vst_m.drop(primer_outgroup)
-    ingroup_rle_vst_otus = dr_rle_vst_otus.drop(primer_outgroup)
-    ingroup_rle_vst_m = dr_rle_vst_m.drop(primer_outgroup)
-    ingroup_otu_m = derepped_otu_m.drop(primer_outgroup)
-    ingroup_otu = dereplicated_otu.drop(primer_outgroup)
-    ingroup_clr_m = derepped_clr_m.drop(primer_outgroup)
-    ingroup_clr = dereplicated_clr.drop(primer_outgroup)
+    ingroup_otu_m = derepped_m.drop(primer_outgroup)
+    ingroup_otu = derepped_otus.drop(primer_outgroup)
+    
+    print "\nTransforming counts into centered log ratios and model based methods"
+    # Perform centered log-ratio transform 
+    ss_T_otus, ss_T_m = standardScaled(ingroup_otu, ingroup_otu_m)
+    clr_T_otus, clr_T_m = centeredLogRatio(ingroup_otu, ingroup_otu_m)
+    rare_t_otus, rare_t_m = rarefyOTUtables(ingroup_otu, ingroup_otu_m)
+    prop_T_otus, prop_T_m = simpleProportions(ingroup_otu, ingroup_otu_m)
+    tmm_vst_otus, tmm_vst_m = edgeRtmm(ingroup_otu, ingroup_otu_m)
+    rlog_vst_otus, rlog_vst_m = DESeqRlog(ingroup_otu, ingroup_otu_m,
+                                          saved_file=True)
+    
+    print "\n Generating superficial comparisons of transforms"
+    
+    transforms = {"ss": (ss_T_otus, ss_T_m, 0, 0),
+                  "clr": (clr_T_otus, clr_T_m, 0, 1),
+                  "rare": (rare_t_otus, rare_t_m, 1, 0),
+                  "props": (prop_T_otus, prop_T_m, 1, 1),
+                  "tmm": (tmm_vst_otus, tmm_vst_m, 2, 0),
+                  "rlog": (rlog_vst_otus, rlog_vst_m, 2, 1)
+                  }
+
+    # of dropped OTUS
+    f, axarr = plt.subplots(3, 2)
+    for t_name, t_dats in transforms.items():
+        print "Transformation Name: {}".format(t_name)
+        t_otus = t_dats[0]
+        t_otu_set = set(t_otus.columns)
+        base_otu_set = set(ingroup_otu.columns) 
+        otus_removed = list(t_otu_set.symmetric_difference(base_otu_set))
+        print "\t# OTUS dropped: {}".format(otus_removed)
+    # average change per OTU
+        med_otu_change = np.median((t_otu - ingroup_otu).mean().values)
+        total_otu_change = (t_otu - ingroup_otu).sum().sum()
+        print "\tTotal change in OTUS counts: {}".format(total_otu_change)
+        print "\tMedian change in OTUS counts: {}".format(med_otu_change)
+    # histogram of sample sizes 
+        this_ax = axarr[t_dats[2], t_dats[3]]
+        this_ax.set_title(t_name, fontsize=14)
+        if (sr != 0) or (sr != 1):
+            this_ax.set_xlabel('sample size (bins)', fontsize=14)
+        this_ax.set_ylabel('n', fontsize=14)
+        this_ax.hist(t_otus.sum(axis=1).values, bins=20)
+        for axis in [axarr[sr, sc].xaxis, axarr[sr, sc].yaxis]:
+            for tick in axis.get_major_ticks():
+                tick.label.set_fontsize(14)
+        
     
     print "\Lets see how the signal holds up through PCA:"
-    _ = scalePCAcorrelate(ingroup_otu, ingroup_otu_m, metadata, True)
-    _ = scalePCAcorrelate(ingroup_tmm_vst_otus, ingroup_tmm_vst_m, metadata, True)
-    _ = scalePCAcorrelate(ingroup_rle_vst_otus, ingroup_rle_vst_m, metadata, True)
-    _ = scalePCAcorrelate(ingroup_clr, ingroup_clr_m, metadata, True)
+    corrComp0, fcomp0 = scalePCAcorrelate(ingroup_otu, ingroup_otu_m, metadata, False)
+    corrComp1, fcomp1 = scalePCAcorrelate(ingroup_otu, ingroup_otu_m, metadata, True)
+    corrComp2, fcomp2 = scalePCAcorrelate(clr_T_otus, clr_T_m, metadata, True)
+    corrComp3, fcomp3 = scalePCAcorrelate(prop_T_otus, prop_T_m, metadata, True)
+    corrComp4, fcomp4 = scalePCAcorrelate(tmm_vst_otus, tmm_vst_m, metadata, True)
+    corrComp5, fcomp5 = scalePCAcorrelate(rlog_vst_otus, rlog_vst_m, metadata, True)
+    corrComp6, fcomp6 = scalePCAcorrelate(rare_t_otus, rare_t_m, metadata, True)
     
-    X_std2 = ingroup_clr.values
-    svd = TruncatedSVD(n_components=2, n_iter=20, random_state=42)
-    y_std2 = svd.fit_transform(X_std2)
-    
+    t_types = [prop_T_otus, clr_T_otus, rare_t_otus, tmm_vst_otus]
+    mdata_dfs = [prop_T_m, clr_T_m, rare_t_m, tmm_vst_m]
+    t_titles = ["Relative Abundances", "Center Log Ratios", "Rarefaction", "TMM (edgeR)"]
+    qtup, coltup = ('Q1', 'Q2', 'Q3', 'Q4'), ('blue', 'red', 'green', 'magenta')
+    sprow, spcol = [0,0,1,1], [0, 1, 0, 1]
     with plt.style.context('seaborn-whitegrid'):
-        plt.figure(4, figsize=(9, 9))
-        for lab, lab_en, col in zip(('Q1', 'Q2', 'Q3', 'Q4'),range(1,5),
-                            ('blue', 'red', 'green', 'magenta')):
-            plt.scatter(y_std2[(ingroup_clr_m.Quadrants==lab_en).values, 0],
-                        y_std2[(ingroup_clr_m.Quadrants==lab_en).values, 1],
-                        label=lab,c=col, s=40)
-        ax = plt.gca()
-        for axis in [ax.xaxis, ax.yaxis]:
-            for tick in axis.get_major_ticks():
-                tick.label.set_fontsize(16)
-        plt.xlabel('Principal Component 1', fontsize=24)
-        plt.ylabel('Principal Component 2', fontsize=24)
-        plt.legend(loc='lower left', fontsize=16)
-        plt.tight_layout()
-        plt.show()
+        f, axarr = plt.subplots(2, 2)
+        for tt, title_, ttm, sr, sc in zip(t_types, t_titles, mdata_dfs, sprow, spcol):
+            X_std2 = tt.values
+            svd = TruncatedSVD(n_components=2, n_iter=20, random_state=42)
+            y_std2 = svd.fit_transform(X_std2)
+            axarr[sr, sc].set_title(title_, fontsize=14)
+            if sr != 0:
+                axarr[sr, sc].set_xlabel('PC 1', fontsize=14)
+            axarr[sr, sc].set_ylabel('PC 2', fontsize=14)
+            for lab, lab_en, col in zip(qtup,range(1,5),coltup):
+                axarr[sr, sc].scatter(y_std2[(ttm.Quadrants==lab_en).values, 0],
+                                      y_std2[(ttm.Quadrants==lab_en).values, 1],
+                                      label=lab,c=col, s=40)
     
+            for axis in [axarr[sr, sc].xaxis, axarr[sr, sc].yaxis]:
+                for tick in axis.get_major_ticks():
+                    tick.label.set_fontsize(14)
+        plt.legend(loc='upper right', fontsize=16)
+
+
     print "\nPlot Alpha Diversity Heat Map"
-    a_metrics = ['shannon', 'chao1', 'enspie']
-    for a_metric in a_metrics:
+    a_metrics = ['chao1', 'enspie']
+    fig_nums = [203,333,444]
+    for a_metric, fig_n in zip(a_metrics, fig_nums):
         depths = np.unique(ingroup_otu_m.depth)
         dates = np.unique(ingroup_otu_m.date)
         alpha_plot_df = pd.DataFrame(index=depths, columns=dates)
@@ -258,12 +303,10 @@ if (skip_ahead == True) and not checkpoint:
         alpha_plot_df.columns = decoded_dates
         
         alpha_plot_df.to_csv(a_metric+'.csv', index_label='depths')
-        # make an autoplotting function for 
-    
-        
-    #plotHeatmap(alpha_plot_df, 2)
-    #al_ax = plt.gca()
-    #al_ax.set(xlabel='date', ylabel='depth')
+        # make an autoplotting function for
+        plotHeatmap(alpha_plot_df, fig_n)
+        al_ax = plt.gca()
+        al_ax.set(xlabel='date', ylabel='depth')
     
     print "\nCleaning out any OTUs that only appeared in dropped samples"
     var_thresh = (.9 * (1 - .9))
@@ -317,8 +360,8 @@ depths_vector = np.arange(22)
 surfaceM_df = append_depths(surfaceM_df, depths_vector)
 surfaceM_df.set_index(['date', 'depth'], inplace=True)
 
-obs_conc_df = importratesandconcentrations_obs(obs_conc_f)
-rate_dict, conc_dict = importratesandconcentrations_mod(rate_conc_f)
+obs_conc_df = importratesandconcs_obs(obs_conc_f)
+rate_dict, conc_dict = importratesandconcs_mod(rate_conc_f)
 model_proc_df = time_scale_modeled_chem_data(rate_dict, conc_dict, 146, 
                                              '03/23/2013', '08/15/2013')
 
@@ -397,7 +440,7 @@ print "lets test clustering"
 test_clust_df = score_clusters(test_cluster_dict, all_taxa, 
                                taxa_series, test_labels)
 
-test_clust_df.to_csv('test_clust_df.csv', sep="\t", index_label='Iteration')
+test_clust_df.to_csv('test_clust_df.tsv', sep="\t", index_label='Iteration')
 
 # cluster everything
 print "Lets cluster all the data"
@@ -410,7 +453,7 @@ cluster_dict = extract_linkages(row_clusters, corr_labels)
 row_dendr = dendrogram(row_clusters, labels=corr_labels, orientation='top')
 
 full_cluster_df = score_clusters(cluster_dict, all_taxa, taxa_series, corr_labels)
-full_cluster_df.to_csv('full_cluster_df.csv', sep="\t", index_label='Iteration')
+full_cluster_df.to_csv('full_cluster_df.tsv', sep="\t", index_label='Iteration')
 
 sys.exit("awaiting your command")
 
@@ -464,7 +507,7 @@ for baton in baton_twirler.columns:
                         'rf_feat_import':lookatTheTrees.feature_importances_,
                         'lasso_coeffs': rodeo_clown.coef_}
     
-    scores = [lasso_r2, lasso_mse, this_cv, rf_r2, rf_mse, this_oob]
+    scores = [lasso_r2, rf_r2, lasso_mse, rf_mse, this_cv, this_oob]
     score_df.ix[baton, :] = np.array(scores)
     
 score_df.to_csv(os.path.join(os.getcwd(),"model_scores.tsv"), sep="\t")

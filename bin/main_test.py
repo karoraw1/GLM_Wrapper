@@ -192,7 +192,7 @@ print "NO3 error score: {}".format(no3_NSE)
 #ph_NSE = test.score_variants(test, 'CAR_pH', lik_fxn='NSE')
 #print "PH error score: {}".format(ph_NSE)
 
-LakeModel.plotLakeandError(test, test.observations_mod, 9)
+LakeModel.plotLakeandError(test, test.observations_sub, 'OXY_oxy', 9)
 LakeModel.plotLakeProfiles(test, 10)
 
 # Make skeleton dataframe with expected time/depth shape

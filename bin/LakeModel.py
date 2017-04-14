@@ -140,12 +140,13 @@ def print_minimums(Lake):
                     for i in best_idxes:
                         print liks[i]
 
-def plotLakeandError(scored_Lake, Lake_temps, fignum):
-    modelled_dm = scored_Lake.modelled_mat
+def plotLakeandError(scored_Lake, Lake_temps, var_key, fignum):
+    modelled_dm = scored_Lake.modelled_sub[var_key]
+    observed_dm = Lake_temps[var_key]
     plt.figure(fignum, figsize=(16,8))
     titles = ["Observed", "Model", "Error"]
-    ylabs_ = [str(i.date()) for i in Lake_temps.index]
-    for i, v in enumerate([Lake_temps, modelled_dm, abs(Lake_temps-modelled_dm)]):
+    ylabs_ = [str(i.date()) for i in observed_dm.index]
+    for i, v in enumerate([observed_dm, modelled_dm, abs(observed_dm-modelled_dm)]):
         ax = plt.subplot(1, 3, i+1)
         ax1 = plt.imshow(v)
         plt.title(titles[i])
@@ -158,8 +159,8 @@ def plotLakeandError(scored_Lake, Lake_temps, fignum):
         divider = make_axes_locatable(ax)
         cax1 = divider.append_axes("right", size="5%", pad="3%")
         plt.colorbar(ax1, cax=cax1)
-    error = abs(Lake_temps-modelled_dm).sum().sum()
-    denom = (Lake_temps.shape[0]*Lake_temps.shape[1])
+    error = abs(observed_dm-modelled_dm).sum().sum()
+    denom = (observed_dm.shape[0]*observed_dm.shape[1])
     print error/denom, "average error per voxel"
 
 def plotLakeProfiles(scored_lake, fignum):

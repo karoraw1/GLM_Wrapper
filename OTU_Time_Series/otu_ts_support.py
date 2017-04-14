@@ -10,10 +10,31 @@ import numpy as np
 import sys, os
 from sklearn.decomposition import PCA, TruncatedSVD, LatentDirichletAllocation
 from sklearn.preprocessing import StandardScaler
-
+from copy import deepcopy
 from scipy import stats as ss
+from rarefy import rarefy_table
 
+def rarefyOTUtables(otu_df, meta_df):
+    rare_table = rarefy_table(otu_df.copy())
+    rt_m = meta_df.copy()
+    rt_m.ix[:, otu_df.columns] = rare_table
+    return rare_table, rt_m
 
+def simpleProportions(otu_df, meta_df):
+    
+    sp_otu = otu_df.divide(otu_df.sum(axis=1), axis='rows')
+    sp_m = meta_df.copy()
+    sp_m.ix[:, otu_df.columns] = sp_otu
+    return sp_otu, sp_m
+
+def standardScaled(otu_df, meta_df):
+    data_ = otu_df.copy().values
+    new_data_ = StandardScaler().fit_transform(data_)
+    ss_otu = pd.DataFrame(new_data_, index=otu_df.index, columns=otu_df.columns)
+    ss_m = meta_df.copy()
+    ss_m.ix[:, ss_otu.columns] = ss_otu.ix[:, ss_otu.columns]
+    return ss_otu, ss_m
+    
 def seq_to_taxa(seq_list, all_taxa, taxa_series):
     """
      Accepts a list of `seq` labels, the `all_taxa` set, 
@@ -68,17 +89,13 @@ def score_clusters(test_cluster_dict, all_taxa, taxa_series, test_labels):
     print "Analyzed clusters"
     return cluster_df
 
-
-
-
 def Ftest_pvalue(d1,d2):
     """takes two vectors and performs an F-test, returning the p value"""
     df1 = len(d1) - 1
     df2 = len(d2) - 1
     F = np.var(d1) / np.var(d2)
-    single_tailed_pval = ss.f.cdf(F,df1,df2)
-    double_tailed_pval = single_tailed_pval * 2
-    return double_tailed_pval
+    p_value = ss.f.cdf(F, df1, df2)
+    return p_value
 
 
 def append_depths(df, depths_vector):
@@ -184,19 +201,52 @@ def add_quadrants(dF):
     quad_ns[depth_ns > 16]= "Q4"
     dF["Quadrants"] = quad_ns
     return dF.copy()
-    
-def numericEncodings(df, metadata_cols, verbose=True):
+            
+def numericEncodings(df_orig, metadata_cols, verbose=True):
+    df = df_orig.copy()
     print "Changing {} metadata columns".format(len(metadata_cols))
     unq_metadata = {i:{} for i in metadata_cols}
+    int_vals = ['Forward read length', 'Index read length', 'Quadrants',
+                'Sequencing Date', 'Sequencing platform', 'kit', 'primers',
+                'replicates']
+    dontTransform = ['Coverage', 'TotalSeqs', 'BadBarcodes', 'GoodBarcodes', 
+                     'seasonality']
     for md, unqs in unq_metadata.items():
-        print "\n", md
-        for num, unq in enumerate(np.unique(df[md])):
-            num+=1
-            unqs[num] = unq
-            if verbose == True:
-                print "Encoding", unq, "as", num
-            bool_ = df[md] == unq 
-            df.ix[bool_, md] = num
+        if md in int_vals:
+            if verbose:
+                print "\n", md
+                
+            for num, unq in enumerate(np.unique(df[md])):
+                num+=1
+                unqs[num] = unq
+                if verbose == True:
+                    print "Encoding", unq, "as", num
+                bool_ = df[md] == unq 
+                df.ix[bool_, md] = num
+        elif md in dontTransform:
+            pass
+        elif md == 'date' or md == 'Date':
+            earliest = df[md].min()
+            earliest = pd.to_datetime(earliest)
+            
+            for unq in np.unique(df[md]):
+                this_day = pd.to_datetime(unq)
+                td = (this_day - earliest).days
+                unqs[td] = unq
+                if verbose == True:
+                    print "Encoding", unq, "as", td, "(days since first day)"
+                bool_ = df[md] == unq
+                df.ix[bool_, md] = td
+        elif md == 'depth' or md == 'Depth':
+            for unq in np.unique(df[md]):
+                unqs[unq] = float(unq)
+                if verbose == True:
+                    print "Encoding", unq, "as", float(unq)
+                bool_ = df[md] == unq 
+                df.ix[bool_, md] = float(unq)
+        else:
+            sys.exit("Illegal var type detected")
+            
 
     for i in metadata_cols:
         df[[i]] = df[[i]].apply(pd.to_numeric)
@@ -233,32 +283,98 @@ def listRepGroups(df):
     print len(unq_rep_groups), "groups of replicates detected"
     return unq_rep_groups
 
+def KLD(x,y):
+    a = np.array(x, dtype=float) + 0.000001
+    b = np.array(y, dtype=float) + 0.000001
+    return (a*np.log(a/b)).sum()
+
+def rootJSD(x,y):
+    a = np.array(x, dtype=float)
+    b = np.array(y, dtype=float)
+    return np.sqrt(0.5 * KLD(a, (a+b)/2) + 0.5 * KLD(b, (a+b)/2))
+
+def distant_replicate_covariates(broken_groups, df, df_m, metadata):
+        
+        # create a dictionary with the combined keys of (mdata_cat + mdata_val)
+        # for each instance add the average distance for an individual
+        super_meta_dict = {}
+        m_only_df = df_m.ix[:, metadata]
+    
+        # measure average distance to all other replicates    
+        for grp in broken_groups:
+            dists = JensenShannonDiv_Sqrt(df.ix[grp, :])
+            for row, idx in zip(range(dists.shape[0]), dists.index):
+                nz_row = dists.ix[row, :].values
+                this_ird = nz_row[nz_row !=0].mean()
+                # add to a particular column & value key 
+                for col in m_only_df.columns:
+                    if col != 'replicates' and col !='depth':
+                        this_val = m_only_df.ix[idx, col]
+                        jk = str(col) + "_" + str(this_val)
+                        if not super_meta_dict.has_key(jk):
+                            super_meta_dict[jk] = [this_ird]
+                        else:
+                            super_meta_dict[jk].append(this_ird)
+                        
+        meta_dict_u = {}
+        for k, v in super_meta_dict.items():
+            meta_dict_u[k] = np.array(v)
+    
+        return meta_dict_u
+    
+def plot_interreplicate_distances(df_otus, rep_groups, fnum):
+    """"
+    plot distribution of inter-replicate distances
+    """
+    all_dists = []
+    for idx, group in enumerate(rep_groups):
+        this_grps = df_otus.ix[group, :]
+        dist_dat = JensenShannonDiv_Sqrt(this_grps)
+        for a_d in dist_dat.values.flatten():
+            if a_d != 0:
+                all_dists.append(a_d)
+    plt.figure(fnum, figsize=(8,6))
+    plt.clf()
+    plt.hist(all_dists, bins=100)
+    plt.tick_params(labelsize=14)
+    plt.xlabel("root JS distance (inter-replicate)", fontsize=14)
+    plt.ylabel("N", fontsize=14)
+    
 def JensenShannonDiv_Sqrt(df_otu):
-    ps_df = df_otu.copy()+1
+    ps_df = df_otu.copy()
     ps_n_df = ps_df.divide(ps_df.sum(axis=1), axis=0)
     shape_sq = len(ps_n_df.index)    
     dist_dat = np.zeros((shape_sq, shape_sq))
-    
     for r_idx, r in enumerate(ps_n_df.index):
         for c_idx, c in enumerate(ps_n_df.index):
-            x_ = ps_n_df.ix[r, :]
-            y_ = ps_n_df.ix[c, :]
-            m_ = (x_+y_) / 2
-            jsd_sqrt = (0.5*(x_*np.log2(x_/m_) + y_*np.log2(y_/m_)).sum())**0.5
-            dist_dat[r_idx, c_idx] = jsd_sqrt
-
+            x_ = ps_n_df.ix[r, :].values
+            y_ = ps_n_df.ix[c, :].values
+            dist_dat[r_idx, c_idx] = rootJSD(x_, y_)
     dist_mat = pd.DataFrame(index=ps_n_df.index, columns=ps_n_df.index,
                             data=dist_dat)
     return dist_mat
+
+def centeredLogRatio(otu_table, otu_table_m):
+    from scipy.stats.mstats import gmean
+    noZeros = otu_table.copy().replace(0, np.nan)
+    geomeans = np.repeat(np.nan, repeats = noZeros.shape[0])
+    for i in range(0, noZeros.shape[0]):
+        geomeans[i] = gmean(noZeros.ix[i, :].dropna())
+    clr_table = np.log(noZeros.divide(geomeans, axis=0))
+    clr_table.replace(np.nan, 0, inplace=True)
+    clr_table_m = otu_table_m.copy()
+    clr_table_m.ix[:, otu_table.columns] = clr_table
+    return clr_table, clr_table_m
     
 def ReplicateReport(df, df_otus, rep_groups, verbose=True, metric="JSD"):
     print "REPLICATE REPORT"
     
-    in_rep_distances, all_dists, worst_reps = [], [], []
+    in_rep_distances, worst_reps = [], []
     broken_groups = 0
-    
-    for idx, group in enumerate(rep_groups):
-        print "Group {}".format(idx)
+    rep_groups_mutable = deepcopy(rep_groups)
+    for idx, group in enumerate(rep_groups_mutable):
+        if verbose:
+            print "Group {}".format(idx)
         
         this_grps = df_otus.ix[group, :]
         dist_mat = JensenShannonDiv_Sqrt(this_grps)
@@ -269,11 +385,12 @@ def ReplicateReport(df, df_otus, rep_groups, verbose=True, metric="JSD"):
                 in_rep_distances.append(a_d)
         
         if verbose == True:
-            print dist_mat.max()
+            print dist_mat
             
         most_distant = dist_mat.max().max()
-        
-        print "Most Distant: {}".format(most_distant)
+        if verbose:
+            print "Most Distant: {}".format(most_distant)
+            
         if most_distant > 0.3:
             broken_groups+=1
             while most_distant > 0.3:
@@ -282,78 +399,16 @@ def ReplicateReport(df, df_otus, rep_groups, verbose=True, metric="JSD"):
                 bad_means = dist_mat[bad_reps_bool].mean(axis=1)
                 worst_rep = bad_means.argmax()
                 worst_reps.append(worst_rep)
-                print "\tdropping {}".format(worst_rep)
+                if verbose:
+                    print "\tdropping {}".format(worst_rep)
                 group.remove(worst_rep)
                 this_grps = df_otus.ix[group, :]
                 dist_mat = JensenShannonDiv_Sqrt(this_grps)          
                 most_distant = dist_mat.max().max()
-                print "\tmost distant now: {}".format(most_distant)
-    
-    in_rep_distances = np.array(in_rep_distances)
-    if len(in_rep_distances) > (len(df_otus.index)-2):
-        random_samples = len(df_otus.index)-2
-    else:
-        random_samples = len(in_rep_distances)
-        
-    rand_samp_idx = list(np.random.choice(df_otus.index, random_samples, 
-                                          replace=False))
-    
-    print "{} random vectors selected".format(len(rand_samp_idx))
-    df_otus_rand = df_otus.ix[rand_samp_idx, :]
-    rand_dist_mat = JensenShannonDiv_Sqrt(df_otus_rand)
-    for all_d in np.unique(rand_dist_mat.values):
-        if all_d != 0:
-            all_dists.append(all_d)
-        
-    all_dists = np.array(all_dists)
-    for lab, dist_arr in zip(['In Rep','Rand Dists'], [in_rep_distances, all_dists]):
-        print lab
-        print "Mean: {}".format(dist_arr.mean())
-        print "Variance: {}".format(np.var(dist_arr))
-        print "CV: {}".format(np.std(dist_arr)/dist_arr.mean())
-        print "n: {}".format(len(dist_arr))
-     
-    
-    return worst_reps, broken_groups
-    
-"""
-        this_sum = this_grps        
-        best_rep = list(this_sum[ this_sum == this_sum.max()].index)
-        bad_reps = list(this_sum[this_sum != this_sum.max()].index)        
-        farthest_rep = dist_mat.max().max()
+                if verbose:
+                    print "\tmost distant now: {}".format(most_distant)
 
-        if farthest_rep > 0.25:
-            while farthest_rep > 0.25:
-                distances = euclidean_distances(df.ix[best_rep, :], 
-                                                df.ix[bad_reps, :])
-                worst_rep = bad_reps[np.argmax(distances)]
-                bad_reps.remove(worst_rep)
-                worst_reps.append(worst_rep)
-                rem_reps = bad_reps + best_rep
-                rem_grps = df.ix[rem_reps, 'enspie']
-                rem_sum = rem_grps
-                this_cv = (rem_sum.std() / rem_sum.mean())
-        else:
-            rem_reps = group
-            
-        this_grps = df_otus.ix[rem_reps, :]
-        this_bool = this_grps != 0
-        this_sum = this_bool.T.sum()
-        
-        if verbose == True:
-            print group[0][:-1]
-            print "Mean Count Total:", this_sum.mean()
-            print "CV:", (this_sum.std() / this_sum.mean())
-            reps, _ = this_grps.shape
-            n_ = range(1,reps+1)
-            totalTaxa = (this_bool.sum() > 0).sum()
-            print "Total Taxa Discovered in {} reps: {}".format(reps ,totalTaxa)
-            for n in n_:
-                overlap = ((this_bool.sum() == n).sum()/float(totalTaxa))*100.0
-                print "{0:.3f}% among {1} replicates".format(overlap, n)
-            
-    return (list(set(worst_reps)), cvs)
-"""
+    return worst_reps, broken_groups
 
 def originate_rep_groupings(final_rep_groups):
     final_rep_dict = []
@@ -383,6 +438,7 @@ def matchXandYbyIndex(clr_x, model_proc_df):
 def prettify_date_string(time_stamp):
     return str(time_stamp).split(" ")[0]
     
+
 def dropBadReps(less_diverse_reps, rep_groups):
     """
     1. Unpack current replicate groups
@@ -394,7 +450,8 @@ def dropBadReps(less_diverse_reps, rep_groups):
     
     """
     new_rep_groups = []
-    for g in rep_groups:
+    old_groups = deepcopy(rep_groups)
+    for g in old_groups:
         for l in less_diverse_reps:
             if l in g:
                 g.remove(l)
@@ -405,8 +462,9 @@ def dropBadReps(less_diverse_reps, rep_groups):
             new_rep_groups.append(g)
         else:
             pass
-        
-    return new_rep_groups
+    
+    broken_groups = [i for i in rep_groups if i not in new_rep_groups]
+    return new_rep_groups, broken_groups
     
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -438,30 +496,60 @@ def beta_wrapper(df, var_key):
                    center='median', scores=False)
     return brayDist
     
+from sklearn.feature_selection import f_regression
+
 def scalePCAcorrelate(df_numerical, df_w_mdata, metadata_cols, transformed):
+    rv = df_numerical.shape[0]
     if transformed:
         X_std2 = df_numerical.values.T
     else:
         X_std2 = StandardScaler().fit_transform(df_numerical.values.T)
-    
+
     rows_n, cols_n = X_std2.shape
     print "\nPerforming PCA"
-    print "Matrix has {} features and {} samples".format(rows_n, cols_n)
-    pca2 = TruncatedSVD(n_components=100, n_iter=20, random_state=42)
+    pca2 = PCA(n_components=100, random_state=42)
     pca2.fit(X_std2)
-    print "Top two components explain {} and {} of variance.".format(pca2.explained_variance_ratio_[0],
-                                                                     pca2.explained_variance_ratio_[1])
+    no1 = pca2.explained_variance_ratio_[0]
+    no2 = pca2.explained_variance_ratio_[1]
+    print "Top two components explain {} and {} of variance.".format(no1, no2)
+    all_cors, p_comp_n, exp_vars, corr_ps = [], [], [], []
+    all_pvals, p_comp_nF, exp_vars2 = [], [], []
     for mdata in metadata_cols:
         md_arr = np.array(df_w_mdata[mdata])
+        raw_corrs = [ss.pearsonr(pca2.components_[i, :], md_arr) for i in range(100)]
+        corrs, c_pvals = zip(*raw_corrs)
         
-        corrs = [np.corrcoef(pca2.components_[i, :], md_arr)[0, 1] for i in range(100)]
-        print "Metadata Variable:", mdata
-        print "Max Correlation:", np.array(corrs).max()
+        if not np.all(np.isfinite(md_arr)):
+            print "Replacing {} not finite # with 0".format((~np.isfinite(md_arr)).sum())        
+            md_arr[~np.isfinite(md_arr)] = 0
+                   
+        pvals = [f_regression(pca2.components_[i, :].reshape(rv, 1), md_arr)[1][0] for i in range(100)]
+        all_pvals.append(np.array(pvals).min())
+        all_cors.append(np.array(corrs).max())
         pca_comp_no = np.argmax(np.array(corrs))
-        print "PCA component No:", pca_comp_no+1
-        print "Explained Variance:", pca2.explained_variance_ratio_[pca_comp_no]
-        print ""
-    return pca2
+        corr_ps.append(np.array(c_pvals)[pca_comp_no])
+        pca_comp_no2 = np.argmin(np.array(pvals))
+        p_comp_n.append(pca_comp_no+1)
+        p_comp_nF.append(pca_comp_no2+1)
+        exp_vars.append(pca2.explained_variance_ratio_[pca_comp_no])
+        exp_vars2.append(pca2.explained_variance_ratio_[pca_comp_no2])
+    data_ = np.vstack((all_cors, p_comp_n, exp_vars, corr_ps)).T
+    data_2 = np.vstack((all_pvals, p_comp_nF, exp_vars2)).T
+
+    colset = ['Correlation', 'Component', 'Explained Variance', 'P-value']
+    colset2 = ['Pvalue', 'Component_F', 'Explained Variance_F']
+    to_return = pd.DataFrame(data=data_, index=metadata_cols, columns=colset)
+    f_to_return = pd.DataFrame(data=data_2, index=metadata_cols, columns=colset2)
+    f_to_return.sort_values(['Component_F', 'Pvalue'], 
+                          ascending=[True, True],
+                          inplace=True)
+    to_return.sort_values(['Component', 'Correlation'], 
+                          ascending=[True, False],
+                          inplace=True)
+    final_return = to_return[to_return.Correlation.notnull()]
+    final_f_return = f_to_return[f_to_return.Pvalue.notnull()]
+    return final_return, final_f_return
+    
         
 def readChemData(chem_path, units, ftype, plotbool=False):
     print os.path.basename(chem_path)
@@ -533,7 +621,9 @@ def inferTaxaLevel(taxa_series):
     return taxa_frame
 
     
-def analyze_alpha_diversity(decoder, derepped_otus_m, valPairs):
+def analyze_alpha_diversity(decoder, derepped_otus_m, valPairs, var_type):
+    skippable = ['replicates', 'Index read length', 'Sequencing platform',
+                 'Forward read length', 'Quadrants' ]
     ad_cats =  []
     ad_cols = {"Mean":[], "Median":[], "Std":[], "N":[]}
                 
@@ -542,20 +632,24 @@ def analyze_alpha_diversity(decoder, derepped_otus_m, valPairs):
         for code in codes:
             if var == 'date':
                 ad_cats.append(str(decoder[var][code]).split("T")[0]+" ("+var+")")
-            elif var == 'replicates':
+            elif var in skippable:
                 pass
             else:
                 ad_cats.append(str(decoder[var][code])+" ("+var+")")
             
-            if var == 'replicates':
+            if var in skippable:
                 pass
             else:
-                sub_bool = derepped_otus_m[var] == code
+                try:
+                    sub_bool = derepped_otus_m[var] == code
+                except TypeError:
+                    sub_bool = derepped_otus_m[var] == float(code)
+                    
                 subdf = derepped_otus_m[sub_bool]
-                ad_cols["Median"].append(np.median(subdf.enspie))
-                ad_cols["Std"].append(subdf.enspie.std())
+                ad_cols["Median"].append(np.median(subdf.ix[:, var_type]))
+                ad_cols["Std"].append(subdf.ix[:, var_type].std())
                 ad_cols["N"].append(subdf.shape[0])
-                ad_cols["Mean"].append(subdf.enspie.mean())
+                ad_cols["Mean"].append(subdf.ix[:, var_type].mean())
     
     for idx, vp in enumerate(valPairs):
         kitT, primT = vp[0], vp[1]
@@ -566,15 +660,16 @@ def analyze_alpha_diversity(decoder, derepped_otus_m, valPairs):
             primer_outgroup = list(subdf2.index)
             
         ad_cats.append(str(decoder['primers'][primT])+" & "+str(decoder['kit'][kitT]))
-        ad_cols["Median"].append(np.median(subdf2.enspie))
-        ad_cols["Std"].append(subdf2.enspie.std())
+        ad_cols["Median"].append(np.median(subdf2.ix[:, var_type]))
+        ad_cols["Std"].append(subdf2.ix[:, var_type].std())
         ad_cols["N"].append(subdf2.shape[0])
-        ad_cols["Mean"].append(subdf2.enspie.mean())
+        ad_cols["Mean"].append(subdf2.ix[:, var_type].mean())
                 
     alpha_df = pd.DataFrame(data=ad_cols, index=ad_cats)
     return alpha_df, primer_outgroup
     
-def alpha_diversity(dereplicated_otus, derepped_otus_m, metrics):
+def alpha_diversity(dereplicated_otus, derepped_m, metrics):
+    derepped_otus_m = derepped_m.copy()
     row_sum = dereplicated_otus.copy().sum(axis=1)
     row_rel = dereplicated_otus.copy().divide(row_sum, axis=0).astype('float64')
     if 'enspie' in metrics:
@@ -654,20 +749,7 @@ def replicateAlphaDiv(df, metric, rep_groups):
 
     return (enspie_cv, enspie_1, enspie_2)
 
-def centeredLogRatio(otu_table, otu_table_m=None):
-    from scipy.stats.mstats import gmean
-    noZeros = otu_table.copy().replace(0, np.nan)
-    geomeans = np.repeat(np.nan, repeats = noZeros.shape[0])
-    for i in range(0, noZeros.shape[0]):
-        geomeans[i] = gmean(noZeros.ix[i, :].dropna())
-    clr_table = np.log(noZeros.divide(geomeans, axis=0))
-    clr_table.replace(np.nan, 0, inplace=True)
-    if otu_table_m is not None:
-        clr_table_m = otu_table_m.copy()
-        clr_table_m.ix[:, otu_table.columns] = clr_table
-        return clr_table, clr_table_m
-    else:
-        return clr_table
+
 
 from sklearn.model_selection import train_test_split
 
@@ -802,21 +884,78 @@ def bz2wrapper(fpath):
     stdout, stderr = p.communicate()
     return stdout
 
-def varStabTransform(path, df_otus, df_m, method):
+def DESeqRlog(df_otus, df_m, saved_file=False):
+    if not saved_file:
+        path = "/Users/login/Desktop/vst_temp.csv"
+        path2 = "/Users/login/Desktop/date_temp.csv"
+        wrapper_file = os.path.join(os.getcwd(), "DESeqwrapper.R")
+        base_cmd = "Rscript DESeqwrapper.R"
+        if not os.path.exists(wrapper_file):
+            sys.exit("Accessory script missing")
+                
+        # direct export path
+        to_transform = path
+        shared_otus = df_otus.T.copy()
+        arg_1 = os.path.dirname(to_transform)
+        arg_2 = to_transform.split("/")[-1]
+        arg_3 = os.path.basename(path2)
+        
+        # export data to disk
+        date_series = df_m.ix[:, 'Sequencing Date']
+        date_series.to_csv(path2)
+        shared_otus.to_csv(to_transform)
+        
+        # communicate with the world      
+        cmd = " ".join([base_cmd, arg_1, arg_2, arg_3])
+        p = sp.Popen(cmd, cwd=os.getcwd(), shell=True, stderr=sp.PIPE, stdout=sp.PIPE)
+        stdout, stderr = p.communicate()
+        
+        if "Execution halted" in stderr:
+            sys.exit("R wrapper failed")
+        
+        to_read_back = os.path.join(arg_1, arg_2.split(".")[0]+"_vst.csv")
+        rlog_otus = pd.read_csv(to_read_back, index_col = 0)
+        dropped_otus = len(rlog_otus.columns) - len(shared_otus.columns)
+        if dropped_otus > 0:
+            print "{} OTUS dropped".format(dropped_otus)
+            
+        for i, j in zip(rlog_otus.index, shared_otus.index):
+            assert i == j 
+        
+        for temps in [to_read_back, to_transform]:
+            os.remove(temps)
+    else:
+        saved_file = os.path.join(os.getcwd(), "rlog_saved.csv")
+        rlog_otus = pd.read_csv(saved_file, index_col = 0)
+        dropped_otus = len(rlog_otus.columns) - len(shared_otus.columns)
+        if dropped_otus > 0:
+            print "{} OTUS dropped".format(dropped_otus)
+            
+        for i, j in zip(rlog_otus.index, shared_otus.index):
+            assert i == j
+    
+    # return only those columns not in both dfs
+    mdata_cols = set(df_otus).symmetric_difference(set(df_m.columns))
+    # copy transformed matrix
+    rlog_m = rlog_otus.copy()
+    # add back metadata
+    for mc in mdata_cols:
+        rlog_m[mc] = df_m.ix[:, mc]
+    
+    return rlog_otus, rlog_m
+    
+def edgeRtmm(df_otus, df_m):
     """
     Uses edgeR's variance stabilizing transformation to transform sequence counts
     into OTU abundances. Involves adding and subtracting psuedocounts. 
 
     """
-    print "VST Method selected is {}".format(method)
-    if method == 'TMM':
-        wrapper_file = os.path.join(os.getcwd(), "edgeRwrapper_tmm.R")
-        base_cmd = "Rscript edgeRwrapper_tmm.R"
-    elif method == 'RLE':
-        wrapper_file = os.path.join(os.getcwd(), "edgeRwrapper_rle.R")
-        base_cmd = "Rscript edgeRwrapper_rle.R"
-    else:
-        sys.exit("Incorrect transformation method specified")
+    path = "/Users/login/Desktop/vst_temp.csv"
+    
+    print "Performing TMM Transform"
+
+    wrapper_file = os.path.join(os.getcwd(), "edgeRwrapper_tmm.R")
+    base_cmd = "Rscript edgeRwrapper_tmm.R"
         
     if not os.path.exists(wrapper_file):
         sys.exit("Accessory script missing")
@@ -861,7 +1000,7 @@ def varStabTransform(path, df_otus, df_m, method):
     
     return vs_T_otus, vs_T_m
 
-def importratesandconcentrations_mod(path_):
+def importratesandconcs_mod(path_):
     assert os.path.exists(path_)
     conc_f_dict = {"concs_1.txt" : "O",
                    "concs_2.txt" : "C",
@@ -950,7 +1089,7 @@ def preheim_date_parser(date_str):
     new_str = date_part[2:4] + "-" + date_part[4:6] + "-" + date_part[0:2]
     return pd.to_datetime(new_str)
     
-def importratesandconcentrations_obs(chem_dir):
+def importratesandconcs_obs(chem_dir):
     assert os.path.exists(chem_dir)
     obs_conc_f_dict = { "Chloride" : "Cl_mg_ClL-1.txt",
                       "Dissolved Oxygen" : "DO.txt",
