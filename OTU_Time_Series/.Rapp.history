@@ -1,0 +1,292 @@
+cbind(site, time, sp_1)
+dim(sp_1)
+dim(cbind(site, time, sp_1))
+test_sp <- sp_1
+dim(test_sp)
+require(vegan)
+print(fit <- adonis(dist(test_sp) ~ time, permutations=1))
+B <- 1999
+pop <- rep(NA, B + 1)
+dim(pop)
+length(pop)
+pop[1] <- fit$aov.tab[1, 5]
+pop[1]
+ctrl <- permControl(strata = site, within = Within(type = "series", mirror = FALSE))
+library(vegan)
+ctrl <- permControl(strata = site, within = Within(type = "series", mirror = FALSE))
+args(shuffle)
+library(permute)
+Error: could not find function "permControl"
+ctrl <- permControl(strata = site, within = Within(type = "series", mirror = FALSE))
+library(perm)
+? permControl
+?permControl
+??permControl
+install.packages("rattle")
+library(rattle)
+rattle()
+install.packages(rattle, dependencies=c("Depends", "Suggests"))
+quit()
+install.packages(rattle, dependencies=c("Depends", "Suggests"))
+install.packages("rattle", dependencies=c("Depends", "Suggests"))
+library(rattle)
+rattle()
+rm(list = ls())
+library(edgeR)
+edgeRUsersGuide()
+library(methods)
+path = "/Users/login/Desktop/"
+path = "/Users/login/Desktop"
+f_in = 'shared_otus.csv'
+infile = paste0(path, "/", f_in)#
+basename = sub("\\..*", "", f_in)#
+f_out = paste0(basename, "_vst.csv")#
+outfile = paste0(path, "/", f_out)
+otuTable = read.csv(infile, header=T, row.names=1)
+x = as(otuTable, "matrix")#
+x = x + 1#
+y = edgeR::DGEList(counts = t(x), remove.zeros = TRUE)
+names(y)
+z = edgeR::calcNormFactors(y, method = "RLE")
+names(z)
+z$samples
+otuTable = read.csv(infile, header=T, row.names=1)
+x = as(otuTable, "matrix")
+y = edgeR::DGEList(counts = t(x), remove.zeros = TRUE)
+z = edgeR::calcNormFactors(y, method = "RLE")
+z$samples
+z = edgeR::calcNormFactors(y, method = "TMM")
+z$samples
+rm(list=ls())
+matrix_small_counts = matrix( c(8,11,3,22), nrow=2, ncol=2 )
+fisher.test( matrix_small_counts )
+matrix
+matrix_small_counts
+chisq.test( matrix_small_counts )
+matrix_small_counts = matrix( c(138,15,129,11,163,28,92,1,257,13,14,1), nrow=2, ncol=6 )
+matrix_small_counts
+chisq.test( matrix_small_counts )
+fisher.test( matrix_small_counts )
+NN <- c(359,32);JJ <- c(108,13);NNS <- c(103,15);VBN <- c(95,9);RB <- c(63,11);NNP <- c(56,0);VBG <- c(55,10);IN <- c(38,16);VB <- c(20,10);CD <- c(17,6);CC <- c(11,6);DT <- c(11,4);MD <- c(8,5);PRP4 <- c(8,1);PRP <- c(7,4);FW <- c(5,1);VBD <- c(5,3);RBR <- c(4,0);VBP <- c(4,1);VBZ <- c(4,3);WRB <- c(4,2);EX <- c(3,1);NNPS <- c(2,0);WDT <- c(2,3);WP <- c(2,1);PDT <- c(1,1);POS <- c(1,0);RBS <- c(1,0);TO <- c(1,1);UH <- c(0,1)
+Finaltable <-#
+cbind(NN,JJ,NNS,VBN,RB,NNP,VBG,IN,VB,CD,CC,DT,MD,PRP4,PRP,FW,VBD,RBR,VBP,VBZ,WRB,EX,NNPS,WDT,WP,PDT,POS,RBS,TO,UH)
+rownames(Finaltable) <- c("tag1","tag2")
+Finaltable
+fisher.test( matrix_small_counts, hybrid=T)
+fisher.test( matrix_small_counts, simulate.p.value=T)
+fisher.test( matrix_small_counts,simulate.p.value=T)
+chisq.test( matrix_small_counts )
+rm(list = ls())
+library(vegan)
+data(varespec)
+dis <- vegdist(varespec)
+groups <- factor(c(rep(1,16), rep(2,8)), labels = c("grazed","ungrazed"))
+groups
+dis
+mod = betadisper(dis, groups)
+mod
+anova(mod)
+size(dis)
+shape(dis)
+length(dis)
+dis
+permutest(mod, pairwise = TRUE)
+library(glmulti)#
+#
+# Read in data and pre-process#
+pGTn_bin_data = read.csv("pGTn-binary-response.csv", header = TRUE)#
+response2 = pGTn_bin_data2$V1#
+predictor_names = colnames(pGTn_con_data2)[c(2:109)]#
+predictors2 = pGTn_con_data2[,predictor_names]#
+resp.cat = factor(response2, levels = 0:1, labels = c("No","Yes"))
+library("DESeq2")
+library("pasilla")
+source("https://bioconductor.org/biocLite.R")
+biocLite("pasilla")
+library("pasilla")
+pasCts <- system.file("extdata", "pasilla_gene_counts.tsv",#
+                 package="pasilla", mustWork=TRUE)
+pasCts
+pasAnno <- system.file("extdata", "pasilla_sample_annotation.csv",#
+                       package="pasilla", mustWork=TRUE)
+pasAnno
+pasAnno <- system.file("extdata", "pasilla_sample_annotation.csv", package="pasilla", mustWork=TRUE)
+countData <- as.matrix(read.csv(pasCts,sep="\t",row.names="gene_id"))
+rm(list = ls())
+setwd("/Users/login/Documents/GLM_Wrapper/OTU_Time_Series")#
+library("DESeq2")#
+library("pasilla")#
+pasCts = "pasilla_gene_counts.tsv"#
+pasAnno = "pasilla_sample_annotation.csv"#
+countData <- as.matrix(read.csv(pasCts,sep="\t",row.names="gene_id"))#
+colData <- read.csv(pasAnno, row.names=1)#
+colData <- colData[,c("condition","type")]
+countData
+dim(countData)
+colnames(countData)
+colData <- read.csv(pasAnno, row.names=1)
+colData
+colData <- colData[,c("condition","type")]
+colData
+rownames(colData) <- sub("fb","",rownames(colData))
+colData
+all(rownames(colData) %in% colnames(countData))
+countData <- countData[, rownames(colData)]
+dim(countData)
+rownames(colData)
+all(rownames(colData) == colnames(countData))
+condition
+dds <- DESeqDataSetFromMatrix(countData = countData,#
+                              colData = colData,#
+                              design = ~ condition)
+colData
+dds <- DESeqDataSetFromMatrix(countData = countData)
+dds <- DESeqDataSetFromMatrix(countData = countData, colData = colData)
+dds <- dds[ rowSums(counts(dds)) > 1, ]
+counts(dds)
+dim(counts)
+?counts()
+counts?
+?counts
+dds$condition <- factor(dds$condition, levels=c("untreated","treated"))
+dds$condition
+names(dds)
+dds$condition <- relevel(dds$condition, ref="untreated")
+?droplevels
+dds$condition
+?droplevels
+dds$condition <- droplevels(dds$condition)
+dds$condition
+dds <- DESeq(dds)
+res <- results(dds)
+res
+colData(dds)
+vsd <- varianceStabilizingTransformation(dds, blind=FALSE)
+??varianceStabilizingTransformation
+colData <- read.csv(pasAnno, row.names=1)
+fix(colData)
+typeof(vsd)
+outfile = '/Users/login/Desktop/temp.csv'
+write.table(vsd, outfile, row.names=T, na="", col.names=T, sep=",")
+dim(vsd)
+dim(dds)
+ls()
+dim(countData)
+to_write = as.matrix(vsd)
+names(vsd)
+to_write = as.data.frame(vsd)
+vsd.fast <- vst(dds, blind=FALSE)
+typeof(vsd.fast)
+to_write = as.data.frame(vsd.fast)
+dim(vsd.fast)
+write.table(to_write, outfile, row.names=T, na="", col.names=T, sep=",")
+to_write = as.data.frame(counts(vsd.fast))
+to_write = as.data.frame(counts(vsd))
+to_write = as.data.frame(counts(vsd, normalized=T))
+as.data.frame(counts(dds, normalized=TRUE))
+dds <- DESeqDataSetFromMatrix(countData = countData,#
+                              colData = colData,#
+                              design = ~ condition)
+colData <- read.csv(pasAnno, row.names=1)
+setwd("/Users/login/Documents/GLM_Wrapper/OTU_Time_Series")#
+library("DESeq2")#
+library("pasilla")#
+pasCts = "pasilla_gene_counts.tsv"#
+pasAnno = "pasilla_sample_annotation.csv"#
+countData <- as.matrix(read.csv(pasCts,sep="\t",row.names="gene_id"))#
+colData <- read.csv(pasAnno, row.names=1)#
+colData <- colData[,c("condition","type")]
+head(countData)
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ depth)
+rownames(colData) <- sub("fb","",rownames(colData))
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ depth)
+countData <- countData[, rownames(colData)]
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ depth)
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ design)
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ condition)
+head(dds)
+dds <- dds[ rowSums(counts(dds)) > 1, ]
+dds$condition <- factor(dds$condition, levels=c("untreated","treated"))
+dds$condition <- relevel(dds$condition, ref="untreated")
+dds$condition <- droplevels(dds$condition)
+dds <- DESeq(dds)#
+res <- results(dds)
+head(dds)
+to_write = as.data.frame(counts(dds, normalized=TRUE))
+typeof(to_write)
+head(to_write)
+dim(to_write)
+to_write = as.data.frame(counts(dds))
+head(to_write)
+head(res)
+rld <- rlog(dds, blind=FALSE)
+to_write = as.data.frame(counts(rld, normalized=TRUE))
+rld$sizeFactor
+vsd <- varianceStabilizingTransformation(dds, blind=FALSE)
+vsd.fast <- vst(dds, blind=FALSE)
+vsd.fast$sizeFactor
+vsd.fast$type
+head(assay(rld), 3)
+?sizeFactors()
+?sizeFactors
+sizeFactors(dds)
+counts(dds)[,1] / sizeFactors(dds)[1]
+px = counts(dds)[,1] / sizeFactors(dds)[1]
+dim(px)
+length(px)
+length(counts(dds))
+setwd("/Users/login/Documents/GLM_Wrapper/OTU_Time_Series")#
+library("DESeq2")#
+library("pasilla")#
+pasCts = "pasilla_gene_counts.tsv"#
+pasAnno = "pasilla_sample_annotation.csv"#
+countData <- as.matrix(read.csv(pasCts,sep="\t",row.names="gene_id"))#
+colData <- read.csv(pasAnno, row.names=1)#
+colData <- colData[,c("condition","type")]
+rownames(colData) <- sub("fb","",rownames(colData))
+countData <- countData[, rownames(colData)]
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ condition)
+dds <- DESeq(dds)
+sizeFactors(dds)
+rld <- rlog(dds, blind=FALSE)
+head(assay(rld), 3)
+dim(assay(rld))
+typeof(assay(rld))
+to_write = as.data.frame(assay(rld))
+typeof(to_write)
+write.table(to_write, outfile, row.names=T, na="", col.names=T, sep=",")
+outfile
+rm(list = ls())
+path = '/Users/login/Desktop'
+f_in = 'vst_temp.csv'
+f_cond = 'date_temp.csv'
+infile = paste0(path, "/", f_in)
+library("DESeq2")#
+library(methods)
+infile2 = paste0(path, "/", f_cond)
+basename = sub("\\..*", "", f_in)
+basename
+f_out = paste0(basename, "_vst.csv")
+outfile = paste0(path, "/", f_out)
+outfile
+f_out
+infile2
+inflie
+infile
+countData = as.matrix(read.csv(infile, header=T, row.names=1))
+dim(countData)
+colData = read.csv(infile2, row.names=1)
+dim(colData)
+fix(colData)
+fix(colData)
+colData = read.csv(infile2, row.names=1, header=FALSE)
+dim(colData)
+colnames(colData) = c("Date")
+fix(colData)
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ Date)
+colData$Date = as.factor(colData$Date)
+dds = DESeqDataSetFromMatrix(countData = countData, colData = colData, design = ~ Date)
+rld <- rlog(dds, blind=FALSE)
+rld <- varianceStabilizingTransformation(dds, blind=FALSE)
+rld <- vst(dds, blind=FALSE)
+rld <- rlog(dds, blind=FALSE)
